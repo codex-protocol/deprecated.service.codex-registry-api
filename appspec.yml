@@ -1,0 +1,35 @@
+version: 0.0
+os: linux
+
+files:
+  - source: ./dist
+    destination: /opt/process/dist
+
+  - source: ./package.json
+    destination: /opt/process
+
+  - source: ./static
+    destination: /opt/process/static
+
+  - source: ./deployment
+    destination: /opt/process/deployment
+
+  - source: ./node_modules
+    destination: /opt/process/node_modules
+
+permissions:
+  - object: /opt/process
+    owner: ec2-user
+    group: ec2-user
+    mode: 755
+
+hooks:
+  BeforeInstall:
+    - location: deployment/codedeploy/before-install.sh
+      timeout: 300
+      runas: root
+
+  ApplicationStart:
+    - location: deployment/codedeploy/application-start.sh
+      timeout: 300
+      runas: ec2-user
