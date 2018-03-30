@@ -5,14 +5,14 @@ import config from '../config'
 import contracts from '../services/contracts'
 import ethereumService from '../services/ethereum'
 
-export default () => {
+export default (app) => {
 
   return new Bluebird((resolve, reject) => {
 
     const filewalkerHandler = filewalker(`${__dirname}/../../static/contracts`, { recursive: true, matchRegExp: /\.json$/i })
 
     filewalkerHandler.on('error', reject)
-    filewalkerHandler.on('done', () => { resolve(contracts) })
+    filewalkerHandler.on('done', () => { resolve(app) })
 
     // dynamically load & register all the contracts
     filewalkerHandler.on('file', (contractFilePath) => {
@@ -31,7 +31,7 @@ export default () => {
 
       contract.name = contractJSON.contractName
 
-      contracts.push(contract)
+      contracts[contract.name] = contract
 
     })
 

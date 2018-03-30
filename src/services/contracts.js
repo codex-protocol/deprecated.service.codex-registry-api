@@ -1,3 +1,3 @@
-const contracts = [] // populated in contracts initializer
+const contracts = {} // populated in contracts initializer
 
 export default contracts
