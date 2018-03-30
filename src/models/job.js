@@ -2,13 +2,9 @@ import mongoose from 'mongoose'
 
 import mongooseService from '../services/mongoose'
 
-const { Schema } = mongoose
-
-const JobSchema = new Schema({
+const schema = new mongoose.Schema({
   name: String,
-  data: Schema.Types.Mixed,
+  data: mongoose.Schema.Types.Mixed,
 })
 
-const Job = mongooseService.titleRegistry.model('Job', JobSchema)
-
-export default Job
+export default mongooseService.titleRegistry.model('Job', schema)

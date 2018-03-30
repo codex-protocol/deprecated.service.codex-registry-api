@@ -2,15 +2,13 @@ import mongoose from 'mongoose'
 
 import mongooseService from '../services/mongoose'
 
-const { Schema } = mongoose
-
-const BlockchainEventSchema = new Schema({
+const schema = new mongoose.Schema({
   eventName: String,
   blockNumber: Number,
   contractName: String,
   contractAddress: String,
   transactionHash: String,
-  returnValues: Schema.Types.Mixed,
+  returnValues: mongoose.Schema.Types.Mixed,
   createdAt: {
     type: Date,
     default: () => {
@@ -19,6 +17,4 @@ const BlockchainEventSchema = new Schema({
   },
 })
 
-const BlockchainEvent = mongooseService.eel.model('BlockchainEvent', BlockchainEventSchema)
-
-export default BlockchainEvent
+export default mongooseService.eel.model('BlockchainEvent', schema)
