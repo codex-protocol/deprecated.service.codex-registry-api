@@ -61,25 +61,54 @@ export default {
 
                 const returnValues = Object.values(blockchainEvent.returnValues)
 
+                let promise = Bluebird.resolve(null)
+
                 switch (blockchainEvent.eventName) {
 
-                  case 'Transfer':
-                    if (blockchainEvent.returnValues._from === '0') {
-                      return codexTitleService.create(...returnValues.slice(1))
+                  case 'Transfer': {
+
+                    const [fromAddress, toAddress, tokenId] = returnValues
+
+                    // "transfer" events FROM address 0x0 are really "create"
+                    //  events
+                    if (Number.parseInt(fromAddress, 16) === 0) {
+                      promise = codexTitleService.create(toAddress, tokenId)
+
+                    // "transfer" events TO address 0x0 are really "destroy"
+                    //  events
+                    } else if (Number.parseInt(toAddress, 16) === 0) {
+                      promise = codexTitleService.destroy(fromAddress, tokenId)
+
+                    // otherwise, this was a "real" transfer from one address to
+                    //  another
+                    } else {
+                      promise = codexTitleService.transfer(fromAddress, toAddress, tokenId)
                     }
-                    return codexTitleService.transfer(...returnValues)
 
-                  case 'Approval':
-                    return codexTitleService.approve(...returnValues)
+                    break
 
-                  case 'ApprovalForAll':
-                    return codexTitleService.approveAll(...returnValues)
+                  }
+
+                  case 'Approval': {
+                    promise = codexTitleService.approveAddress(...returnValues)
+                    break
+                  }
+
+                  case 'ApprovalForAll': {
+                    promise = codexTitleService.approveOperator(...returnValues)
+                    break
+                  }
 
                   default:
-                    logger.warn(`[${this.name}]`, 'unexpected event found:', blockchainEvent.eventName)
-                    return null
+                    logger.warn(`[${this.name}]`, 'unexpected event found:', blockchainEvent.eventName, blockchainEvent.returnValues)
+                    break
 
                 }
+
+                return promise
+                  .catch((error) => {
+                    logger.warn(`[${this.name}]`, 'could not process blockchainEvent:', { blockchainEvent, error })
+                  })
 
               })
               .then(() => {
