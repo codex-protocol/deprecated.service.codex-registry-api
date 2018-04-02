@@ -5,7 +5,7 @@ import models from '../../../models'
 export default {
 
   method: 'get',
-  path: '/address(es)?/:userAddress/titles?',
+  path: '/users?/:userAddress/titles?',
 
   parameters: Joi.object().keys({
 
