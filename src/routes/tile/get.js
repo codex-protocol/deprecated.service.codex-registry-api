@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import RestifyErrors from 'restify-errors'
 
 import models from '../../models'
 
@@ -25,6 +26,15 @@ export default {
 
     return models.CodexTitle.findById(request.params.tokenId, fieldsToOmit)
       .populate(request.parameters.include)
+      .then((codexTitle) => {
+
+        if (!codexTitle) {
+          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+        }
+
+        return codexTitle
+
+      })
 
   },
 

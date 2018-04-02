@@ -1,3 +1,5 @@
+import RestifyErrors from 'restify-errors'
+
 import models from '../../../models'
 
 export default {
@@ -9,8 +11,14 @@ export default {
 
     return models.CodexTitle.findById(request.params.tokenId, 'provenance')
       .populate('provenance')
-      .then(({ provenance }) => {
-        return provenance
+      .then((codexTitle) => {
+
+        if (!codexTitle) {
+          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+        }
+
+        return codexTitle.provenance
+
       })
 
   },
