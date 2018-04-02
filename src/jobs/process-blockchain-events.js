@@ -67,13 +67,7 @@ export default {
 
                   case 'Transfer': {
 
-                    // eslint-disable-next-line prefer-const
-                    let [fromAddress, toAddress, tokenId] = returnValues
-
-                    // NOTE: Converting fromAddress and toAddress to lowercase from their checksum counterpart
-                    //  This is because MetaMask always returns the lowercase format and not the checksum format
-                    fromAddress = fromAddress.toLowerCase()
-                    toAddress = toAddress.toLowerCase()
+                    const [fromAddress, toAddress, tokenId] = returnValues
 
                     // "transfer" events FROM address 0x0 are really "create"
                     //  events
