@@ -10,8 +10,14 @@ if (dotenvResult.error) {
 
 const mongodbUriPrefix = (process.env.EEL_MONGO_USER && process.env.EEL_MONGO_PW) ? `mongodb://${process.env.EEL_MONGO_USER}:${encodeURIComponent(process.env.EEL_MONGO_PW)}@` : 'mongodb://'
 
+// this is the message that will be signed by MetaMask and checked against when
+//  authenticating users
+const personalMessageToSign = 'Please sign this message to authenticate with the Codex Title Registry.'
+
 const config = {
   development: {
+
+    personalMessageToSign,
 
     mongodb: {
       dbUris: {
@@ -29,11 +35,9 @@ const config = {
     },
 
     blockchain: {
-
       minConfirmations: 3,
       startingBlockHeight: 0,
       networkId: '5777', // Ganache
-
       providerRpcUrl: process.env.RPC_URL,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
     },

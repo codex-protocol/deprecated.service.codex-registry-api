@@ -5,7 +5,9 @@ import models from '../../../models'
 export default {
 
   method: 'get',
-  path: '/users?/:userAddress/titles?',
+  path: '/users?/titles?',
+
+  authenticateUser: true,
 
   parameters: Joi.object().keys({
 
@@ -21,7 +23,7 @@ export default {
   handler(request, response) {
 
     const conditions = {
-      ownerAddress: request.params.userAddress,
+      ownerAddress: response.locals.userAddress,
     }
 
     const fieldsToOmit = []

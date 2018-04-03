@@ -42,6 +42,7 @@
     "express": "^4.16.2",
     "filewalker": "^0.1.3",
     "joi": "^13.1.2",
+    "jsonwebtoken": "^8.2.0",
     "lusca": "^1.5.2",
     "mongoose": "^4.13.11",
     "request": "^2.83.0",

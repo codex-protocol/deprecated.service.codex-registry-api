@@ -5,6 +5,7 @@ import Bluebird from 'bluebird'
 import filewalker from 'filewalker'
 
 import logger from '../services/logger'
+import authenticateUserMiddleware from '../middleware/authenticate-user'
 import validateParametersMiddleware from '../middleware/validate-parameters'
 import restrictToEnvironmentsMiddleware from '../middleware/restrict-to-environments'
 
@@ -78,8 +79,20 @@ export default (app) => {
 
       })
 
+      // the next middleware will check the authorization header for a valid JWT
+      //  and add response.locals.user if the specified token corresponds to a
+      //  valid user record
+      if (route.authenticateUser) {
+        middleware.push(authenticateUserMiddleware())
+      }
+
       // the next middleware will validate parameters based on the specified
       //  Joi schema
+      //
+      // @NOTE: this should come after the authenticateUser middleware,
+      //  otherwise the response would be sent for invalid parameters before
+      //  authentication takes place, thus giving potential attackers too much
+      //  info about a protected route
       if (route.parameters) {
         middleware.push(validateParametersMiddleware(route.parameters))
       }
