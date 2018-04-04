@@ -82,9 +82,13 @@ export default (app) => {
       // the next middleware will check the authorization header for a valid JWT
       //  and add response.locals.user if the specified token corresponds to a
       //  valid user record
-      if (route.authenticateUser) {
-        middleware.push(authenticateUserMiddleware())
-      }
+      //
+      // NOTE: we always call the authenticate middleware even if the route is
+      //  public, so that routes can know if the user is "logged in" or not
+      //
+      // routes are responsible for returning appropriate data based on whether
+      //  or not the user is authenticated
+      middleware.push(authenticateUserMiddleware(route.requireAuthentication || false))
 
       // the next middleware will validate parameters based on the specified
       //  Joi schema

@@ -7,7 +7,7 @@ export default {
   method: 'get',
   path: '/users?/titles?',
 
-  authenticateUser: true,
+  requireAuthentication: true,
 
   parameters: Joi.object().keys({
 

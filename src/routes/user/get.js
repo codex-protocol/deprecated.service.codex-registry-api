@@ -5,7 +5,7 @@ export default {
   method: 'get',
   path: '/user',
 
-  authenticateUser: true,
+  requireAuthentication: true,
 
   handler(request, response) {
     return models.User.findById(response.locals.userAddress)
