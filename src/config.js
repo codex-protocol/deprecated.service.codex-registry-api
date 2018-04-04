@@ -35,17 +35,41 @@ const config = {
     },
 
     blockchain: {
-      minConfirmations: 3,
-      startingBlockHeight: 0,
+      minConfirmations: 0,
+      startingBlockHeight: 2053830,
       networkId: '5777', // Ganache
       providerRpcUrl: process.env.RPC_URL,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
     },
   },
 
-  // TODO: populate when a staging environment is set up
-  // TODO: logLevel: 'verbose',
-  staging: {},
+  staging: {
+
+    personalMessageToSign,
+
+    mongodb: {
+      dbUris: {
+        // DB URI for Ethereum Event Listener service
+        eel: `${mongodbUriPrefix}ds235239.mlab.com:35239/staging-eel`,
+
+        // DB URI for this project
+        titleRegistry: `${mongodbUriPrefix}ds233769.mlab.com:33769/staging-codex-title-registry-api`,
+      },
+    },
+
+    process: {
+      port: 3000,
+      logLevel: 'verbose',
+    },
+
+    blockchain: {
+      minConfirmations: 5,
+      startingBlockHeight: 2053830,
+      networkId: '4', // Ganache
+      providerRpcUrl: process.env.RPC_URL,
+      averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
+    },
+  },
 
   // TODO: populate when a production environment is set up
   // TODO: logLevel: 'info',
