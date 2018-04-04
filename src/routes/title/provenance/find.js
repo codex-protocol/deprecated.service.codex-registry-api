@@ -7,6 +7,11 @@ export default {
   method: 'get',
   path: '/titles?/:tokenId/provenance',
 
+  // NOTE: even though this route is not returning user-specific data, business
+  //  logic dictates that we should not return provenance if the user isn't
+  //  logged in
+  requireAuthentication: true,
+
   handler(request, response) {
 
     return models.CodexTitle.findById(request.params.tokenId, 'provenance')

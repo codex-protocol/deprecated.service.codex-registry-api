@@ -16,6 +16,14 @@ export default {
 
   handler(request, response) {
 
+    // even though this is a public route, business logic dictates that we
+    //  should not return provenance if the user isn't logged in
+    if (!response.locals.userAddress) {
+      request.parameters.include = request.parameters.include.filter((include) => {
+        return include !== 'provenance'
+      })
+    }
+
     const fieldsToOmit = []
 
     // don't retrieve the provenance if it's not explicitly requested, since
