@@ -38,8 +38,6 @@ export default {
 
     // see: https://hackernoon.com/never-use-passwords-again-with-ethereum-and-metamask-b61c7e409f0d
 
-    console.log('typeof request.parameters.signedData', typeof request.parameters.signedData)
-
     try {
 
       const { v, r, s } = ethUtil.fromRpcSig(ethUtil.toBuffer(request.parameters.signedData))
