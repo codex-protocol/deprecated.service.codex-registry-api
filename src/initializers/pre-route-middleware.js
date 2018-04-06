@@ -2,7 +2,7 @@ import express from 'express'
 import Bluebird from 'bluebird'
 
 import cors from 'cors'
-import lusca from 'lusca'
+import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import compression from 'compression'
 
@@ -16,15 +16,11 @@ export default (app) => {
 
   app.use(express.static(`${__dirname}/../../static/assets`))
 
-  // disable the stupid "X-Powered-By: Express" header
-  app.set('x-powered-by', false)
-
+  app.use(helmet())
   app.use(compression())
+
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
-
-  app.use(lusca.xframe('SAMEORIGIN'))
-  app.use(lusca.xssProtection(true))
 
   // if this response local is still false by the time the "throw route not
   //  found error" middleware, then we know no route touched the request and a
