@@ -16,14 +16,15 @@
   ],
   "license": "MIT",
   "scripts": {
+    "nsp": "nsp check",
     "clean": "rm -rf dist",
     "lint": "eslint src/.",
     "watch": "nodemon -x npm start",
-    "build": "npm run lint && npm run compile",
     "start": "npm run lint && babel-node src/index.js",
+    "compile": "npm run clean && babel src --out-dir dist",
+    "build": "npm run lint && npm run nsp &&npm run compile",
     "start:compiled": "npm run compile && node dist/index.js",
-    "drop-db": "mongo codex-title-registry --eval 'db.dropDatabase()'",
-    "compile": "npm run clean && babel src --out-dir dist"
+    "drop-db": "mongo codex-title-registry --eval 'db.dropDatabase()'"
   },
   "dependencies": {
     "agenda": "^1.0.3",
@@ -60,6 +61,7 @@
     "babel-register": "^6.26.0",
     "eslint": "^4.18.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.9.0"
+    "eslint-plugin-import": "^2.9.0",
+    "nsp": "^3.2.1"
   }
 }
