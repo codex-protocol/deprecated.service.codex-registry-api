@@ -8,8 +8,6 @@ if (dotenvResult.error) {
   throw dotenvResult.error
 }
 
-const mongodbUriPrefix = (process.env.EEL_MONGO_USER && process.env.EEL_MONGO_PW) ? `mongodb://${process.env.EEL_MONGO_USER}:${encodeURIComponent(process.env.EEL_MONGO_PW)}@` : 'mongodb://'
-
 // this is the message that will be signed by MetaMask and checked against when
 //  authenticating users
 const personalMessageToSign = 'Please sign this message to authenticate with the Codex Title Registry.'
@@ -22,10 +20,10 @@ const config = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: `${mongodbUriPrefix}localhost:27017/eel`,
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        titleRegistry: `${mongodbUriPrefix}localhost:27017/codex-title-registry`,
+        titleRegistry: encodeURI(process.env.TITLE_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -50,10 +48,10 @@ const config = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: `${mongodbUriPrefix}ds235239.mlab.com:35239/staging-eel`,
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        titleRegistry: `${mongodbUriPrefix}ds233769.mlab.com:33769/staging-codex-title-registry-api`,
+        titleRegistry: encodeURI(process.env.TITLE_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
