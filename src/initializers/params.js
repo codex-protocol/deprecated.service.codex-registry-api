@@ -21,7 +21,7 @@ export default (app) => {
 
       // do not consider files & folders that start with an underscore or dot as
       //  valid params (also ignore sourcemap files)
-      if (paramFilePath[0] === '_' || /\/(_|\.)/g.test(paramFilePath) || /\.js\.map$/.test(paramFilePath)) {
+      if (/^(_|\.)/.test(paramFilePath) || /\/(_|\.)/g.test(paramFilePath) || /\.js\.map$/.test(paramFilePath)) {
         return
       }
 

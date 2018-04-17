@@ -8,10 +8,10 @@ source /home/ec2-user/.bash_profile
 # NOTE: this is probably redundant since the source line above will load the
 #  NODE_ENV exported from the .bashrc, but it's just a safegaurd to make sure
 #  the app runs in the correct environment
-if [ $DEPLOYMENT_GROUP_NAME == "production" ]
+if [[ $DEPLOYMENT_GROUP_NAME == "production" ]]
 then
     NODE_ENV=production
-elif [ $DEPLOYMENT_GROUP_NAME == "staging" ]
+elif [[ $DEPLOYMENT_GROUP_NAME == "staging" ]]
 then
     NODE_ENV=staging
 else

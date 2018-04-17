@@ -1,6 +1,7 @@
+import { contracts } from '@codex-protocol/ethereum-service'
+
 import logger from './logger'
 import models from '../models'
-import contracts from './contracts'
 
 const zeroAddress = '0x0000000000000000000000000000000000000000'
 
