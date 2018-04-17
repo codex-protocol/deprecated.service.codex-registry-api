@@ -36,9 +36,9 @@ export default (app) => {
           // dynamically load & register all the jobs
           filewalkerHandler.on('file', (jobFilePath) => {
 
-            // do not consider files & folders that start with an underscore or dot as
-            //  valid jobs (also ignore sourcemap files)
-            if (jobFilePath[0] === '_' || /\/(_|\.)/g.test(jobFilePath) || /\.js\.map$/.test(jobFilePath)) {
+            // do not consider files & folders that start with an underscore or
+            //  dot as valid jobs (also ignore sourcemap files)
+            if (/^(_|\.)/.test(jobFilePath) || /\/(_|\.)/g.test(jobFilePath) || /\.js\.map$/.test(jobFilePath)) {
               return
             }
 

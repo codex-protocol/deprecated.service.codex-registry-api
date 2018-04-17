@@ -22,7 +22,7 @@ export default (app) => {
 
       // do not consider files & folders that start with an underscore or dot as
       //  valid routes (also ignore sourcemap files)
-      if (routeFilePath[0] === '_' || /\/(_|\.)/g.test(routeFilePath) || /\.js\.map$/.test(routeFilePath)) {
+      if (/^(_|\.)/.test(routeFilePath) || /\/(_|\.)/g.test(routeFilePath) || /\.js\.map$/.test(routeFilePath)) {
         return
       }
 
