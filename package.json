@@ -27,6 +27,7 @@
     "drop-db": "mongo codex-title-registry --eval 'db.dropDatabase()'"
   },
   "dependencies": {
+    "@codex-protocol/ethereum-service": "latest",
     "agenda": "^1.0.3",
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
