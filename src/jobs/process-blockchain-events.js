@@ -97,6 +97,9 @@ export default {
                     promise = codexTitleService.approveOperator(...returnValues)
                     break
 
+                  case 'OwnershipTransferred':
+                    break
+
                   default:
                     logger.warn(`[${this.name}]`, 'unexpected event found:', blockchainEvent.eventName, blockchainEvent.returnValues)
                     break
