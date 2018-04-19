@@ -8,9 +8,6 @@ files:
   - source: ./package.json
     destination: /opt/process
 
-  - source: ./static
-    destination: /opt/process/static
-
   - source: ./deployment
     destination: /opt/process/deployment
 
