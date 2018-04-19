@@ -26,10 +26,10 @@ permissions:
 hooks:
   BeforeInstall:
     - location: deployment/codedeploy/before-install.sh
+      runas: ec2-user
       timeout: 300
-      runas: root
 
   ApplicationStart:
     - location: deployment/codedeploy/application-start.sh
-      timeout: 300
       runas: ec2-user
+      timeout: 300

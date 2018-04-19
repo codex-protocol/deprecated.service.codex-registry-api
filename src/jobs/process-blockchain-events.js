@@ -89,15 +89,16 @@ export default {
 
                   }
 
-                  case 'Approval': {
+                  case 'Approval':
                     promise = codexTitleService.approveAddress(...returnValues)
                     break
-                  }
 
-                  case 'ApprovalForAll': {
+                  case 'ApprovalForAll':
                     promise = codexTitleService.approveOperator(...returnValues)
                     break
-                  }
+
+                  case 'OwnershipTransferred':
+                    break
 
                   default:
                     logger.warn(`[${this.name}]`, 'unexpected event found:', blockchainEvent.eventName, blockchainEvent.returnValues)
