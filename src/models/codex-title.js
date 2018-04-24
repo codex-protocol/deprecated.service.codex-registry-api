@@ -9,9 +9,14 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
-  tokenId: {
-    type: String,
+  // instead of using an auto-generated ObjectId, let's just use the tokenId
+  //  stored in the smart contract since it's already a unique identifier for
+  //  this title (and also makes mapping DB records to smart contract records
+  //  easier)
+  _id: {
+    type: Number,
     required: true,
+    alias: 'tokenId',
   },
   ownerAddress: {
     type: String,
@@ -54,6 +59,7 @@ const schema = new mongoose.Schema({
 }, schemaOptions)
 
 schema.set('toJSON', {
+  virtuals: true,
   getters: true, // essentially converts _id to just id
   transform(document, transformedDocument) {
 
@@ -61,10 +67,15 @@ schema.set('toJSON', {
     //  responses
     delete transformedDocument.__v
     delete transformedDocument._id
+    delete transformedDocument.id
 
     return transformedDocument
 
   },
+})
+
+schema.set('toObject', {
+  virtuals: true,
 })
 
 // make all queries for addresses lowercase, since that's how we store them

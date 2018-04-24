@@ -6,7 +6,7 @@ import models from '../../models'
 export default {
 
   method: 'get',
-  path: '/titles?/:codexTitleId',
+  path: '/titles?/:tokenId',
 
   parameters: Joi.object().keys({
     include: Joi.array().items(
@@ -33,12 +33,12 @@ export default {
     if (!request.parameters.include.includes('provenance')) fieldsToOmit.push('-provenance')
     if (!request.parameters.include.includes('metadata')) fieldsToOmit.push('-metadata')
 
-    return models.CodexTitle.findById(request.params.codexTitleId, fieldsToOmit)
+    return models.CodexTitle.findById(request.params.tokenId, fieldsToOmit)
       .populate(request.parameters.include)
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with id ${request.params.codexTitleId} does not exist.`)
+          throw new RestifyErrors.NotFoundError(`CodexTitle with id ${request.params.tokenId} does not exist.`)
         }
 
         return codexTitle

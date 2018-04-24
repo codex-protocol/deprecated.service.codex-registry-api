@@ -11,9 +11,9 @@ const schemaOptions = {
 
 const schema = new mongoose.Schema({
   codexTitleTokenId: {
-    type: String,
+    type: Number,
     default: null,
-    ref: 'CodexTitle.tokenId',
+    ref: 'CodexTitle',
   },
   contractAddress: {
     type: String,

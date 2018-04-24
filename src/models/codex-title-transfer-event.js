@@ -4,9 +4,9 @@ import mongooseService from '../services/mongoose'
 
 const schema = new mongoose.Schema({
   codexTitleTokenId: {
-    type: String,
+    type: Number,
     required: true,
-    ref: 'CodexTitle.tokenId',
+    ref: 'CodexTitle',
   },
   type: {
     type: String,

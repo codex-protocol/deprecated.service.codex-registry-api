@@ -12,7 +12,7 @@ export default {
   //  info emitted by the Minted event
   confirmMint: (tokenId, providerId, providerMetadataId) => {
 
-    return models.CodexTitle.findOne({ tokenId })
+    return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
 
         if (!codexTitle) {
