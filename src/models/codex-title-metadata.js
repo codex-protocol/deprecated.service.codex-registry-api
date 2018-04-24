@@ -15,11 +15,6 @@ const schema = new mongoose.Schema({
     default: null,
     ref: 'CodexTitle',
   },
-  contractAddress: {
-    type: String,
-    required: true,
-    lowercase: true,
-  },
   creatorAddress: {
     type: String,
     required: true,
@@ -37,10 +32,6 @@ const schema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  mintTransactionData: {
-    type: String,
-    required: true,
-  },
 }, schemaOptions)
 
 schema.set('toJSON', {
@@ -57,12 +48,7 @@ schema.set('toJSON', {
   },
 })
 
-schema.pre('validate', function generateMintTransactionData(next) {
-
-  if (!this.isNew || this.mintTransactionData) {
-    next()
-    return
-  }
+schema.methods.generateMintTransactionData = function generateMintTransactionData() {
 
   const mintArguments = [
     this.creatorAddress,
@@ -79,18 +65,17 @@ schema.pre('validate', function generateMintTransactionData(next) {
   //
   // mintArguments.push(signResult.v, signResult.r, signResult.s)
 
-  this.contractAddress = contracts.CodexTitle.options.address
-  this.mintTransactionData = contracts.CodexTitle.methods.mint(...mintArguments).encodeABI()
+  return {
+    contractAddress: contracts.CodexTitle.options.address,
+    mintTransactionData: contracts.CodexTitle.methods.mint(...mintArguments).encodeABI(),
+  }
 
-  next()
-
-})
+}
 
 // make all queries for addresses lowercase, since that's how we store them
 function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
   if (query.creatorAddress) query.creatorAddress = query.creatorAddress.toLowerCase()
-  if (query.contractAddress) query.contractAddress = query.contractAddress.toLowerCase()
   next()
 }
 
