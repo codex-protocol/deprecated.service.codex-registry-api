@@ -12,7 +12,7 @@ export default {
   parameters: Joi.object().keys({
 
     include: Joi.array().items(
-      Joi.string().valid('provenance'),
+      Joi.string().valid('metadata', 'provenance'),
     ).single().default([]),
 
     offset: Joi.number().integer().min(0).default(0),
@@ -26,13 +26,12 @@ export default {
       ownerAddress: response.locals.userAddress,
     }
 
+    // don't retrieve the includes if they're not explicitly requested, since
+    //  they'll just be ObjectIds otherwise
     const fieldsToOmit = []
 
-    // don't retrieve the provenance if it's not explicitly requested, since
-    //  it'll just be an array of ObjectIds otherwise
-    if (!request.parameters.include.includes('provenance')) {
-      fieldsToOmit.push('-provenance')
-    }
+    if (!request.parameters.include.includes('provenance')) fieldsToOmit.push('-provenance')
+    if (!request.parameters.include.includes('metadata')) fieldsToOmit.push('-metadata')
 
     return models.CodexTitle.find(conditions, fieldsToOmit)
       .populate(request.parameters.include)

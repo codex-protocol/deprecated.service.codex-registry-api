@@ -6,11 +6,11 @@ import models from '../../models'
 export default {
 
   method: 'get',
-  path: '/titles?/:tokenId',
+  path: '/titles?/:codexTitleId',
 
   parameters: Joi.object().keys({
     include: Joi.array().items(
-      Joi.string().valid('provenance'),
+      Joi.string().valid('metadata', 'provenance'),
     ).single().default([]),
   }),
 
@@ -18,26 +18,27 @@ export default {
 
     // even though this is a public route, business logic dictates that we
     //  should not return provenance if the user isn't logged in
+    //
+    // TODO: should metadata follow the same rules?
     if (!response.locals.userAddress) {
       request.parameters.include = request.parameters.include.filter((include) => {
         return include !== 'provenance'
       })
     }
 
+    // don't retrieve the includes if they're not explicitly requested, since
+    //  they'll just be ObjectIds otherwise
     const fieldsToOmit = []
 
-    // don't retrieve the provenance if it's not explicitly requested, since
-    //  it'll just be an array of ObjectIds otherwise
-    if (!request.parameters.include.includes('provenance')) {
-      fieldsToOmit.push('-provenance')
-    }
+    if (!request.parameters.include.includes('provenance')) fieldsToOmit.push('-provenance')
+    if (!request.parameters.include.includes('metadata')) fieldsToOmit.push('-metadata')
 
-    return models.CodexTitle.findById(request.params.tokenId, fieldsToOmit)
+    return models.CodexTitle.findById(request.params.codexTitleId, fieldsToOmit)
       .populate(request.parameters.include)
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+          throw new RestifyErrors.NotFoundError(`CodexTitle with id ${request.params.codexTitleId} does not exist.`)
         }
 
         return codexTitle

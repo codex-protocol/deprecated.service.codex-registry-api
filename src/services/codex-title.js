@@ -1,16 +1,61 @@
+import ethUtil from 'ethereumjs-util'
 import { contracts } from '@codex-protocol/ethereum-service'
 
 import logger from './logger'
 import models from '../models'
 
-const zeroAddress = '0x0000000000000000000000000000000000000000'
+const zeroAddress = ethUtil.zeroAddress()
 
 export default {
+
+  // this links a CodexTitle record to a CodexTitleMetadata record based on the
+  //  info emitted by the Minted event
+  confirmMint: (tokenId, providerId, providerMetadataId) => {
+
+    return models.CodexTitle.findOne({ tokenId })
+      .then((codexTitle) => {
+
+        if (!codexTitle) {
+          throw new Error(`Can not confirm CodexTitle with tokenId ${tokenId} because it does not exist.`)
+        }
+
+        codexTitle.providerMetadataId = providerMetadataId
+        codexTitle.providerId = providerId
+
+        // TODO: sort out proper provider ID functionality
+        if (codexTitle.providerId === '1') {
+          return models.CodexTitleMetadata.findById(providerMetadataId)
+            .then((codexTitleMetadata) => {
+
+              if (!codexTitleMetadata) {
+                throw new Error(`Can not confirm CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+              }
+
+              codexTitleMetadata.codexTitleTokenId = codexTitle.tokenId
+
+              return codexTitleMetadata.save()
+                .then(() => {
+                  codexTitle.metadata = codexTitleMetadata
+                  return codexTitle
+                })
+
+            })
+        }
+
+        return codexTitle
+
+      })
+
+      .then((codexTitle) => {
+        return codexTitle.save()
+      })
+
+  },
 
   create: (ownerAddress, tokenId) => {
 
     return contracts.CodexTitle.methods.getTokenById(tokenId).call()
-      .then(({ name, description, imageUri }) => {
+      .then(({ nameHash, descriptionHash, imageHashes }) => {
 
         const newCodexTitleTransferEventData = {
           newOwnerAddress: ownerAddress,
@@ -22,13 +67,13 @@ export default {
         return new models.CodexTitleTransferEvent(newCodexTitleTransferEventData).save()
           .then((newCodexTitleTransferEvent) => {
 
+            // TODO: store imageHashes
             const newCodexTitleData = {
               provenance: [newCodexTitleTransferEvent],
-              _id: tokenId,
+              descriptionHash,
               ownerAddress,
-              description,
-              imageUri,
-              name,
+              nameHash,
+              tokenId,
             }
 
             return new models.CodexTitle(newCodexTitleData).save()
@@ -41,7 +86,7 @@ export default {
 
   transfer: (oldOwnerAddress, newOwnerAddress, tokenId) => {
 
-    return models.CodexTitle.findById(tokenId)
+    return models.CodexTitle.findOne({ tokenId })
       .then((codexTitle) => {
 
         if (!codexTitle) {
@@ -71,7 +116,7 @@ export default {
 
   destroy: (ownerAddress, tokenId) => {
 
-    return models.CodexTitle.findById(tokenId)
+    return models.CodexTitle.findOne({ tokenId })
       .then((codexTitle) => {
 
         if (!codexTitle) {
@@ -101,7 +146,7 @@ export default {
 
   approveAddress: (ownerAddress, approvedAddress, tokenId) => {
 
-    return models.CodexTitle.findById(tokenId)
+    return models.CodexTitle.findOne({ tokenId })
       .then((codexTitle) => {
 
         if (!codexTitle) {
@@ -119,4 +164,5 @@ export default {
     // TODO: implement approveAll functionality here
     logger.debug('codexTitleService.approveAll() called', { ownerAddress, operatorAddress, isApproved })
   },
+
 }

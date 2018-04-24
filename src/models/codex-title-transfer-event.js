@@ -4,9 +4,9 @@ import mongooseService from '../services/mongoose'
 
 const schema = new mongoose.Schema({
   codexTitleTokenId: {
-    type: Number,
+    type: String,
     required: true,
-    ref: 'CodexTitle',
+    ref: 'CodexTitle.tokenId',
   },
   type: {
     type: String,
@@ -19,10 +19,12 @@ const schema = new mongoose.Schema({
   oldOwnerAddress: {
     type: String,
     required: true,
+    lowercase: true,
   },
   newOwnerAddress: {
     type: String,
     required: true,
+    lowercase: true,
   },
   description: {
     type: String,
@@ -38,7 +40,7 @@ const schema = new mongoose.Schema({
 
 
 schema.set('toJSON', {
-  virtuals: true,
+  getters: true, // essentially converts _id to just id
   transform(document, transformedDocument) {
 
     // remove some mongo-specicic keys that aren't necessary to send in
@@ -46,33 +48,24 @@ schema.set('toJSON', {
     delete transformedDocument.__v
     delete transformedDocument._id
 
-    // convert addresses to lowercase from their checksum counterpart because
-    //  MetaMask always expects the lowercase format and not the checksum format
-    if (document.oldOwnerAddress) transformedDocument.oldOwnerAddress = document.oldOwnerAddress.toLowerCase()
-    if (document.newOwnerAddress) transformedDocument.newOwnerAddress = document.newOwnerAddress.toLowerCase()
-
     return transformedDocument
 
   },
 })
 
-// make all queries for addresses case insensitive
-//
-// TODO: maybe it's better to just convert the addresses to lowercase before
-//  saving the documents like John did initially so we don't incur the
-//  additional overhead for every query 🤔
-function makeAddressesCaseInsensitive(next) {
+// make all queries for addresses lowercase, since that's how we store them
+function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
-  if (query.oldOwnerAddress) query.oldOwnerAddress = new RegExp(`^${query.oldOwnerAddress}$`, 'i')
-  if (query.newOwnerAddress) query.newOwnerAddress = new RegExp(`^${query.newOwnerAddress}$`, 'i')
+  if (query.oldOwnerAddress) query.oldOwnerAddress = query.oldOwnerAddress.toLowerCase()
+  if (query.newOwnerAddress) query.newOwnerAddress = query.newOwnerAddress.toLowerCase()
   next()
 }
-schema.pre('find', makeAddressesCaseInsensitive)
-schema.pre('count', makeAddressesCaseInsensitive)
-schema.pre('update', makeAddressesCaseInsensitive)
-schema.pre('findOne', makeAddressesCaseInsensitive)
-schema.pre('findOneAndRemove', makeAddressesCaseInsensitive)
-schema.pre('findOneAndUpdate', makeAddressesCaseInsensitive)
 
+schema.pre('find', makeQueryAddressesCaseInsensitive)
+schema.pre('count', makeQueryAddressesCaseInsensitive)
+schema.pre('update', makeQueryAddressesCaseInsensitive)
+schema.pre('findOne', makeQueryAddressesCaseInsensitive)
+schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
+schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
 export default mongooseService.titleRegistry.model('CodexTitleTransferEvent', schema)

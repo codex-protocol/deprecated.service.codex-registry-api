@@ -5,7 +5,7 @@ import models from '../../../models'
 export default {
 
   method: 'get',
-  path: '/titles?/:tokenId/provenance',
+  path: '/titles?/:codexTitleId/provenance',
 
   // NOTE: even though this route is not returning user-specific data, business
   //  logic dictates that we should not return provenance if the user isn't
@@ -14,12 +14,12 @@ export default {
 
   handler(request, response) {
 
-    return models.CodexTitle.findById(request.params.tokenId, 'provenance')
+    return models.CodexTitle.findById(request.params.codexTitleId, 'provenance')
       .populate('provenance')
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+          throw new RestifyErrors.NotFoundError(`CodexTitle with codexTitleId ${request.params.codexTitleId} does not exist.`)
         }
 
         return codexTitle.provenance
