@@ -69,8 +69,8 @@ schema.pre('validate', function generateMintTransactionData(next) {
     web3.utils.soliditySha3(this.name),
     web3.utils.soliditySha3(this.description || ''),
     web3.utils.soliditySha3('image data here'), // TODO: calculate image hashes
-    // '1', // TODO: sort out proper provider ID functionality
-    // this.id,
+    '1', // TODO: sort out proper provider ID functionality
+    this.id,
   ]
 
   // const hashedMintArguments = web3.utils.soliditySha3(...mintArguments)
