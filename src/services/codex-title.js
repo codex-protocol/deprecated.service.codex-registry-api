@@ -86,7 +86,7 @@ export default {
 
   transfer: (oldOwnerAddress, newOwnerAddress, tokenId) => {
 
-    return models.CodexTitle.findOne({ tokenId })
+    return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
 
         if (!codexTitle) {
@@ -116,7 +116,7 @@ export default {
 
   destroy: (ownerAddress, tokenId) => {
 
-    return models.CodexTitle.findOne({ tokenId })
+    return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
 
         if (!codexTitle) {
@@ -146,7 +146,7 @@ export default {
 
   approveAddress: (ownerAddress, approvedAddress, tokenId) => {
 
-    return models.CodexTitle.findOne({ tokenId })
+    return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
 
         if (!codexTitle) {

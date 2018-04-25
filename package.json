@@ -24,7 +24,8 @@
     "compile": "npm run clean && babel src --out-dir dist",
     "build": "npm run lint && npm run nsp &&npm run compile",
     "start:compiled": "npm run compile && node dist/index.js",
-    "drop-db": "mongo codex-title-registry --eval 'db.dropDatabase()'"
+    "drop-db": "mongo codex-title-registry --eval 'db.dropDatabase()'",
+    "debug": "babel-node --inspect src/index.js"
   },
   "dependencies": {
     "@codex-protocol/ethereum-service": "latest",
