@@ -19,6 +19,7 @@ const schema = new mongoose.Schema({
     alias: 'tokenId',
   },
   ownerAddress: {
+    index: true,
     type: String,
     required: true,
     lowercase: true,
@@ -26,6 +27,7 @@ const schema = new mongoose.Schema({
   },
   approvedAddress: {
     type: String,
+    sparse: true,
     default: null,
     lowercase: true,
     // TODO: add validators to make sure only proper addresses can be specified
