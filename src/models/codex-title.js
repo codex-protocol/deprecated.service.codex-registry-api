@@ -22,11 +22,13 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     lowercase: true,
+    // TODO: add validators to make sure only proper addresses can be specified
   },
   approvedAddress: {
     type: String,
     default: null,
     lowercase: true,
+    // TODO: add validators to make sure only proper addresses can be specified
   },
   nameHash: {
     type: String,
