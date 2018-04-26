@@ -26,7 +26,7 @@ export default {
     //  a raw Buffer
     signedData: Joi.binary().encoding('hex').length(65).required(),
 
-    userAddress: Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').required(),
+    userAddress: Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase().required(),
 
     // this regex validates a 4+ character string in the form "30 minutes",
     //  and also allows for zeit/ms shorthad durations:
