@@ -31,7 +31,7 @@ export default {
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with id ${request.params.tokenId} does not exist.`)
+          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
 
         return codexTitle
