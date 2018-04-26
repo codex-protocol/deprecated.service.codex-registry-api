@@ -26,14 +26,7 @@ export default {
       })
     }
 
-    // don't retrieve the includes if they're not explicitly requested, since
-    //  they'll just be ObjectIds otherwise
-    const fieldsToOmit = []
-
-    if (!request.parameters.include.includes('provenance')) fieldsToOmit.push('-provenance')
-    if (!request.parameters.include.includes('metadata')) fieldsToOmit.push('-metadata')
-
-    return models.CodexTitle.findById(request.params.tokenId, fieldsToOmit)
+    return models.CodexTitle.findById(request.params.tokenId)
       .populate(request.parameters.include)
       .then((codexTitle) => {
 

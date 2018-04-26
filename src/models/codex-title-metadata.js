@@ -10,11 +10,6 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
-  codexTitleTokenId: {
-    type: Number,
-    default: null,
-    ref: 'CodexTitle',
-  },
   creatorAddress: {
     type: String,
     required: true,
@@ -28,10 +23,10 @@ const schema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  imageUri: {
-    type: String,
-    default: null,
-  },
+  files: [{
+    ref: 'CodexTitleFile',
+    type: mongoose.Schema.Types.ObjectId,
+  }],
 }, schemaOptions)
 
 schema.set('toJSON', {
@@ -42,6 +37,18 @@ schema.set('toJSON', {
     //  responses
     delete transformedDocument.__v
     delete transformedDocument._id
+    delete transformedDocument.id
+
+    // remove any populations if they weren't populated, since they'll just be
+    //  ObjectIds otherwise and that might expose too much information to
+    //  someone who isn't allowed to view that data
+    //
+    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
+    //  way the front end can always assume the keys will be present
+    if (document.files.length > 0 && !document.populated('files')) {
+      // delete transformedDocument.files
+      transformedDocument.files = []
+    }
 
     return transformedDocument
 
@@ -85,5 +92,15 @@ schema.pre('update', makeQueryAddressesCaseInsensitive)
 schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
+
+// always get files for metadata
+function populateFiles(next) {
+  this.populate('files')
+  next()
+}
+
+schema.pre('find', populateFiles)
+schema.pre('findOne', populateFiles)
+schema.pre('findOneAndUpdate', populateFiles)
 
 export default mongooseService.titleRegistry.model('CodexTitleMetadata', schema)

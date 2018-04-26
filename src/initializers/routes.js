@@ -1,6 +1,8 @@
 // This initializer traverses over the /src/routes directory and attaches all
 //  defined routes to the express app
 
+import uuid from 'uuid'
+import multer from 'multer'
 import Bluebird from 'bluebird'
 import filewalker from 'filewalker'
 
@@ -8,6 +10,18 @@ import logger from '../services/logger'
 import authenticateUserMiddleware from '../middleware/authenticate-user'
 import validateParametersMiddleware from '../middleware/validate-parameters'
 import restrictToEnvironmentsMiddleware from '../middleware/restrict-to-environments'
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(request, file, callback) {
+      callback(null, '/tmp')
+    },
+    filename(request, file, callback) {
+      const extension = file.originalname.split('.').pop().toLowerCase()
+      callback(null, `${Date.now()}.${uuid.v4()}.${extension}`)
+    },
+  }),
+})
 
 export default (app) => {
 
@@ -48,6 +62,30 @@ export default (app) => {
       //  this environment
       if (route.restrictToEnvironments) {
         middleware.push(restrictToEnvironmentsMiddleware(route.restrictToEnvironments))
+      }
+
+      // the next middleware will accept multipart/form-data (with file support
+      //  if necessary)
+      //
+      // route.fileOptions should be an object with the following keys:
+      //   {
+      //     as: 'image', // specifies the field name for the file(s) to be read from (default is "file(s)")
+      //     multiple: true, // should this route accept an array of files or only one?
+      //   }
+      if (route.fileOptions) {
+
+        if (route.fileOptions.multiple === true) {
+          middleware.push(upload.array(route.fileOptions.as || 'files'))
+        } else {
+          middleware.push(upload.single(route.fileOptions.as || 'file'))
+        }
+
+      } else {
+        // not specifying a file name for upload.array() allows routes to accept
+        //  multipart/form-data requests, but not files
+        //
+        // see: https://www.npmjs.com/package/multer#usage
+        middleware.push(upload.array())
       }
 
       // the next middleware logs the request and sets an initial status code

@@ -26,14 +26,7 @@ export default {
       ownerAddress: response.locals.userAddress,
     }
 
-    // don't retrieve the includes if they're not explicitly requested, since
-    //  they'll just be ObjectIds otherwise
-    const fieldsToOmit = []
-
-    if (!request.parameters.include.includes('provenance')) fieldsToOmit.push('-provenance')
-    if (!request.parameters.include.includes('metadata')) fieldsToOmit.push('-metadata')
-
-    return models.CodexTitle.find(conditions, fieldsToOmit)
+    return models.CodexTitle.find(conditions)
       .populate(request.parameters.include)
       .limit(request.parameters.limit)
       .skip(request.parameters.offset)

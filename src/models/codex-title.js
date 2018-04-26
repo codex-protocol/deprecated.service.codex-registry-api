@@ -59,8 +59,8 @@ const schema = new mongoose.Schema({
 }, schemaOptions)
 
 schema.set('toJSON', {
-  virtuals: true,
   getters: true, // essentially converts _id to just id
+  virtuals: true,
   transform(document, transformedDocument) {
 
     // remove some mongo-specicic keys that aren't necessary to send in
@@ -68,6 +68,22 @@ schema.set('toJSON', {
     delete transformedDocument.__v
     delete transformedDocument._id
     delete transformedDocument.id
+
+    // remove any populations if they weren't populated, since they'll just be
+    //  ObjectIds otherwise and that might expose too much information to
+    //  someone who isn't allowed to view that data
+    //
+    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
+    //  way the front end can always assume the keys will be present
+    if (document.provenance.length > 0 && !document.populated('provenance')) {
+      // delete transformedDocument.provenance
+      transformedDocument.provenance = []
+    }
+
+    if (document.metadata && !document.populated('metadata')) {
+      // delete transformedDocument.metadata
+      transformedDocument.metadata = null
+    }
 
     return transformedDocument
 

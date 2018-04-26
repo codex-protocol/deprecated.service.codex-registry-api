@@ -42,6 +42,15 @@ const config = {
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
     },
+
+    aws: {
+      region: 'us-east-1',
+      s3: {
+        buckets: {
+          titleRegistry: 'codex.title-registry',
+        },
+      },
+    },
   },
 
   staging: {
@@ -73,11 +82,32 @@ const config = {
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
     },
+
+    aws: {
+      region: 'us-east-1',
+      s3: {
+        buckets: {
+          titleRegistry: 'codex.title-registry',
+        },
+      },
+    },
   },
 
   // TODO: populate when a production environment is set up
-  // TODO: logLevel: 'info',
-  production: {},
+  production: {
+    process: {
+      port: 3000,
+      logLevel: 'info',
+    },
+    aws: {
+      region: 'us-west-2',
+      s3: {
+        buckets: {
+          titleRegistry: 'codex.title-registry',
+        },
+      },
+    },
+  },
 }
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
