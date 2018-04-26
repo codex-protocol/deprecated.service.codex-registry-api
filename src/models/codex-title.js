@@ -79,7 +79,7 @@ schema.set('toJSON', {
     //
     // NOTE: instead of deleting keys, we'll just pretend they're empty, that
     //  way the front end can always assume the keys will be present
-    if (document.provenance.length > 0 && !document.populated('provenance')) {
+    if (document.provenance && document.provenance.length > 0 && !document.populated('provenance')) {
       // delete transformedDocument.provenance
       transformedDocument.provenance = []
     }
