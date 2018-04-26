@@ -37,7 +37,6 @@ schema.set('toJSON', {
     //  responses
     delete transformedDocument.__v
     delete transformedDocument._id
-    delete transformedDocument.id
 
     // remove any populations if they weren't populated, since they'll just be
     //  ObjectIds otherwise and that might expose too much information to
