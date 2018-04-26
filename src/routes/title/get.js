@@ -34,6 +34,8 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
 
+        codexTitle.applyPrivacyFilters(response.locals.userAddress)
+
         return codexTitle
 
       })

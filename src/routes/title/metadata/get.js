@@ -9,9 +9,11 @@ export default {
 
   handler(request, response) {
 
-    // TODO: add permissions here
-
-    return models.CodexTitle.findById(request.params.tokenId, 'metadata')
+    // NOTE: we must retrieve the entire CodexTitle record (and not just the
+    //  metadata even though that's all we need here) because the
+    //  applyPrivacyFilters() instance method needs other values to determine if
+    //  this user should be allowed to view the metadata
+    return models.CodexTitle.findById(request.params.tokenId)
       .populate('metadata')
       .then((codexTitle) => {
 
@@ -19,7 +21,9 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        return codexTitle.metadata
+        codexTitle.applyPrivacyFilters(response.locals.userAddress)
+
+        return codexTitle.populated('metadata') ? codexTitle.metadata : null
 
       })
 

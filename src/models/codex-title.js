@@ -51,6 +51,22 @@ const schema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  isPrivate: {
+    type: Boolean,
+    default: true,
+  },
+  // this is a list of addresses explicitly allowed to view this title even if
+  //  it's private
+  //
+  // NOTE: this will not include the ownerAddress and approvedAddress addresses
+  //  since those are implied as whitelisted
+  whitelistedAddresses: {
+    type: [{
+      type: String,
+      lowercase: true,
+      // TODO: add validators to make sure only proper addresses can be specified
+    }],
+  },
   metadata: {
     default: null,
     ref: 'CodexTitleMetadata',
@@ -61,6 +77,30 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
+
+schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
+
+  // if this isn't a private title, apply no filters
+  if (!this.isPrivate) {
+    return false
+  }
+
+  const approvedAddresses = [
+    this.ownerAddress,
+    this.approvedAddress,
+    ...this.whitelistedAddresses || [],
+  ]
+
+  // if the user is logged in and an approved address, apply no filters
+  if (userAddress && approvedAddresses.includes(userAddress)) {
+    return false
+  }
+
+  this.depopulate('metadata')
+
+  return true
+
+}
 
 schema.set('toJSON', {
   getters: true, // essentially converts _id to just id
