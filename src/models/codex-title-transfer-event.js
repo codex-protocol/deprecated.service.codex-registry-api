@@ -4,7 +4,7 @@ import mongooseService from '../services/mongoose'
 
 const schema = new mongoose.Schema({
   codexTitleTokenId: {
-    type: Number,
+    type: String,
     required: true,
     ref: 'CodexTitle',
   },

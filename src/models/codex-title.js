@@ -14,7 +14,7 @@ const schema = new mongoose.Schema({
   //  this title (and also makes mapping DB records to smart contract records
   //  easier)
   _id: {
-    type: Number,
+    type: String,
     required: true,
     alias: 'tokenId',
   },
