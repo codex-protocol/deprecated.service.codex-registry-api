@@ -9,25 +9,40 @@ export default {
   path: '/titles?/:tokenId',
 
   parameters: Joi.object().keys({
+
     include: Joi.array().items(
       Joi.string().valid('metadata', 'provenance'),
     ).single().default([]),
+
+    includeOrder: Joi.object().keys({
+      provenance: Joi.string().valid('createdAt', '-createdAt'),
+    }).default({
+      provenance: '-createdAt',
+    }),
+
   }),
 
   handler(request, response) {
 
     // even though this is a public route, business logic dictates that we
     //  should not return provenance if the user isn't logged in
-    //
-    // TODO: should metadata follow the same rules?
     if (!response.locals.userAddress) {
       request.parameters.include = request.parameters.include.filter((include) => {
         return include !== 'provenance'
       })
     }
 
+    const populateConditions = request.parameters.include.map((include) => {
+      return {
+        path: include,
+        options: {
+          sort: request.parameters.includeOrder[include],
+        },
+      }
+    })
+
     return models.CodexTitle.findById(request.params.tokenId)
-      .populate(request.parameters.include)
+      .populate(populateConditions)
       .then((codexTitle) => {
 
         if (!codexTitle) {

@@ -1,3 +1,4 @@
+import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
 import models from '../../../models'
@@ -12,10 +13,19 @@ export default {
   //  logged in
   requireAuthentication: true,
 
+  parameters: Joi.object().keys({
+    order: Joi.string().valid('createdAt', '-createdAt').default('-createdAt'),
+  }),
+
   handler(request, response) {
 
     return models.CodexTitle.findById(request.params.tokenId, 'provenance')
-      .populate('provenance')
+      .populate({
+        path: 'provenance',
+        options: {
+          sort: request.parameters.order,
+        },
+      })
       .then((codexTitle) => {
 
         if (!codexTitle) {
