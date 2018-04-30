@@ -19,7 +19,6 @@
     "nsp": "nsp check",
     "clean": "rm -rf dist",
     "lint": "eslint src/.",
-    "watch": "nodemon -x npm start",
     "debug": "babel-node --inspect src/index.js",
     "start": "npm run lint && babel-node src/index.js",
     "compile": "npm run clean && babel src --out-dir dist",
