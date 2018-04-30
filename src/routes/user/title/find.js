@@ -16,7 +16,7 @@ export default {
     ).single().default([]),
 
     offset: Joi.number().integer().min(0).default(0),
-    limit: Joi.number().integer().min(1).max(100).default(25),
+    limit: Joi.number().integer().min(1).max(100).default(100),
 
     order: Joi.string().valid('createdAt', '-createdAt').default('createdAt'),
 
