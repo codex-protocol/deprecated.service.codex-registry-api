@@ -1,4 +1,3 @@
-import express from 'express'
 import Bluebird from 'bluebird'
 
 import cors from 'cors'
@@ -13,8 +12,6 @@ export default (app) => {
   if (process.env.NODE_ENV === 'development') {
     app.use(cors())
   }
-
-  app.use(express.static(`${__dirname}/../../static/assets`))
 
   app.use(helmet())
   app.use(compression())
