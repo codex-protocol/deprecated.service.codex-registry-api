@@ -10,7 +10,7 @@ export default {
 
   // this links a CodexTitle record to a CodexTitleMetadata record based on the
   //  info emitted by the Minted event
-  confirmMint: (tokenId, providerId, providerMetadataId) => {
+  confirmMint: (tokenId, providerId, providerMetadataId, transactionHash) => {
 
     return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
@@ -50,7 +50,7 @@ export default {
 
   },
 
-  create: (ownerAddress, tokenId) => {
+  create: (ownerAddress, tokenId, transactionHash) => {
 
     return contracts.CodexTitle.methods.getTokenById(tokenId).call()
       .then(({ nameHash, descriptionHash, imageHashes }) => {
@@ -59,6 +59,7 @@ export default {
           newOwnerAddress: ownerAddress,
           oldOwnerAddress: zeroAddress,
           codexTitleTokenId: tokenId,
+          transactionHash,
           type: 'create',
         }
 
@@ -82,7 +83,7 @@ export default {
 
   },
 
-  transfer: (oldOwnerAddress, newOwnerAddress, tokenId) => {
+  transfer: (oldOwnerAddress, newOwnerAddress, tokenId, transactionHash) => {
 
     return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
@@ -95,6 +96,7 @@ export default {
           codexTitleTokenId: tokenId,
           oldOwnerAddress,
           newOwnerAddress,
+          transactionHash,
           type: 'transfer',
         }
 
@@ -112,7 +114,7 @@ export default {
 
   },
 
-  destroy: (ownerAddress, tokenId) => {
+  destroy: (ownerAddress, tokenId, transactionHash) => {
 
     return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
@@ -125,6 +127,7 @@ export default {
           oldOwnerAddress: ownerAddress,
           newOwnerAddress: zeroAddress,
           codexTitleTokenId: tokenId,
+          transactionHash,
           type: 'destroy',
         }
 
@@ -142,7 +145,7 @@ export default {
 
   },
 
-  approveAddress: (ownerAddress, approvedAddress, tokenId) => {
+  approveAddress: (ownerAddress, approvedAddress, tokenId, transactionHash) => {
 
     return models.CodexTitle.findById(tokenId)
       .then((codexTitle) => {
@@ -158,7 +161,7 @@ export default {
 
   },
 
-  approveOperator: (ownerAddress, operatorAddress, isApproved) => {
+  approveOperator: (ownerAddress, operatorAddress, isApproved, transactionHash) => {
     // TODO: implement approveAll functionality here
     logger.debug('codexTitleService.approveAll() called', { ownerAddress, operatorAddress, isApproved })
   },

@@ -86,6 +86,8 @@ export default {
 
                 const returnValues = Object.values(blockchainEvent.returnValues)
 
+                returnValues.push(blockchainEvent.transactionHash)
+
                 let promise = Bluebird.resolve(null)
 
                 switch (blockchainEvent.eventName) {
@@ -96,22 +98,22 @@ export default {
 
                   case 'Transfer': {
 
-                    const [fromAddress, toAddress, tokenId] = returnValues
+                    const [fromAddress, toAddress, tokenId, transactionHash] = returnValues
 
                     // "transfer" events FROM address 0x0 are really "create"
                     //  events
                     if (fromAddress === zeroAddress) {
-                      promise = codexTitleService.create(toAddress, tokenId)
+                      promise = codexTitleService.create(toAddress, tokenId, transactionHash)
 
                     // "transfer" events TO address 0x0 are really "destroy"
                     //  events
                     } else if (toAddress === zeroAddress) {
-                      promise = codexTitleService.destroy(fromAddress, tokenId)
+                      promise = codexTitleService.destroy(fromAddress, tokenId, transactionHash)
 
                     // otherwise, this was a "real" transfer from one address to
                     //  another
                     } else {
-                      promise = codexTitleService.transfer(fromAddress, toAddress, tokenId)
+                      promise = codexTitleService.transfer(fromAddress, toAddress, tokenId, transactionHash)
                     }
 
                     break

@@ -16,6 +16,10 @@ const schema = new mongoose.Schema({
       'transfer',
     ],
   },
+  transactionHash: {
+    type: String,
+    required: true,
+  },
   oldOwnerAddress: {
     type: String,
     required: true,
