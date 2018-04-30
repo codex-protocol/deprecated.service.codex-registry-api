@@ -23,6 +23,7 @@ export default {
 
         codexTitle.applyPrivacyFilters(response.locals.userAddress)
 
+        // TODO: return a 403 error here insted?
         return codexTitle.populated('metadata') ? codexTitle.metadata : null
 
       })
