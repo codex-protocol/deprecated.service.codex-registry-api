@@ -1,7 +1,7 @@
 import Bluebird from 'bluebird'
 
 import startJobs from './jobs'
-import addParams from './params'
+// import addParams from './params'
 import addRoutes from './routes'
 import connectToMongoDb from './mongo'
 import addPreRouteMiddleware from './pre-route-middleware'
@@ -17,7 +17,7 @@ export default (app) => {
   return Bluebird.resolve(app)
     .then(connectToMongoDb)
     .then(addPreRouteMiddleware)
-    .then(addParams)
+    // .then(addParams)
     .then(addRoutes)
     .then(addPostRouteMiddleware)
     .then(startJobs)
