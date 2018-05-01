@@ -69,9 +69,9 @@ export default (app) => {
 
         // cancel any old jobs of the same name first
         return cancelAgendaJob({ name: job.name })
-          .then((numJobsCancelled) => {
+          .then((numJobsCanceled) => {
 
-            logger.verbose(`cancelled ${numJobsCancelled} existing ${job.name} job(s)`)
+            logger.verbose(`canceled ${numJobsCanceled} existing ${job.name} job(s)`)
 
             // run the job's setup() method if it exists
             return Bluebird.resolve(job.setup ? job.setup() : null)

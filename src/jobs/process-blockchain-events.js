@@ -1,9 +1,12 @@
 import Bluebird from 'bluebird'
+import ethUtil from 'ethereumjs-util'
 
 import config from '../config'
 import models from '../models'
 import logger from '../services/logger'
 import codexTitleService from '../services/codex-title'
+
+const zeroAddress = ethUtil.zeroAddress()
 
 export default {
 
@@ -51,8 +54,30 @@ export default {
 
             // save the block number of the last event we processed so we know
             //  where to start looking the next time this job runs
+            //
+            // NOTE: since we're sorting the query by blockNumber, we can be
+            //  certain that the last event will have the most recent blockNumber
             job.data.lastProcessedEventBlockNumber = blockchainEvents[blockchainEvents.length - 1].blockNumber
             job.markModified('data')
+
+            // move Minted events to the end of the array so that they are
+            //  guaranteed to be processed AFTER their associated Transfer
+            //  events
+            //
+            // "creation" transfers will always have a Minted event emitted in
+            //  the same block, but since they have the same blockNumber there's
+            //  no guarantee that mongoose will retrieve them in the correct
+            //  order (Transfer -> Minted)
+            //
+            // NOTE: this MUST come before the lastProcessedEventBlockNumber
+            //  update performed above since it relies on blockchainEvents being
+            //  sorted by blockNumber
+            //
+            // NOTE: the weird conditional moves all Minted events to the end
+            //  while preserving their relative order (i.e. blockNumber)
+            blockchainEvents.sort((a, b) => {
+              return a.eventName === 'Minted' && b.eventName !== 'Minted'
+            })
 
             return Bluebird
               .mapSeries(blockchainEvents, (blockchainEvent) => {
@@ -61,28 +86,34 @@ export default {
 
                 const returnValues = Object.values(blockchainEvent.returnValues)
 
+                returnValues.push(blockchainEvent.transactionHash)
+
                 let promise = Bluebird.resolve(null)
 
                 switch (blockchainEvent.eventName) {
 
+                  case 'Minted':
+                    promise = codexTitleService.confirmMint(...returnValues)
+                    break
+
                   case 'Transfer': {
 
-                    const [fromAddress, toAddress, tokenId] = returnValues
+                    const [fromAddress, toAddress, tokenId, transactionHash] = returnValues
 
                     // "transfer" events FROM address 0x0 are really "create"
                     //  events
-                    if (Number.parseInt(fromAddress, 16) === 0) {
-                      promise = codexTitleService.create(toAddress, tokenId)
+                    if (fromAddress === zeroAddress) {
+                      promise = codexTitleService.create(toAddress, tokenId, transactionHash)
 
                     // "transfer" events TO address 0x0 are really "destroy"
                     //  events
-                    } else if (Number.parseInt(toAddress, 16) === 0) {
-                      promise = codexTitleService.destroy(fromAddress, tokenId)
+                    } else if (toAddress === zeroAddress) {
+                      promise = codexTitleService.destroy(fromAddress, tokenId, transactionHash)
 
                     // otherwise, this was a "real" transfer from one address to
                     //  another
                     } else {
-                      promise = codexTitleService.transfer(fromAddress, toAddress, tokenId)
+                      promise = codexTitleService.transfer(fromAddress, toAddress, tokenId, transactionHash)
                     }
 
                     break
@@ -108,7 +139,7 @@ export default {
 
                 return promise
                   .catch((error) => {
-                    logger.warn(`[${this.name}]`, 'could not process blockchainEvent:', { blockchainEvent, error })
+                    logger.error(`[${this.name}]`, 'could not process blockchainEvent:', { blockchainEvent, error })
                   })
 
               })

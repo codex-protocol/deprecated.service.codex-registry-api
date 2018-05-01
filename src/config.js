@@ -12,7 +12,7 @@ if (dotenvResult.error) {
 //  authenticating users
 const personalMessageToSign = 'Please sign this message to authenticate with the Codex Title Registry.'
 
-const config = {
+const fullConfig = {
   development: {
 
     personalMessageToSign,
@@ -36,6 +36,20 @@ const config = {
       minConfirmations: 0,
       startingBlockHeight: 0,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
+
+      // remove 0x from beginning of signerPrivateKey and store in a Buffer for
+      //  use in various methods that require the private key as a hex buffer
+      signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
+      signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
+    },
+
+    aws: {
+      region: 'us-east-1',
+      s3: {
+        buckets: {
+          titleRegistry: 'codex.title-registry',
+        },
+      },
     },
   },
 
@@ -62,14 +76,44 @@ const config = {
       minConfirmations: 5,
       startingBlockHeight: 2053830,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
+
+      // remove 0x from beginning of signerPrivateKey and store in a Buffer for
+      //  use in various methods that require the private key as a hex buffer
+      signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
+      signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
+    },
+
+    aws: {
+      region: 'us-east-1',
+      s3: {
+        buckets: {
+          titleRegistry: 'codex.title-registry',
+        },
+      },
     },
   },
 
   // TODO: populate when a production environment is set up
-  // TODO: logLevel: 'info',
-  production: {},
+  production: {
+    process: {
+      port: 3000,
+      logLevel: 'info',
+    },
+    aws: {
+      region: 'us-west-2',
+      s3: {
+        buckets: {
+          titleRegistry: 'codex.title-registry',
+        },
+      },
+    },
+  },
 }
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-export default config[process.env.NODE_ENV]
+const envConfig = fullConfig[process.env.NODE_ENV]
+
+envConfig.useSentry = !!process.env.SENTRY_DSN
+
+export default envConfig

@@ -5,7 +5,7 @@ import models from '../../../models'
 export default {
 
   method: 'get',
-  path: '/users?/titles?',
+  path: '/users?/approved-titles?',
 
   requireAuthentication: true,
 
@@ -31,7 +31,7 @@ export default {
   handler(request, response) {
 
     const conditions = {
-      ownerAddress: response.locals.userAddress,
+      approvedAddress: response.locals.userAddress,
     }
 
     const populateConditions = request.parameters.include.map((include) => {
@@ -48,6 +48,20 @@ export default {
       .skip(request.parameters.offset)
       .sort(request.parameters.order)
       .populate(populateConditions)
+
+      // NOTE: applying privacy filters here is unnecessary as of 2018-04-30
+      //  since approved addresses currently have the same privacy priveledges
+      //  as the owner of a title, but this is a future-proofing measure just in
+      //  case that business logic changes down the road
+      .then((codexTitles) => {
+
+        codexTitles.forEach((codexTitle) => {
+          return codexTitle.applyPrivacyFilters(response.locals.userAddress)
+        })
+
+        return codexTitles
+
+      })
 
   },
 

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 
+// import config from '../config'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -13,37 +14,96 @@ const schema = new mongoose.Schema({
   //  this title (and also makes mapping DB records to smart contract records
   //  easier)
   _id: {
-    type: Number,
+    type: String,
     required: true,
     alias: 'tokenId',
   },
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    default: null,
-  },
-  imageUri: {
-    type: String,
-    default: null,
-  },
   ownerAddress: {
+    index: true,
     type: String,
     required: true,
+    lowercase: true,
+    // TODO: add validators to make sure only proper addresses can be specified
   },
   approvedAddress: {
     type: String,
+    sparse: true,
+    default: null,
+    lowercase: true,
+    // TODO: add validators to make sure only proper addresses can be specified
+  },
+  nameHash: {
+    type: String,
+    required: true,
+    lowercase: true,
+  },
+  descriptionHash: {
+    type: String,
+    default: null,
+    lowercase: true,
+  },
+  providerId: {
+    type: String, // TODO: use mongoose.Schema.Types.ObjectId?
+    default: null,
+    // ref: 'Provider', // TODO: link this to a Provider model?
+  },
+  providerMetadataId: {
+    type: String,
     default: null,
   },
-  provenance: [{
+  isPrivate: {
+    type: Boolean,
+    default: true,
+  },
+  // this is a list of addresses explicitly allowed to view this title even if
+  //  it's private
+  //
+  // NOTE: this will not include the ownerAddress and approvedAddress addresses
+  //  since those are implied as whitelisted
+  whitelistedAddresses: {
+    type: [{
+      type: String,
+      lowercase: true,
+      // TODO: add validators to make sure only proper addresses can be specified
+    }],
+  },
+  metadata: {
+    default: null,
+    ref: 'CodexTitleMetadata',
     type: mongoose.Schema.Types.ObjectId,
+  },
+  provenance: [{
     ref: 'CodexTitleTransferEvent',
+    type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
 
+schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
+
+  // if this isn't a private title, apply no filters
+  if (!this.isPrivate) {
+    return false
+  }
+
+  const approvedAddresses = [
+    this.ownerAddress,
+    this.approvedAddress,
+    ...this.whitelistedAddresses || [],
+  ]
+
+  // if the user is logged in and an approved address, apply no filters
+  if (userAddress && approvedAddresses.includes(userAddress)) {
+    return false
+  }
+
+  this.depopulate('metadata')
+
+  return true
+
+}
+
 schema.set('toJSON', {
+  getters: true, // essentially converts _id to just id
   virtuals: true,
   transform(document, transformedDocument) {
 
@@ -53,10 +113,21 @@ schema.set('toJSON', {
     delete transformedDocument._id
     delete transformedDocument.id
 
-    // convert addresses to lowercase from their checksum counterpart because
-    //  MetaMask always expects the lowercase format and not the checksum format
-    if (document.ownerAddress) transformedDocument.ownerAddress = document.ownerAddress.toLowerCase()
-    if (document.approvedAddress) transformedDocument.approvedAddress = document.approvedAddress.toLowerCase()
+    // remove any populations if they weren't populated, since they'll just be
+    //  ObjectIds otherwise and that might expose too much information to
+    //  someone who isn't allowed to view that data
+    //
+    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
+    //  way the front end can always assume the keys will be present
+    if (document.provenance && document.provenance.length > 0 && !document.populated('provenance')) {
+      // delete transformedDocument.provenance
+      transformedDocument.provenance = []
+    }
+
+    if (document.metadata && !document.populated('metadata')) {
+      // delete transformedDocument.metadata
+      transformedDocument.metadata = null
+    }
 
     return transformedDocument
 
@@ -67,22 +138,19 @@ schema.set('toObject', {
   virtuals: true,
 })
 
-// make all queries for addresses case insensitive
-//
-// TODO: maybe it's better to just convert the addresses to lowercase before
-//  saving the documents like John did initially so we don't incur the
-//  additional overhead for every query 🤔
-function makeAddressesCaseInsensitive(next) {
+// make all queries for addresses lowercase, since that's how we store them
+function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
-  if (query.ownerAddress) query.ownerAddress = new RegExp(`^${query.ownerAddress}$`, 'i')
-  if (query.approvedAddress) query.approvedAddress = new RegExp(`^${query.approvedAddress}$`, 'i')
+  if (query.ownerAddress) query.ownerAddress = query.ownerAddress.toLowerCase()
+  if (query.approvedAddress) query.approvedAddress = query.approvedAddress.toLowerCase()
   next()
 }
-schema.pre('find', makeAddressesCaseInsensitive)
-schema.pre('count', makeAddressesCaseInsensitive)
-schema.pre('update', makeAddressesCaseInsensitive)
-schema.pre('findOne', makeAddressesCaseInsensitive)
-schema.pre('findOneAndRemove', makeAddressesCaseInsensitive)
-schema.pre('findOneAndUpdate', makeAddressesCaseInsensitive)
+
+schema.pre('find', makeQueryAddressesCaseInsensitive)
+schema.pre('count', makeQueryAddressesCaseInsensitive)
+schema.pre('update', makeQueryAddressesCaseInsensitive)
+schema.pre('findOne', makeQueryAddressesCaseInsensitive)
+schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
+schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
 export default mongooseService.titleRegistry.model('CodexTitle', schema)

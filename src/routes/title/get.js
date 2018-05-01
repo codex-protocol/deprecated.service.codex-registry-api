@@ -9,9 +9,17 @@ export default {
   path: '/titles?/:tokenId',
 
   parameters: Joi.object().keys({
+
     include: Joi.array().items(
-      Joi.string().valid('provenance'),
+      Joi.string().valid('metadata', 'provenance'),
     ).single().default([]),
+
+    includeOrder: Joi.object().keys({
+      provenance: Joi.string().valid('createdAt', '-createdAt'),
+    }).default({
+      provenance: '-createdAt',
+    }),
+
   }),
 
   handler(request, response) {
@@ -24,21 +32,24 @@ export default {
       })
     }
 
-    const fieldsToOmit = []
+    const populateConditions = request.parameters.include.map((include) => {
+      return {
+        path: include,
+        options: {
+          sort: request.parameters.includeOrder[include],
+        },
+      }
+    })
 
-    // don't retrieve the provenance if it's not explicitly requested, since
-    //  it'll just be an array of ObjectIds otherwise
-    if (!request.parameters.include.includes('provenance')) {
-      fieldsToOmit.push('-provenance')
-    }
-
-    return models.CodexTitle.findById(request.params.tokenId, fieldsToOmit)
-      .populate(request.parameters.include)
+    return models.CodexTitle.findById(request.params.tokenId)
+      .populate(populateConditions)
       .then((codexTitle) => {
 
         if (!codexTitle) {
           throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
+
+        codexTitle.applyPrivacyFilters(response.locals.userAddress)
 
         return codexTitle
 
