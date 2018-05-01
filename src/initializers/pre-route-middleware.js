@@ -5,7 +5,15 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import compression from 'compression'
 
+import config from '../config'
+import logger from '../services/logger'
+
 export default (app) => {
+
+  // sentry's request middleware must come before any others
+  if (config.useSentry) {
+    app.use(logger.transports.sentry.raven.requestHandler())
+  }
 
   // in development, we need CORS enabled so the widget test page served by
   //  webpack can talk to this api

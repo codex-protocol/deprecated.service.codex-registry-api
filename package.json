@@ -51,7 +51,8 @@
     "request-promise": "^4.2.2",
     "restify-errors": "^6.0.0",
     "uuid": "^3.2.1",
-    "winston": "^2.4.0"
+    "winston": "^2.4.0",
+    "winston-raven-sentry": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

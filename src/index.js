@@ -16,5 +16,4 @@ initialize(app)
   })
   .catch((error) => {
     logger.error('failed to initialize application', error)
-    process.exit(1)
   })

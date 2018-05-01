@@ -12,7 +12,7 @@ if (dotenvResult.error) {
 //  authenticating users
 const personalMessageToSign = 'Please sign this message to authenticate with the Codex Title Registry.'
 
-const config = {
+const fullConfig = {
   development: {
 
     personalMessageToSign,
@@ -112,4 +112,8 @@ const config = {
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-export default config[process.env.NODE_ENV]
+const envConfig = fullConfig[process.env.NODE_ENV]
+
+envConfig.useSentry = !!process.env.SENTRY_DSN
+
+export default envConfig
