@@ -11,7 +11,7 @@ const app = express()
 initialize(app)
   .then(() => {
     const listener = app.listen(config.process.port, () => {
-      logger.info(`server listening on port ${listener.address().port}`)
+      logger.verbose(`server listening on port ${listener.address().port}`)
     })
   })
   .catch((error) => {
