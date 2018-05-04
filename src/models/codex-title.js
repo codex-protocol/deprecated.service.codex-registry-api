@@ -92,6 +92,10 @@ schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
   ]
 
   // if the user is logged in and an approved address, apply no filters
+  //
+  // NOTE: userAddress could be null, and this.approvedAddress could be null,
+  //  so we must explicity check if userAddress is null first to avoid false
+  //  positives
   if (userAddress && approvedAddresses.includes(userAddress)) {
     return false
   }
