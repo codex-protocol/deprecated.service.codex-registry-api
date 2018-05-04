@@ -105,6 +105,7 @@ export default {
 
             codexTitle.provenance.push(newCodexTitleTransferEvent)
             codexTitle.ownerAddress = newOwnerAddress
+            codexTitle.approvedAddress = null
 
             return codexTitle.save()
 
