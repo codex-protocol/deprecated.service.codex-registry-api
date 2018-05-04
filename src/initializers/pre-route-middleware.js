@@ -15,14 +15,9 @@ export default (app) => {
     app.use(logger.transports.sentry.raven.requestHandler())
   }
 
-  // in development, we need CORS enabled so the widget test page served by
-  //  webpack can talk to this api
-  if (process.env.NODE_ENV === 'development') {
-    app.use(cors())
-  }
-
-  app.use(helmet())
   app.use(compression())
+  app.use(helmet())
+  app.use(cors())
 
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
