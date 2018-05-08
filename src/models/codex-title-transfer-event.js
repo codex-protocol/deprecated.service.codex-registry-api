@@ -65,8 +65,8 @@ schema.set('toJSON', {
 // make all queries for addresses lowercase, since that's how we store them
 function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
-  if (query.oldOwnerAddress) query.oldOwnerAddress = query.oldOwnerAddress.toLowerCase()
-  if (query.newOwnerAddress) query.newOwnerAddress = query.newOwnerAddress.toLowerCase()
+  if (typeof query.oldOwnerAddress === 'string') query.oldOwnerAddress = query.oldOwnerAddress.toLowerCase()
+  if (typeof query.newOwnerAddress === 'string') query.newOwnerAddress = query.newOwnerAddress.toLowerCase()
   next()
 }
 
