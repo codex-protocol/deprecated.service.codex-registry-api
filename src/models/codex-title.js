@@ -145,8 +145,8 @@ schema.set('toObject', {
 // make all queries for addresses lowercase, since that's how we store them
 function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
-  if (query.ownerAddress) query.ownerAddress = query.ownerAddress.toLowerCase()
-  if (query.approvedAddress) query.approvedAddress = query.approvedAddress.toLowerCase()
+  if (typeof query.ownerAddress === 'string') query.ownerAddress = query.ownerAddress.toLowerCase()
+  if (typeof query.approvedAddress === 'string') query.approvedAddress = query.approvedAddress.toLowerCase()
   next()
 }
 

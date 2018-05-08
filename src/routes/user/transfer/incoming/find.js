@@ -1,11 +1,11 @@
 import Joi from 'joi'
 
-import models from '../../../models'
+import models from '../../../../models'
 
 export default {
 
   method: 'get',
-  path: '/users?/approved-titles?',
+  path: '/users?/transfers?/incoming',
 
   requireAuthentication: true,
 

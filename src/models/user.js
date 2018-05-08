@@ -33,7 +33,7 @@ schema.set('toJSON', {
 
     // convert addresses to lowercase from their checksum counterpart because
     //  MetaMask always expects the lowercase format and not the checksum format
-    if (document.address) transformedDocument.address = document.address.toLowerCase()
+    if (typeof document.address === 'string') transformedDocument.address = document.address.toLowerCase()
 
     return transformedDocument
 
