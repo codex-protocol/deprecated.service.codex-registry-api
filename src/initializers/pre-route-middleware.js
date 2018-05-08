@@ -10,6 +10,8 @@ import logger from '../services/logger'
 
 export default (app) => {
 
+  const bodySizeLimit = '100mb'
+
   // sentry's request middleware must come before any others
   if (config.useSentry) {
     app.use(logger.transports.sentry.raven.requestHandler())
@@ -19,8 +21,13 @@ export default (app) => {
   app.use(helmet())
   app.use(cors())
 
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.json({
+    limit: bodySizeLimit,
+  }))
+  app.use(bodyParser.urlencoded({
+    limit: bodySizeLimit,
+    extended: true,
+  }))
 
   // if this response local is still false by the time the "throw route not
   //  found error" middleware, then we know no route touched the request and a
