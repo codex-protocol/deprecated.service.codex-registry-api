@@ -14,7 +14,7 @@
       "name": "Colin Wood"
     }
   ],
-  "license": "MIT",
+  "license": "AGPLv3",
   "scripts": {
     "nsp": "nsp check",
     "clean": "rm -rf dist",
