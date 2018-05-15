@@ -37,6 +37,7 @@
     "compression": "^1.7.1",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
+    "eth-sig-util": "^1.4.2",
     "ethereumjs-util": "^5.1.4",
     "express": "^4.16.2",
     "file-type": "^7.6.0",
