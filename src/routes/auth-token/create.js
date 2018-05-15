@@ -7,8 +7,6 @@ import models from '../../models'
 import config from '../../config'
 import logger from '../../services/logger'
 
-const { typedDataToSign } = config
-
 export default {
 
   method: 'post',
@@ -16,7 +14,7 @@ export default {
 
   parameters: Joi.object().keys({
 
-    signedData: Joi.string().length(132).required(),
+    signedData: Joi.string().required(),
 
     userAddress: Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase().required(),
 
@@ -33,8 +31,8 @@ export default {
     try {
 
       const recoveredAddress = ethSigUtil.recoverTypedSignature({
-        data: typedDataToSign,
         sig: request.parameters.signedData,
+        data: config.typedDataToSign,
       })
 
       if (recoveredAddress !== request.parameters.userAddress) {

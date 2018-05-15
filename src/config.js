@@ -14,7 +14,7 @@ const typedDataToSign = [
   {
     type: 'string',
     name: 'Sign In',
-    value: 'Sign in to Codex Title Viewer',
+    value: 'Please sign this message to authenticate with the Codex Title Registry.',
   },
 ]
 
