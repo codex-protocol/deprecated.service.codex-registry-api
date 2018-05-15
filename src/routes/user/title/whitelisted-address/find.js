@@ -1,24 +1,13 @@
-import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
-import models from '../../../models'
+import models from '../../../../models'
 
 export default {
 
-  method: 'put',
-  path: '/users?/titles?/:tokenId',
+  method: 'get',
+  path: '/users?/titles?/:tokenId/whitelisted-address(es)?',
 
   requireAuthentication: true,
-
-  parameters: Joi.object().keys({
-    isPrivate: Joi.boolean(),
-    whitelistedAddresses: Joi.array().items(
-      Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
-    ),
-  }).or(
-    'isPrivate',
-    'whitelistedAddresses',
-  ),
 
   handler(request, response) {
 
@@ -34,9 +23,7 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        Object.assign(codexTitle, request.parameters)
-
-        return codexTitle.save()
+        return codexTitle.whitelistedAddresses
 
       })
 
