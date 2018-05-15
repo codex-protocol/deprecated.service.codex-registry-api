@@ -14,7 +14,7 @@
       "name": "Colin Wood"
     }
   ],
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "nsp": "nsp check",
     "clean": "rm -rf dist",
