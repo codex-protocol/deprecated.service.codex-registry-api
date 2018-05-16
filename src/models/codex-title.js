@@ -102,7 +102,7 @@ schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
 
   // if this isn't a private title, apply no filters
   if (!this.isPrivate) {
-    return this.maskOwnerOnlyFields()
+    return this.maskOwnerOnlyFields(userAddress)
   }
 
   const approvedAddresses = [
@@ -117,12 +117,12 @@ schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
   //  so we must explicity check if userAddress is null first to avoid false
   //  positives
   if (userAddress && approvedAddresses.includes(userAddress)) {
-    return this.maskOwnerOnlyFields()
+    return this.maskOwnerOnlyFields(userAddress)
   }
 
   this.depopulate('metadata')
 
-  this.maskOwnerOnlyFields()
+  this.maskOwnerOnlyFields(userAddress)
 
   return true
 
