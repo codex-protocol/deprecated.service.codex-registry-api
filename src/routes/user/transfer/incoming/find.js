@@ -15,6 +15,12 @@ export default {
       Joi.string().valid('metadata', 'provenance'),
     ).single().default([]),
 
+    filters: Joi.object({
+      isIgnored: Joi.array().items(
+        Joi.boolean().required()
+      ).single(),
+    }).default({}),
+
     offset: Joi.number().integer().min(0).default(0),
     limit: Joi.number().integer().min(1).max(100).default(100),
 
@@ -33,6 +39,10 @@ export default {
     const conditions = {
       approvedAddress: response.locals.userAddress,
     }
+
+    Object.entries(request.parameters.filters).forEach(([key, value]) => {
+      conditions[key] = { $in: value }
+    })
 
     const populateConditions = request.parameters.include.map((include) => {
       return {

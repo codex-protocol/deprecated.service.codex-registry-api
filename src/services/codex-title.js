@@ -107,6 +107,7 @@ export default {
             codexTitle.ownerAddress = newOwnerAddress
             codexTitle.whitelistedAddresses = []
             codexTitle.approvedAddress = null
+            codexTitle.isIgnored = false
             codexTitle.isPrivate = true
 
             return codexTitle.save()
@@ -158,6 +159,8 @@ export default {
         }
 
         codexTitle.approvedAddress = approvedAddress
+        codexTitle.isIgnored = false
+
         return codexTitle.save()
 
       })

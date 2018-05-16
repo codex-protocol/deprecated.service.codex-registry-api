@@ -55,6 +55,13 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  // has this title been ignored by the approvedAddress? this essentially just
+  //  hides it from the frontend "incoming transfer" view and has no real
+  //  correlation to anything in the smart contract
+  isIgnored: {
+    type: Boolean,
+    default: false,
+  },
   // this is a list of addresses explicitly allowed to view this title even if
   //  it's private
   //
