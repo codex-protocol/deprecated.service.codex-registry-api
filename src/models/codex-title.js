@@ -105,18 +105,18 @@ schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
     return this.maskOwnerOnlyFields(userAddress)
   }
 
-  const approvedAddresses = [
+  const whitelistedAddresses = [
     this.ownerAddress,
     this.approvedAddress,
     ...this.whitelistedAddresses,
   ]
 
-  // if the user is logged in and an approved address, apply no filters
+  // if the user is logged in and a whitelisted address, apply no filters
   //
   // NOTE: userAddress could be null, and this.approvedAddress could be null,
   //  so we must explicity check if userAddress is null first to avoid false
   //  positives
-  if (userAddress && approvedAddresses.includes(userAddress)) {
+  if (userAddress && whitelistedAddresses.includes(userAddress)) {
     return this.maskOwnerOnlyFields(userAddress)
   }
 
