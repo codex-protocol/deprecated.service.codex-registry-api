@@ -10,12 +10,18 @@ if (dotenvResult.error) {
 
 // this is the message that will be signed by MetaMask and checked against when
 //  authenticating users
-const personalMessageToSign = 'Please sign this message to authenticate with the Codex Title Registry.'
+const typedDataToSign = [
+  {
+    type: 'string',
+    name: 'Sign In',
+    value: 'Please sign this message to authenticate with the Codex Title Registry.',
+  },
+]
 
 const fullConfig = {
   development: {
 
-    personalMessageToSign,
+    typedDataToSign,
 
     mongodb: {
       dbUris: {
@@ -55,7 +61,7 @@ const fullConfig = {
 
   staging: {
 
-    personalMessageToSign,
+    typedDataToSign,
 
     mongodb: {
       dbUris: {

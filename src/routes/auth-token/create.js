@@ -1,13 +1,11 @@
 import Joi from 'joi'
 import jwt from 'jsonwebtoken'
-import ethUtil from 'ethereumjs-util'
+import ethSigUtil from 'eth-sig-util'
 import RestifyErrors from 'restify-errors'
 
 import models from '../../models'
 import config from '../../config'
 import logger from '../../services/logger'
-
-const hashedPersonalMessage = ethUtil.hashPersonalMessage(ethUtil.toBuffer(config.personalMessageToSign))
 
 export default {
 
@@ -16,15 +14,7 @@ export default {
 
   parameters: Joi.object().keys({
 
-    // NOTE: the length of the signedData may change if the ethereumjs-util
-    //  package is ever updated and the fromRpcSignature method changes it's
-    //  length validation, as indicated by a comment in the source
-    //
-    // see: https://github.com/ethereumjs/ethereumjs-util/blob/fde15dd/index.js
-    //
-    // NOTE: signedData should not have the 0x prefix as Joi will validate it as
-    //  a raw Buffer
-    signedData: Joi.binary().encoding('hex').length(65).required(),
+    signedData: Joi.string().required(),
 
     userAddress: Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase().required(),
 
@@ -36,17 +26,16 @@ export default {
 
   handler(request, response) {
 
-    // see: https://hackernoon.com/never-use-passwords-again-with-ethereum-and-metamask-b61c7e409f0d
+    // see: https://medium.com/metamask/scaling-web3-with-signtypeddata-91d6efc8b290
 
     try {
 
-      const { v, r, s } = ethUtil.fromRpcSig(ethUtil.toBuffer(request.parameters.signedData))
-      const publicKey = ethUtil.ecrecover(hashedPersonalMessage, v, r, s)
+      const recoveredAddress = ethSigUtil.recoverTypedSignature({
+        sig: request.parameters.signedData,
+        data: config.typedDataToSign,
+      })
 
-      const userAddressBuffer = ethUtil.toBuffer(request.parameters.userAddress)
-      const senderAddressBuffer = ethUtil.publicToAddress(publicKey)
-
-      if (!senderAddressBuffer.equals(userAddressBuffer)) {
+      if (recoveredAddress !== request.parameters.userAddress) {
         // throw a blank error here since it'll just get picked up by the catch
         //  below anyway
         throw new Error()
