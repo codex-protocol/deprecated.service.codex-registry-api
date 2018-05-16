@@ -49,10 +49,6 @@ export default {
       .sort(request.parameters.order)
       .populate(populateConditions)
 
-      // NOTE: applying privacy filters here is unnecessary as of 2018-04-30
-      //  since approved addresses currently have the same privacy priveledges
-      //  as the owner of a title, but this is a future-proofing measure just in
-      //  case that business logic changes down the road
       .then((codexTitles) => {
 
         codexTitles.forEach((codexTitle) => {
