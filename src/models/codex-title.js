@@ -101,6 +101,10 @@ schema.methods.maskOwnerOnlyFields = function maskOwnerOnlyFields(userAddress) {
 
   this.whitelistedAddresses = []
 
+  // TODO: mask historical provenance here when that's implemented
+  // TODO: rename provenance to digitalProvenance?
+  // this.depopulate('historicalProvenance')
+
   return true
 
 }
@@ -156,6 +160,13 @@ schema.set('toJSON', {
       // delete transformedDocument.provenance
       transformedDocument.provenance = []
     }
+
+    // TODO: remove historical provenance here when that's implemented
+    // TODO: rename provenance to digitalProvenance?
+    // if (document.historicalProvenance && document.historicalProvenance.length > 0 && !document.populated('historicalProvenance')) {
+    //   // delete transformedDocument.historicalProvenance
+    //   transformedDocument.historicalProvenance = []
+    // }
 
     if (document.metadata && !document.populated('metadata')) {
       // delete transformedDocument.metadata
