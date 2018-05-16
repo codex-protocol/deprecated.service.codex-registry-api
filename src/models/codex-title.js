@@ -78,17 +78,37 @@ const schema = new mongoose.Schema({
   }],
 }, schemaOptions)
 
+// TODO: maybe insted this should be migrated to the toJSON transform? that
+//  would just require all routes to pass the userAddress in the options
+//  though... e.g.:
+//
+// return codexTitle.toJSON({ userAddress: response.locals.userAddress })
+//
+// this has the potential to cause problems if a save() operation is called
+//  after maskOwnerOnlyFields()... hmm...
+schema.methods.maskOwnerOnlyFields = function maskOwnerOnlyFields(userAddress) {
+
+  if (userAddress === this.ownerAddress) {
+    return false
+  }
+
+  this.whitelistedAddresses = []
+
+  return true
+
+}
+
 schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
 
   // if this isn't a private title, apply no filters
   if (!this.isPrivate) {
-    return false
+    return this.maskOwnerOnlyFields()
   }
 
   const approvedAddresses = [
     this.ownerAddress,
     this.approvedAddress,
-    ...this.whitelistedAddresses || [],
+    ...this.whitelistedAddresses,
   ]
 
   // if the user is logged in and an approved address, apply no filters
@@ -97,10 +117,12 @@ schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
   //  so we must explicity check if userAddress is null first to avoid false
   //  positives
   if (userAddress && approvedAddresses.includes(userAddress)) {
-    return false
+    return this.maskOwnerOnlyFields()
   }
 
   this.depopulate('metadata')
+
+  this.maskOwnerOnlyFields()
 
   return true
 
@@ -109,11 +131,11 @@ schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
 schema.set('toJSON', {
   getters: true, // essentially converts _id to just id
   virtuals: true,
+  versionKey: false,
   transform(document, transformedDocument) {
 
     // remove some mongo-specicic keys that aren't necessary to send in
     //  responses
-    delete transformedDocument.__v
     delete transformedDocument._id
     delete transformedDocument.id
 

@@ -105,6 +105,7 @@ export default {
 
             codexTitle.provenance.push(newCodexTitleTransferEvent)
             codexTitle.ownerAddress = newOwnerAddress
+            codexTitle.whitelistedAddresses = []
             codexTitle.approvedAddress = null
             codexTitle.isPrivate = true
 

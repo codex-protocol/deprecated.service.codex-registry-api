@@ -47,11 +47,11 @@ const schema = new mongoose.Schema({
 
 schema.set('toJSON', {
   getters: true, // essentially converts _id to just id
+  versionKey: false,
   transform(document, transformedDocument) {
 
     // remove some mongo-specicic keys that aren't necessary to send in
     //  responses
-    delete transformedDocument.__v
     delete transformedDocument._id
     delete transformedDocument.id
 
