@@ -10,7 +10,7 @@ export default {
   requireAuthentication: true,
 
   parameters: Joi.object().keys({
-    description: Joi.string(),
+    description: Joi.string().allow(null),
     name: Joi.string().required(),
     files: Joi.array().items(
       Joi.object().keys({
