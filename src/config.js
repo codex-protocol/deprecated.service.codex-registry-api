@@ -10,7 +10,7 @@ if (dotenvResult.error) {
 
 // this is the message that will be signed by MetaMask and checked against when
 //  authenticating users
-const personalMessageToSign = 'Please sign this message to authenticate with the Codex Title Registry.'
+const personalMessageToSign = 'Please sign this message to authenticate with the Codex Registry.'
 
 const fullConfig = {
   development: {
