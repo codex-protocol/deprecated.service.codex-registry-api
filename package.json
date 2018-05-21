@@ -1,10 +1,10 @@
 {
-  "name": "@codex-protocol/service.codex-title-registry-api",
+  "name": "@codex-protocol/service.codex-registry-api",
   "version": "0.1.0",
-  "description": "API for Codex Title Registry",
+  "description": "API for Codex Registry",
   "repository": {
     "type": "git",
-    "url": "https://github.com/codex-protocol/service.codex-title-registry-api"
+    "url": "https://github.com/codex-protocol/service.codex-registry-api"
   },
   "contributors": [
     {
@@ -25,7 +25,7 @@
     "link-all": "npm link @codex-protocol/ethereum-service",
     "build": "npm run lint && npm run nsp && npm run compile",
     "start:compiled": "npm run compile && node dist/index.js",
-    "drop-db": "mongo codex-title-registry --eval 'db.dropDatabase()'",
+    "drop-db": "mongo codex-registry --eval 'db.dropDatabase()'",
     "install-and-link": "rm -rf node_modules && npm install && npm run link-all"
   },
   "dependencies": {

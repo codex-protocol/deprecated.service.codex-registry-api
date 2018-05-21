@@ -1,6 +1,6 @@
 apps:
   -
     script: /opt/process/dist/index.js
-    name: codex-title-registry-api
+    name: codex-registry-api
     exec_mode: cluster
     instances: max
