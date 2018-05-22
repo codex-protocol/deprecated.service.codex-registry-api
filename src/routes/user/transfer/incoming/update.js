@@ -1,30 +1,26 @@
 import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
-import models from '../../../models'
+import models from '../../../../models'
 
 export default {
 
   method: 'put',
-  path: '/users?/titles?/:tokenId',
+  path: '/users?/transfers?/incoming/:tokenId',
 
   requireAuthentication: true,
 
   parameters: Joi.object().keys({
-    isPrivate: Joi.boolean(),
-    whitelistedAddresses: Joi.array().items(
-      Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
-    ),
+    isIgnored: Joi.boolean(),
   }).or(
-    'isPrivate',
-    'whitelistedAddresses',
+    'isIgnored',
   ),
 
   handler(request, response) {
 
     const conditions = {
       _id: request.params.tokenId,
-      ownerAddress: response.locals.userAddress,
+      approvedAddress: response.locals.userAddress,
     }
 
     return models.CodexTitle.findOne(conditions)
@@ -37,6 +33,14 @@ export default {
         Object.assign(codexTitle, request.parameters)
 
         return codexTitle.save()
+
+      })
+
+      .then((codexTitle) => {
+
+        codexTitle.applyPrivacyFilters(response.locals.userAddress)
+
+        return codexTitle
 
       })
 

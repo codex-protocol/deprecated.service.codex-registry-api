@@ -12,6 +12,12 @@ export default (app) => {
 
   const bodySizeLimit = '100mb'
 
+  // trust IP addresses forwarded by nginx and the AWS load balancer (i.e.
+  //  X-Forwarded-For headers)
+  //
+  // See: https://expressjs.com/en/guide/behind-proxies.html
+  app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])
+
   // sentry's request middleware must come before any others
   if (config.useSentry) {
     app.use(logger.transports.sentry.raven.requestHandler())

@@ -15,6 +15,12 @@ export default {
       Joi.string().valid('metadata', 'provenance'),
     ).single().default([]),
 
+    filters: Joi.object({
+      isIgnored: Joi.array().items(
+        Joi.boolean().required()
+      ).single(),
+    }).default({}),
+
     offset: Joi.number().integer().min(0).default(0),
     limit: Joi.number().integer().min(1).max(100).default(100),
 
@@ -34,6 +40,10 @@ export default {
       approvedAddress: response.locals.userAddress,
     }
 
+    Object.entries(request.parameters.filters).forEach(([key, value]) => {
+      conditions[key] = { $in: value }
+    })
+
     const populateConditions = request.parameters.include.map((include) => {
       return {
         path: include,
@@ -49,10 +59,6 @@ export default {
       .sort(request.parameters.order)
       .populate(populateConditions)
 
-      // NOTE: applying privacy filters here is unnecessary as of 2018-04-30
-      //  since approved addresses currently have the same privacy priveledges
-      //  as the owner of a title, but this is a future-proofing measure just in
-      //  case that business logic changes down the road
       .then((codexTitles) => {
 
         codexTitles.forEach((codexTitle) => {

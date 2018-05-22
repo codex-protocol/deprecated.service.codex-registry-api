@@ -1,16 +1,16 @@
 import Joi from 'joi'
 
-import models from '../../../../models'
+import models from '../../../models'
 
 export default {
 
   method: 'post',
-  path: '/users?/titles?/metadata',
+  path: '/users?/title-metadata',
 
   requireAuthentication: true,
 
   parameters: Joi.object().keys({
-    description: Joi.string(),
+    description: Joi.string().allow(null),
     name: Joi.string().required(),
     files: Joi.array().items(
       Joi.object().keys({
