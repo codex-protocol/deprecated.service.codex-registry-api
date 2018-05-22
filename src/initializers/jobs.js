@@ -7,7 +7,7 @@ import logger from '../services/logger'
 
 export default (app) => {
 
-  const agenda = new Agenda({ db: { address: config.mongodb.dbUris.titleRegistry } })
+  const agenda = new Agenda({ db: { address: config.mongodb.dbUris.codexRegistry } })
 
   const gracefulShutdown = () => {
     agenda.stop(() => {

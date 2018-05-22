@@ -1,3 +1,4 @@
+import config from '../../config'
 import models from '../../models'
 
 const s3Keys = [
@@ -31,7 +32,7 @@ const mockImages = s3Keys.map((s3Key, index) => {
     creatorAddress: '0x0',
     mimeType: 'image/jpeg',
     name: `Image ${index + 1}`,
-    s3Bucket: 'codex.title-registry',
+    s3Bucket: config.aws.s3.buckets.codexRegistry,
   }
 })
 

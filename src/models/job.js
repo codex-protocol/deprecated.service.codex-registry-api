@@ -7,4 +7,4 @@ const schema = new mongoose.Schema({
   data: mongoose.Schema.Types.Mixed,
 })
 
-export default mongooseService.titleRegistry.model('Job', schema)
+export default mongooseService.codexRegistry.model('Job', schema)

@@ -25,4 +25,4 @@ const schema = new mongoose.Schema({
   tx: mongoose.Schema.Types.Mixed,
 }, schemaOptions)
 
-export default mongooseService.titleRegistry.model('Transaction', schema)
+export default mongooseService.codexRegistry.model('Transaction', schema)
