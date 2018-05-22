@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 
+import config from '../config'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -24,6 +25,10 @@ const schema = new mongoose.Schema({
     default: null,
   },
 }, schemaOptions)
+
+schema.virtual('canRequestFaucetTokens').get(function getCanRequestFaucetTokens() {
+  return process.env.NODE_ENV !== 'production' && (this.faucetLastRequestedAt === null || Date.now() - this.faucetLastRequestedAt.getTime() >= config.faucet.cooldown)
+})
 
 schema.set('toJSON', {
   virtuals: true,
