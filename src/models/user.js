@@ -65,4 +65,4 @@ schema.pre('findOne', makeAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeAddressesCaseInsensitive)
 
-export default mongooseService.titleRegistry.model('User', schema)
+export default mongooseService.codexRegistry.model('User', schema)

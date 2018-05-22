@@ -103,4 +103,4 @@ schema.pre('find', populateFiles)
 schema.pre('findOne', populateFiles)
 schema.pre('findOneAndUpdate', populateFiles)
 
-export default mongooseService.titleRegistry.model('CodexTitleMetadata', schema)
+export default mongooseService.codexRegistry.model('CodexTitleMetadata', schema)

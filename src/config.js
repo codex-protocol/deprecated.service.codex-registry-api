@@ -31,7 +31,7 @@ const fullConfig = {
         eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        titleRegistry: encodeURI(process.env.TITLE_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -56,7 +56,7 @@ const fullConfig = {
       region: 'us-east-1',
       s3: {
         buckets: {
-          titleRegistry: 'codex.title-registry',
+          codexRegistry: 'codex.registry',
         },
       },
     },
@@ -79,7 +79,7 @@ const fullConfig = {
         eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        titleRegistry: encodeURI(process.env.TITLE_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -104,7 +104,7 @@ const fullConfig = {
       region: 'us-east-1',
       s3: {
         buckets: {
-          titleRegistry: 'codex.title-registry',
+          codexRegistry: 'codex.registry',
         },
       },
     },
@@ -120,7 +120,7 @@ const fullConfig = {
       region: 'us-west-2',
       s3: {
         buckets: {
-          titleRegistry: 'codex.title-registry',
+          codexRegistry: 'codex.registry-production',
         },
       },
     },

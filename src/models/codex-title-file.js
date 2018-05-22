@@ -84,4 +84,4 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-export default mongooseService.titleRegistry.model('CodexTitleFile', schema)
+export default mongooseService.codexRegistry.model('CodexTitleFile', schema)

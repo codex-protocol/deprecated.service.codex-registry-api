@@ -20,7 +20,7 @@ export default {
 
   handler(request, response) {
 
-    const s3Bucket = config.aws.s3.buckets.titleRegistry
+    const s3Bucket = config.aws.s3.buckets.codexRegistry
     const s3Path = `${process.env.NODE_ENV}/title-files`
 
     return s3Service.uploadFiles(request.files, s3Bucket, s3Path)

@@ -13,13 +13,13 @@ export default (app) => {
 
   const connections = {
     eelConnection: mongoose.createConnection(config.mongodb.dbUris.eel, connectionOptions),
-    titleRegistryConnection: mongoose.createConnection(config.mongodb.dbUris.titleRegistry, connectionOptions),
+    codexRegistryConnection: mongoose.createConnection(config.mongodb.dbUris.codexRegistry, connectionOptions),
   }
 
   return Bluebird.props(connections)
     .then((result) => {
       mongooseService.eel = result.eelConnection
-      mongooseService.titleRegistry = result.titleRegistryConnection
+      mongooseService.codexRegistry = result.codexRegistryConnection
       return app
     })
     .catch((error) => {
