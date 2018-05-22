@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import ethereumUtil from 'ethereumjs-util'
 
 // Reads environment variables stored in the '.env' file and writes them to the
 //  process.env object
@@ -16,6 +17,13 @@ const fullConfig = {
   development: {
 
     personalMessageToSign,
+
+    faucet: {
+      cooldown: 1 * 60 * 1000, // 1 minute
+      gasPrice: 5000000000, // 5 gwei
+      gasLimit: 300000,
+      amount: '100',
+    },
 
     mongodb: {
       dbUris: {
@@ -35,12 +43,13 @@ const fullConfig = {
     blockchain: {
       minConfirmations: 0,
       startingBlockHeight: 0,
-      averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
+      averageBlockTime: 5, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
+      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
@@ -56,6 +65,13 @@ const fullConfig = {
   staging: {
 
     personalMessageToSign,
+
+    faucet: {
+      cooldown: 24 * 60 * 60 * 1000, // 24 hours
+      gasPrice: 5000000000, // 5 gwei
+      gasLimit: 300000,
+      amount: '100',
+    },
 
     mongodb: {
       dbUris: {
@@ -81,6 +97,7 @@ const fullConfig = {
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
+      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {

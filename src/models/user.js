@@ -4,7 +4,6 @@ import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
   timestamps: true, // let mongoose handle the createdAt and updatedAt fields
-  usePushEach: true, // see https://github.com/Automattic/mongoose/issues/5574
 }
 
 const schema = new mongoose.Schema({
@@ -13,10 +12,15 @@ const schema = new mongoose.Schema({
   _id: {
     type: String,
     required: true,
+    lowercase: true,
     alias: 'address',
   },
   email: {
     type: String,
+    default: null,
+  },
+  faucetLastRequestedAt: {
+    type: Date,
     default: null,
   },
 }, schemaOptions)
@@ -31,10 +35,6 @@ schema.set('toJSON', {
     delete transformedDocument._id
     delete transformedDocument.id
 
-    // convert addresses to lowercase from their checksum counterpart because
-    //  MetaMask always expects the lowercase format and not the checksum format
-    if (typeof document.address === 'string') transformedDocument.address = document.address.toLowerCase()
-
     return transformedDocument
 
   },
@@ -45,15 +45,14 @@ schema.set('toObject', {
 })
 
 // make all queries for addresses case insensitive
-//
-// TODO: maybe it's better to just convert the addresses to lowercase before
-//  saving the documents like John did initially so we don't incur the
-//  additional overhead for every query 🤔
 function makeAddressesCaseInsensitive(next) {
   const query = this.getQuery()
-  if (query.address) query.address = new RegExp(`^${query.address}$`, 'i')
+  if (typeof query.id === 'string') query.id = query.id.toLowerCase()
+  if (typeof query._id === 'string') query._id = query._id.toLowerCase()
+  if (typeof query.address === 'string') query.address = query.address.toLowerCase()
   next()
 }
+
 schema.pre('find', makeAddressesCaseInsensitive)
 schema.pre('count', makeAddressesCaseInsensitive)
 schema.pre('update', makeAddressesCaseInsensitive)
