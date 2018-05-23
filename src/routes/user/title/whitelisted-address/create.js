@@ -29,7 +29,7 @@ export default {
         }
 
         if (codexTitle.whitelistedAddresses.includes(request.parameters.address)) {
-          return codexTitle
+          return codexTitle.whitelistedAddresses
         }
 
         codexTitle.whitelistedAddresses.push(request.parameters.address)
