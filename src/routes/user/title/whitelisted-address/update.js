@@ -30,7 +30,9 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        codexTitle.whitelistedAddresses = request.parameters.addresses
+        codexTitle.whitelistedAddresses = request.parameters.addresses.filter((address) => {
+          return address !== response.locals.userAddress
+        })
 
         return codexTitle.save()
 
