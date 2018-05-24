@@ -31,6 +31,8 @@ export default {
                 throw new Error(`Can not confirm CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
               }
 
+              codexTitleMetadata.codexTitleTokenId = codexTitle.tokenId
+
               return codexTitleMetadata.save()
                 .then(() => {
                   codexTitle.metadata = codexTitleMetadata

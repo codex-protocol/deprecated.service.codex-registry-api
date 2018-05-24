@@ -10,6 +10,11 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
+  codexTitleTokenId: {
+    type: String,
+    default: null,
+    ref: 'CodexTitle',
+  },
   creatorAddress: {
     type: String,
     required: true,
