@@ -34,7 +34,7 @@ export default {
           })
 
         if (existingWhitelistedAddressIndex === -1) {
-          return codexTitle
+          return codexTitle.whitelistedAddresses
         }
 
         codexTitle.whitelistedAddresses.splice(existingWhitelistedAddressIndex, 1)

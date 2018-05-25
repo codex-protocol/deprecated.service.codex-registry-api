@@ -1,6 +1,9 @@
 import mongoose from 'mongoose'
 // import ethUtil from 'ethereumjs-util'
-import { web3, contracts } from '@codex-protocol/ethereum-service'
+import {
+  // web3,
+  contracts,
+} from '@codex-protocol/ethereum-service'
 
 // import config from '../config'
 import mongooseService from '../services/mongoose'
@@ -10,6 +13,11 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
+  codexTitleTokenId: {
+    type: String,
+    default: null,
+    ref: 'CodexTitle',
+  },
   creatorAddress: {
     type: String,
     required: true,
@@ -20,11 +28,24 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  nameHash: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     default: null,
   },
-  files: [{
+  descriptionHash: {
+    type: String,
+    default: null,
+  },
+  mainImage: {
+    default: null,
+    ref: 'CodexTitleFile',
+    type: mongoose.Schema.Types.ObjectId,
+  },
+  images: [{
     ref: 'CodexTitleFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
@@ -45,9 +66,14 @@ schema.set('toJSON', {
     //
     // NOTE: instead of deleting keys, we'll just pretend they're empty, that
     //  way the front end can always assume the keys will be present
-    if (document.files.length > 0 && !document.populated('files')) {
-      // delete transformedDocument.files
-      transformedDocument.files = []
+    if (document.mainImage && !document.populated('mainImage')) {
+      // delete transformedDocument.mainImage
+      transformedDocument.mainImage = null
+    }
+
+    if (document.images.length > 0 && !document.populated('images')) {
+      // delete transformedDocument.images
+      transformedDocument.images = []
     }
 
     return transformedDocument
@@ -59,9 +85,9 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
 
   const mintArguments = [
     this.creatorAddress,
-    web3.utils.soliditySha3(this.name),
-    web3.utils.soliditySha3(this.description || ''),
-    web3.utils.soliditySha3('image data here'), // TODO: calculate image hashes
+    this.nameHash,
+    this.descriptionHash || '',
+    this.mainImage.hash,
     '1', // TODO: sort out proper provider ID functionality
     this.id,
   ]
@@ -93,14 +119,15 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-// always get files for metadata
-function populateFiles(next) {
-  this.populate('files')
+// always get images for metadata
+function populateImages(next) {
+  this.populate('mainImage')
+  this.populate('images')
   next()
 }
 
-schema.pre('find', populateFiles)
-schema.pre('findOne', populateFiles)
-schema.pre('findOneAndUpdate', populateFiles)
+schema.pre('find', populateImages)
+schema.pre('findOne', populateImages)
+schema.pre('findOneAndUpdate', populateImages)
 
 export default mongooseService.codexRegistry.model('CodexTitleMetadata', schema)

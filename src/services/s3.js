@@ -3,6 +3,7 @@ import Bluebird from 'bluebird'
 import getFileType from 'file-type'
 import RestifyErrors from 'restify-errors'
 import probeImageSize from 'probe-image-size'
+import { web3 } from '@codex-protocol/ethereum-service'
 
 import { s3 } from './aws'
 import logger from './logger'
@@ -24,7 +25,7 @@ export default {
 
     return Bluebird.map(files, (file) => {
 
-      const getFileBufferPromise = Bluebird.resolve(file.buffer || readFile(file.path))
+      const getFileBufferPromise = Bluebird.resolve(file.buffer || readFile(file.path, { encoding: 'binary' }))
 
       return getFileBufferPromise
         .catch((error) => {
@@ -76,6 +77,7 @@ export default {
                 mimeType: file.mimetype,
                 width: file.dimensions.width,
                 height: file.dimensions.height,
+                hash: web3.utils.soliditySha3(file.buffer),
               }
             })
         })

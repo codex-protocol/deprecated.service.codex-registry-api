@@ -24,6 +24,11 @@ const schema = new mongoose.Schema({
   fileType: {
     type: String,
     required: true,
+    enum: [
+      'image',
+      'video',
+      'document',
+    ],
   },
   size: {
     type: String,
@@ -44,6 +49,11 @@ const schema = new mongoose.Schema({
   height: {
     type: String,
     default: null,
+  },
+  hash: {
+    type: String,
+    required: true,
+    lowercase: true,
   },
 }, schemaOptions)
 

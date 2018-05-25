@@ -14,7 +14,7 @@ export default {
     isPrivate: Joi.boolean(),
     whitelistedAddresses: Joi.array().items(
       Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
-    ),
+    ).unique(),
   }).or(
     'isPrivate',
     'whitelistedAddresses',
@@ -35,6 +35,10 @@ export default {
         }
 
         Object.assign(codexTitle, request.parameters)
+
+        codexTitle.whitelistedAddresses = request.parameters.whitelistedAddresses.filter((whitelistedAddress) => {
+          return whitelistedAddress !== response.locals.userAddress
+        })
 
         return codexTitle.save()
 

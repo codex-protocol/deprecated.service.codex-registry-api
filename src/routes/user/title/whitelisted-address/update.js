@@ -13,7 +13,7 @@ export default {
   parameters: Joi.object().keys({
     addresses: Joi.array().items(
       Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
-    ).required(),
+    ).unique().required(),
   }),
 
   handler(request, response) {
@@ -30,7 +30,9 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        codexTitle.whitelistedAddresses = request.parameters.addresses
+        codexTitle.whitelistedAddresses = request.parameters.addresses.filter((address) => {
+          return address !== response.locals.userAddress
+        })
 
         return codexTitle.save()
 

@@ -25,6 +25,11 @@ const fullConfig = {
       amount: '100',
     },
 
+    orphanedMetadata: {
+      jobFrequency: '1 minute',
+      expiryThreshold: 5 * 60 * 1000, // 5 minutes
+    },
+
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
@@ -71,6 +76,11 @@ const fullConfig = {
       gasPrice: 5000000000, // 5 gwei
       gasLimit: 300000,
       amount: '100',
+    },
+
+    orphanedMetadata: {
+      jobFrequency: '1 day',
+      expiryThreshold: 7 * 24 * 60 * 60 * 1000, // 1 week
     },
 
     mongodb: {
