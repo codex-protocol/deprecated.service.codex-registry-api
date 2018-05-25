@@ -33,6 +33,10 @@ export default {
 
               codexTitleMetadata.codexTitleTokenId = codexTitle.tokenId
 
+              // TODO: maybe verify hases here? e.g.:
+              // codexTitleMetadata.nameHash === codexTitle.nameHash
+              // codexTitleMetadata.descriptionHash === codexTitle.descriptionHash
+
               return codexTitleMetadata.save()
                 .then(() => {
                   codexTitle.metadata = codexTitleMetadata

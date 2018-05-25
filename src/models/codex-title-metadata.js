@@ -1,6 +1,9 @@
 import mongoose from 'mongoose'
 // import ethUtil from 'ethereumjs-util'
-import { web3, contracts } from '@codex-protocol/ethereum-service'
+import {
+  // web3,
+  contracts,
+} from '@codex-protocol/ethereum-service'
 
 // import config from '../config'
 import mongooseService from '../services/mongoose'
@@ -25,7 +28,15 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  nameHash: {
+    type: String,
+    required: true,
+  },
   description: {
+    type: String,
+    default: null,
+  },
+  descriptionHash: {
     type: String,
     default: null,
   },
@@ -74,8 +85,8 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
 
   const mintArguments = [
     this.creatorAddress,
-    web3.utils.soliditySha3(this.name),
-    web3.utils.soliditySha3(this.description || ''),
+    this.nameHash,
+    this.descriptionHash || '',
     this.mainImage.hash,
     '1', // TODO: sort out proper provider ID functionality
     this.id,
