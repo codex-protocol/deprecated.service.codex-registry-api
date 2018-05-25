@@ -25,7 +25,7 @@ export default {
 
     return Bluebird.map(files, (file) => {
 
-      const getFileBufferPromise = Bluebird.resolve(file.buffer || readFile(file.path, { encoding: 'binary' }))
+      const getFileBufferPromise = Bluebird.resolve(file.buffer || readFile(file.path))
 
       return getFileBufferPromise
         .catch((error) => {
@@ -77,7 +77,7 @@ export default {
                 mimeType: file.mimetype,
                 width: file.dimensions.width,
                 height: file.dimensions.height,
-                hash: web3.utils.soliditySha3(file.buffer),
+                hash: web3.utils.soliditySha3(file.buffer.toString('binary')),
               }
             })
         })
