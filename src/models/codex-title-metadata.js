@@ -76,7 +76,7 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
     this.creatorAddress,
     web3.utils.soliditySha3(this.name),
     web3.utils.soliditySha3(this.description || ''),
-    web3.utils.soliditySha3('image data here'), // TODO: calculate image hashes
+    this.mainImage.hash,
     '1', // TODO: sort out proper provider ID functionality
     this.id,
   ]

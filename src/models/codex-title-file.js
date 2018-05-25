@@ -50,6 +50,11 @@ const schema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  hash: {
+    type: String,
+    required: true,
+    lowercase: true,
+  },
 }, schemaOptions)
 
 schema.virtual('uri').get(function getUri() {
