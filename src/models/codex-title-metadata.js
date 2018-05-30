@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 // import ethUtil from 'ethereumjs-util'
 import {
-  // web3,
+  web3,
   contracts,
 } from '@codex-protocol/ethereum-service'
 
