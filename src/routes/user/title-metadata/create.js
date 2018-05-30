@@ -1,5 +1,4 @@
 import Joi from 'joi'
-import { web3 } from '@codex-protocol/ethereum-service'
 
 import models from '../../../models'
 
@@ -27,8 +26,6 @@ export default {
 
     const newCodexTitleMetadataData = Object.assign({
       creatorAddress: response.locals.userAddress,
-      nameHash: web3.utils.soliditySha3(request.parameters.name),
-      descriptionHash: request.parameters.description ? web3.utils.soliditySha3(request.parameters.description) : null,
     }, request.parameters)
 
     const newCodexTitleMetadata = new models.CodexTitleMetadata(newCodexTitleMetadataData)

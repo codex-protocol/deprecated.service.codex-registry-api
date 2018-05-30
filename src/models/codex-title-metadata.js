@@ -131,4 +131,48 @@ schema.pre('find', populateImages)
 schema.pre('findOne', populateImages)
 schema.pre('findOneAndUpdate', populateImages)
 
+// set hashes when their unhashed counterparts are set
+schema.pre('validate', function setHashesBeforeValidation(next) {
+  this.nameHash = web3.utils.soliditySha3(this.name)
+  this.descriptionHash = this.description ? web3.utils.soliditySha3(this.description) : null
+  next()
+})
+
+schema.pre('save', function setTitleHashesBeforeSave(next) {
+  return models.CodexTitle
+    .updateOne(
+      { _id: this.codexTitleTokenId },
+      { $set: { nameHash: this.nameHash, descriptionHash: this.descriptionHash } }
+    )
+    .then(next)
+    .catch(next)
+})
+
+// eslint-disable-next-line prefer-arrow-callback
+schema.pre('update', function setHashesBeforeUpdate(next) {
+
+  // unless an ID is specified in the bulk update query, there's no way to
+  //  update the parent CodexTitle records without first running the query and
+  //  grabbing all matching IDs... and if an ID is passed, then why not just
+  //  find & save?
+  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexTitle record. Please find & save instead.'))
+
+  // const update = this.getUpdate()
+  //
+  // if (!update.$set) return next()
+  //
+  // // NOTE: this should never be possible since name is required
+  // if (update.$set.name === null) {
+  //   delete update.$set.nameHash
+  //   delete update.$set.name
+  // }
+  //
+  // if (update.$set.description === null) update.$set.descriptionHash = null
+  // if (typeof update.$set.name === 'string') update.$set.nameHash = web3.utils.soliditySha3(update.$set.name)
+  // if (typeof update.$set.description === 'string') update.$set.descriptionHash = web3.utils.soliditySha3(update.$set.description)
+  //
+  // return next()
+
+})
+
 export default mongooseService.codexRegistry.model('CodexTitleMetadata', schema)
