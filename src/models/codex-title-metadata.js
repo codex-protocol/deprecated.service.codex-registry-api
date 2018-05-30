@@ -87,7 +87,7 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
     this.creatorAddress,
     this.nameHash,
     this.descriptionHash || '',
-    this.mainImage.hash,
+    [this.mainImage.hash],
     '1', // TODO: sort out proper provider ID functionality
     this.id,
   ]
