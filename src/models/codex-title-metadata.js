@@ -42,6 +42,7 @@ const schema = new mongoose.Schema({
   },
   mainImage: {
     default: null,
+    required: true,
     ref: 'CodexTitleFile',
     type: mongoose.Schema.Types.ObjectId,
   },
