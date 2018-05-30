@@ -50,7 +50,7 @@ schema.set('toObject', {
 })
 
 // make all queries for addresses case insensitive
-function makeAddressesCaseInsensitive(next) {
+function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
   if (typeof query.id === 'string') query.id = query.id.toLowerCase()
   if (typeof query._id === 'string') query._id = query._id.toLowerCase()
@@ -58,11 +58,11 @@ function makeAddressesCaseInsensitive(next) {
   next()
 }
 
-schema.pre('find', makeAddressesCaseInsensitive)
-schema.pre('count', makeAddressesCaseInsensitive)
-schema.pre('update', makeAddressesCaseInsensitive)
-schema.pre('findOne', makeAddressesCaseInsensitive)
-schema.pre('findOneAndRemove', makeAddressesCaseInsensitive)
-schema.pre('findOneAndUpdate', makeAddressesCaseInsensitive)
+schema.pre('find', makeQueryAddressesCaseInsensitive)
+schema.pre('count', makeQueryAddressesCaseInsensitive)
+schema.pre('update', makeQueryAddressesCaseInsensitive)
+schema.pre('findOne', makeQueryAddressesCaseInsensitive)
+schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
+schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
 export default mongooseService.codexRegistry.model('User', schema)
