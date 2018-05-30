@@ -6,6 +6,7 @@ import {
 } from '@codex-protocol/ethereum-service'
 
 // import config from '../config'
+import models from '../models'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -50,6 +51,10 @@ const schema = new mongoose.Schema({
     ref: 'CodexTitleFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
+  files: [{
+    ref: 'CodexTitleFile',
+    type: mongoose.Schema.Types.ObjectId,
+  }],
 }, schemaOptions)
 
 schema.set('toJSON', {
@@ -77,6 +82,11 @@ schema.set('toJSON', {
       transformedDocument.images = []
     }
 
+    if (document.files.length > 0 && !document.populated('files')) {
+      // delete transformedDocument.files
+      transformedDocument.files = []
+    }
+
     return transformedDocument
 
   },
@@ -88,7 +98,11 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
     this.creatorAddress,
     this.nameHash,
     this.descriptionHash || '',
-    [this.mainImage.hash],
+    [
+      this.mainImage.hash,
+      ...this.images.map((image) => { return image.hash }),
+      ...this.files.map((file) => { return file.hash }),
+    ],
     '1', // TODO: sort out proper provider ID functionality
     this.id,
   ]
@@ -120,10 +134,9 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-// always get images for metadata
+// always get images & files for metadata
 function populateImages(next) {
-  this.populate('mainImage')
-  this.populate('images')
+  this.populate('mainImage images files')
   next()
 }
 

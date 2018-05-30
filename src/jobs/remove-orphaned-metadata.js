@@ -36,8 +36,8 @@ export default {
     const now = Date.now()
 
     // find all metadata records that have not been tied to a CodexTitle after
-    //  one week
-    const findOrphanedMetadatumConditions = {
+    //  the specified expiry threshold
+    const findOrphanedMetadataConditions = {
       codexTitleTokenId: null,
       createdAt: {
         $lte: now - config.orphanedMetadata.expiryThreshold,
@@ -45,36 +45,32 @@ export default {
     }
 
     return models.CodexTitleMetadata
-      .find(findOrphanedMetadatumConditions)
-      .populate('mainImage')
-      .populate('images')
+      .find(findOrphanedMetadataConditions)
+      .then((metadata) => {
 
-      .then((metadatum) => {
+        if (metadata.length === 0) return null
 
-        if (metadatum.length > 0) {
-          logger.verbose(`[${this.name}]`, `found ${metadatum.length} metadata(um) to remove`)
-        }
+        logger.verbose(`[${this.name}]`, `found ${metadata.length} metadata(um) to remove`)
 
         return this.getJob()
           .then((job) => {
 
-            return Bluebird.map(metadatum, (metadata) => {
+            return Bluebird.map(metadata, (metadatum) => {
 
-              logger.verbose(`removing metadata with id ${metadata.id} and associated file records`)
+              const fileIds = [
+                metadatum.mainImage.id,
+                ...metadatum.files.map((file) => { return file.id }),
+                ...metadatum.images.map((image) => { return image.id }),
+              ]
 
-              const removeMetadataImagesConditions = {
-                _id: {
-                  $in: [
-                    metadata.mainImage,
-                    ...metadata.images,
-                  ],
-                },
-              }
+              logger.verbose(`removing metadatum with id ${metadatum.id} and ${fileIds.length} associated file records`)
+
+              const removeMetadataFilesConditions = { _id: { $in: fileIds } }
 
               return models.CodexTitleFile
-                .remove(removeMetadataImagesConditions)
+                .remove(removeMetadataFilesConditions)
                 .then(() => {
-                  return metadata.remove()
+                  return metadatum.remove()
                 })
 
             })

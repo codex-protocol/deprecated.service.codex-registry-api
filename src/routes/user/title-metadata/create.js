@@ -2,7 +2,7 @@ import Joi from 'joi'
 
 import models from '../../../models'
 
-const imageSchema = Joi.object().keys({
+const fileSchema = Joi.object().keys({
   _id: Joi.string().regex(/^[0-9a-f]{24}$/i).required(),
 }).rename('id', '_id')
 
@@ -15,10 +15,13 @@ export default {
 
   parameters: Joi.object().keys({
     description: Joi.string().allow(null),
-    mainImage: imageSchema.required(),
+    mainImage: fileSchema.required(),
     name: Joi.string().required(),
     images: Joi.array().items(
-      imageSchema.required()
+      fileSchema.required()
+    ).single().default([]),
+    files: Joi.array().items(
+      fileSchema.required()
     ).single().default([]),
   }),
 
@@ -34,8 +37,7 @@ export default {
       .then(() => {
 
         return newCodexTitleMetadata
-          .populate('mainImage')
-          .populate('images')
+          .populate('mainImage images files')
           .execPopulate()
 
       })

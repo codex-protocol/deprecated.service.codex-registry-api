@@ -47,9 +47,11 @@ export default {
     return models.Transaction.find(findTransactionConditions)
       .then((transactions) => {
 
-        if (transactions.length > 0) {
-          logger.verbose(`[${this.name}]`, `found ${transactions.length} transaction(s) to submit`)
+        if (transactions.length === 0) {
+          return null
         }
+
+        logger.verbose(`[${this.name}]`, `found ${transactions.length} transaction(s) to submit`)
 
         return this.getJob()
           .then((job) => {
