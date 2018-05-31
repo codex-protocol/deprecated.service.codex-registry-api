@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import BigNumber from 'bignumber.js'
 import ethereumUtil from 'ethereumjs-util'
 
 // Reads environment variables stored in the '.env' file and writes them to the
@@ -19,10 +20,10 @@ const fullConfig = {
     personalMessageToSign,
 
     faucet: {
-      cooldown: 1 * 60 * 1000, // 1 minute
-      gasPrice: 5000000000, // 5 gwei
       gasLimit: 300000,
-      amount: '100',
+      gasPrice: 5000000000, // 5 gwei
+      cooldown: 1 * 60 * 1000, // 1 minute
+      amount: new BigNumber(10).pow(18).times(100), // 100 CODX
     },
 
     orphanedMetadata: {
@@ -72,10 +73,10 @@ const fullConfig = {
     personalMessageToSign,
 
     faucet: {
-      cooldown: 24 * 60 * 60 * 1000, // 24 hours
-      gasPrice: 5000000000, // 5 gwei
       gasLimit: 300000,
-      amount: '100',
+      gasPrice: 5000000000, // 5 gwei
+      cooldown: 24 * 60 * 60 * 1000, // 24 hours
+      amount: new BigNumber(10).pow(18).times(100), // 100 CODX
     },
 
     orphanedMetadata: {
