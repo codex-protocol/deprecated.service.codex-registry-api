@@ -1,16 +1,15 @@
 import mongoose from 'mongoose'
-// import ethUtil from 'ethereumjs-util'
 import {
   web3,
   contracts,
 } from '@codex-protocol/ethereum-service'
 
-// import config from '../config'
 import models from '../models'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
   timestamps: true, // let mongoose handle the createdAt and updatedAt fields
+  usePushEach: true, // see https://github.com/Automattic/mongoose/issues/5574
 }
 
 const schema = new mongoose.Schema({
@@ -42,7 +41,6 @@ const schema = new mongoose.Schema({
     default: null,
   },
   mainImage: {
-    default: null,
     required: true,
     ref: 'CodexTitleFile',
     type: mongoose.Schema.Types.ObjectId,
@@ -55,10 +53,31 @@ const schema = new mongoose.Schema({
     ref: 'CodexTitleFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
+  pendingUpdates: [{
+    ref: 'CodexTitleMetadataPendingUpdate',
+    type: mongoose.Schema.Types.ObjectId,
+  }],
 }, schemaOptions)
+
+schema.virtual('hasPendingUpdates').get(function getHasPendingUpdates() {
+  return this.pendingUpdates.length > 0
+})
+
+schema.virtual('fileHashes').get(function getFileHashes() {
+  return [
+    this.mainImage.hash,
+    ...this.images.map((image) => { return image.hash }),
+    ...this.files.map((file) => { return file.hash }),
+  ]
+})
+
+schema.set('toObject', {
+  virtuals: true,
+})
 
 schema.set('toJSON', {
   getters: true, // essentially converts _id to just id
+  virtuals: true,
   versionKey: false,
   transform(document, transformedDocument) {
 
@@ -87,6 +106,11 @@ schema.set('toJSON', {
       transformedDocument.files = []
     }
 
+    if (document.pendingUpdates.length > 0 && !document.populated('pendingUpdates')) {
+      // delete transformedDocument.pendingUpdates
+      transformedDocument.pendingUpdates = []
+    }
+
     return transformedDocument
 
   },
@@ -98,24 +122,36 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
     this.creatorAddress,
     this.nameHash,
     this.descriptionHash || '',
-    [
-      this.mainImage.hash,
-      ...this.images.map((image) => { return image.hash }),
-      ...this.files.map((file) => { return file.hash }),
-    ],
+    this.fileHashes,
     '1', // TODO: sort out proper provider ID functionality
     this.id,
   ]
 
-  // const hashedMintArguments = web3.utils.soliditySha3(...mintArguments)
-  // const hashedMessage = ethUtil.sha3(`\x19Ethereum Signed Message:\n${hashedMintArguments.length}${hashedMintArguments}`)
-  // const signResult = ethUtil.ecsign(hashedMessage, config.blockchain.signerPrivateKeyBuffer)
-  //
-  // mintArguments.push(signResult.v, signResult.r, signResult.s)
-
   return {
     contractAddress: contracts.CodexTitle.options.address,
     mintTransactionData: contracts.CodexTitle.methods.mint(...mintArguments).encodeABI(),
+  }
+
+}
+
+schema.methods.generateModifyMetadataHashesTransactionData = function generateModifyMetadataHashesTransactionData(pendingUpdate) {
+
+  if (!pendingUpdate) {
+    throw new Error('generateModifyMetadataHashesTransactionData could not be called because a pendingUpdate was not specified.')
+  }
+
+  const modifyMetadataHashesArguments = [
+    this.codexTitleTokenId,
+    pendingUpdate.nameHash,
+    pendingUpdate.descriptionHash || '',
+    pendingUpdate.fileHashes,
+    '1', // TODO: sort out proper provider ID functionality
+    this.id,
+  ]
+
+  return {
+    contractAddress: contracts.CodexTitle.options.address,
+    mintTransactionData: contracts.CodexTitle.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
   }
 
 }
@@ -134,24 +170,24 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-// always get images & files for metadata
-function populateImages(next) {
-  this.populate('mainImage images files')
+// always get images, files, and pendingUpdates
+function populate(next) {
+  this.populate('pendingUpdates mainImage images files')
   next()
 }
 
-schema.pre('find', populateImages)
-schema.pre('findOne', populateImages)
-schema.pre('findOneAndUpdate', populateImages)
+schema.pre('find', populate)
+schema.pre('findOne', populate)
+schema.pre('findOneAndUpdate', populate)
 
 // set hashes when their unhashed counterparts are set
-schema.pre('validate', function setHashesBeforeValidation(next) {
+function setHashesBeforeValidation(next) {
   this.nameHash = web3.utils.soliditySha3(this.name)
   this.descriptionHash = this.description ? web3.utils.soliditySha3(this.description) : null
   next()
-})
+}
 
-schema.pre('save', function setTitleHashesBeforeSave(next) {
+function setTitleHashesBeforeSave(next) {
   return models.CodexTitle
     .updateOne(
       { _id: this.codexTitleTokenId },
@@ -159,33 +195,17 @@ schema.pre('save', function setTitleHashesBeforeSave(next) {
     )
     .then(next)
     .catch(next)
-})
+}
 
-// eslint-disable-next-line prefer-arrow-callback
-schema.pre('update', function setHashesBeforeUpdate(next) {
+schema.pre('validate', setHashesBeforeValidation)
+schema.pre('save', setTitleHashesBeforeSave)
 
-  // unless an ID is specified in the bulk update query, there's no way to
-  //  update the parent CodexTitle records without first running the query and
-  //  grabbing all matching IDs... and if an ID is passed, then why not just
-  //  find & save?
+// unless an ID is specified in the bulk update query, there's no way to
+//  update the parent CodexTitle records without first running the query and
+//  grabbing all matching IDs... and if an ID is passed, then why not just
+//  find & save?
+schema.pre('update', (next) => {
   return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexTitle record. Please find & save instead.'))
-
-  // const update = this.getUpdate()
-  //
-  // if (!update.$set) return next()
-  //
-  // // NOTE: this should never be possible since name is required
-  // if (update.$set.name === null) {
-  //   delete update.$set.nameHash
-  //   delete update.$set.name
-  // }
-  //
-  // if (update.$set.description === null) update.$set.descriptionHash = null
-  // if (typeof update.$set.name === 'string') update.$set.nameHash = web3.utils.soliditySha3(update.$set.name)
-  // if (typeof update.$set.description === 'string') update.$set.descriptionHash = web3.utils.soliditySha3(update.$set.description)
-  //
-  // return next()
-
 })
 
 export default mongooseService.codexRegistry.model('CodexTitleMetadata', schema)

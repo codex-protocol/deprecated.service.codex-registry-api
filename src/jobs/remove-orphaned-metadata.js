@@ -70,6 +70,7 @@ export default {
               return models.CodexTitleFile
                 .remove(removeMetadataFilesConditions)
                 .then(() => {
+                  // TODO: remove old pendingUpdates here?
                   return metadatum.remove()
                 })
 

@@ -1,3 +1,4 @@
+import CodexTitleMetadataPendingUpdate from './codex-title-metadata-pending-update'
 import CodexTitleTransferEvent from './codex-title-transfer-event'
 import CodexTitleMetadata from './codex-title-metadata'
 import BlockchainEvent from './blockchain-event'
@@ -8,6 +9,7 @@ import User from './user'
 import Job from './job'
 
 export default {
+  CodexTitleMetadataPendingUpdate,
   CodexTitleTransferEvent,
   CodexTitleMetadata,
   BlockchainEvent,

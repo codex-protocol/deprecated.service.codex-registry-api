@@ -101,6 +101,10 @@ schema.methods.maskOwnerOnlyFields = function maskOwnerOnlyFields(userAddress) {
 
   this.whitelistedAddresses = []
 
+  if (this.populated('metadata')) {
+    this.metadata.depopulate('pendingUpdates')
+  }
+
   // TODO: mask historical provenance here when that's implemented
   // TODO: rename provenance to digitalProvenance?
   // this.depopulate('historicalProvenance')
