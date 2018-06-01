@@ -72,10 +72,7 @@ export default {
           })
           .then(() => {
             codexTitle.metadata.pendingUpdates.push(newPendingUpdate)
-            return codexTitle.metadata.save()
-          })
-          .then(() => {
-            return codexTitle.metadata.generateModifyMetadataHashesTransactionData(newPendingUpdate)
+            return codexTitle.metadata.save() // TODO: should this route just return newPendingUpdate only?
           })
 
       })
