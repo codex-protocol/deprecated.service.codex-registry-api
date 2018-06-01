@@ -33,6 +33,7 @@ const mockImages = s3Keys.map((s3Key, index) => {
     mimeType: 'image/jpeg',
     name: `Image ${index + 1}`,
     s3Bucket: config.aws.s3.buckets.codexRegistry,
+    hash: '0xdeadbeef00000000000000000000000000000000000000000000000000000000',
   }
 })
 

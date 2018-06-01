@@ -40,7 +40,7 @@ export default {
       })
       .then((user) => {
 
-        return contracts.CodexToken.methods.paused().call()
+        return contracts.CodexCoin.methods.paused().call()
           .then((isPaused) => {
 
             if (isPaused) {
@@ -68,9 +68,9 @@ export default {
             value: 0,
             gasPrice: config.faucet.gasPrice,
             gasLimit: config.faucet.gasLimit,
-            to: contracts.CodexToken.options.address,
+            to: contracts.CodexCoin.options.address,
             from: config.blockchain.signerPublicAddress,
-            data: contracts.CodexToken.methods.transfer(...transferArguments).encodeABI(),
+            data: contracts.CodexCoin.methods.transfer(...transferArguments).encodeABI(),
           },
         }
 

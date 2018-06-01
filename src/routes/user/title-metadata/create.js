@@ -1,9 +1,8 @@
 import Joi from 'joi'
-import { web3 } from '@codex-protocol/ethereum-service'
 
 import models from '../../../models'
 
-const imageSchema = Joi.object().keys({
+const fileSchema = Joi.object().keys({
   _id: Joi.string().regex(/^[0-9a-f]{24}$/i).required(),
 }).rename('id', '_id')
 
@@ -16,10 +15,13 @@ export default {
 
   parameters: Joi.object().keys({
     description: Joi.string().allow(null),
-    mainImage: imageSchema.required(),
+    mainImage: fileSchema.required(),
     name: Joi.string().required(),
     images: Joi.array().items(
-      imageSchema.required()
+      fileSchema.required(),
+    ).single().default([]),
+    files: Joi.array().items(
+      fileSchema.required(),
     ).single().default([]),
   }),
 
@@ -27,20 +29,20 @@ export default {
 
     const newCodexTitleMetadataData = Object.assign({
       creatorAddress: response.locals.userAddress,
-      nameHash: web3.utils.soliditySha3(request.parameters.name),
-      descriptionHash: request.parameters.description ? web3.utils.soliditySha3(request.parameters.description) : null,
     }, request.parameters)
+
+    // remove the main image from the images array if it exists in both places
+    newCodexTitleMetadataData.images = newCodexTitleMetadataData.images.filter((image) => {
+      return image._id !== newCodexTitleMetadataData.mainImage._id
+    })
 
     const newCodexTitleMetadata = new models.CodexTitleMetadata(newCodexTitleMetadataData)
 
     return newCodexTitleMetadata.save()
       .then(() => {
-
         return newCodexTitleMetadata
-          .populate('mainImage')
-          .populate('images')
+          .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
           .execPopulate()
-
       })
 
   },

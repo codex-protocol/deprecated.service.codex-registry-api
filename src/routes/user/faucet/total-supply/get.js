@@ -13,7 +13,7 @@ export default {
   ],
 
   handler(request, response) {
-    return contracts.CodexToken.methods.totalSupply().call()
+    return contracts.CodexCoin.methods.totalSupply().call()
       .then((totalSupply) => {
         return {
           totalSupply,
