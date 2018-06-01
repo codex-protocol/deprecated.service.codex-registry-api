@@ -31,6 +31,11 @@ export default {
       creatorAddress: response.locals.userAddress,
     }, request.parameters)
 
+    // remove the main image from the images array if it exists in both places
+    newCodexTitleMetadataData.images = newCodexTitleMetadataData.images.filter((image) => {
+      return image._id !== newCodexTitleMetadataData.mainImage._id
+    })
+
     const newCodexTitleMetadata = new models.CodexTitleMetadata(newCodexTitleMetadataData)
 
     return newCodexTitleMetadata.save()
