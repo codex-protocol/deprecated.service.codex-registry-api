@@ -120,6 +120,10 @@ export default {
 
                   }
 
+                  case 'Modified':
+                    promise = codexTitleService.modify(...returnValues)
+                    break
+
                   case 'Approval':
                     promise = codexTitleService.approveAddress(...returnValues)
                     break

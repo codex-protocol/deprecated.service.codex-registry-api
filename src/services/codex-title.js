@@ -87,6 +87,110 @@ export default {
 
   },
 
+  modify: (
+    modifierAddress,
+    tokenId,
+    newNameHash,
+    newDescriptionHash,
+    newFileHashes,
+    providerId,
+    providerMetadataId,
+    transactionHash,
+  ) => {
+
+    const findCodexTitleConditions = {
+      providerId,
+      _id: tokenId,
+      providerMetadataId,
+    }
+
+    return models.CodexTitle.findOne(findCodexTitleConditions)
+      .then((codexTitle) => {
+
+        if (!codexTitle) {
+          throw new Error(`Can not modify CodexTitle with tokenId ${tokenId} because it does not exist.`)
+        }
+
+        codexTitle.nameHash = newNameHash
+        codexTitle.descriptionHash = newDescriptionHash
+
+        // TODO: sort out proper provider ID functionality
+        if (codexTitle.providerId !== '1') {
+          return codexTitle
+        }
+
+        return models.CodexTitleMetadata.findById(providerMetadataId)
+          .then((codexTitleMetadata) => {
+
+            if (!codexTitleMetadata) {
+              throw new Error(`Can not modify CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+            }
+
+            const pendingUpdateToCommitIndex = codexTitleMetadata.pendingUpdates.findIndex((pendingUpdate) => {
+
+              if (
+                newNameHash !== pendingUpdate.nameHash ||
+                newDescriptionHash !== pendingUpdate.descriptionHash ||
+                newFileHashes.length !== pendingUpdate.fileHashes.length
+              ) {
+                return false
+              }
+
+              newFileHashes.sort()
+              pendingUpdate.fileHashes.sort()
+
+              return pendingUpdate.fileHashes.every((fileHash, index) => {
+                return fileHash === newFileHashes[index]
+              })
+            })
+
+            if (pendingUpdateToCommitIndex === -1) {
+              throw new Error(`Can not modify CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} has no matching pending updates.`)
+            }
+
+            const [pendingUpdateToCommit] = codexTitleMetadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
+
+            const oldFileIds = [
+              codexTitleMetadata.mainImage.id,
+              ...codexTitleMetadata.files.map((file) => { return file.id }),
+              ...codexTitleMetadata.images.map((image) => { return image.id }),
+            ]
+
+            const newFileIds = [
+              pendingUpdateToCommit.mainImage.id,
+              ...pendingUpdateToCommit.files.map((file) => { return file.id }),
+              ...pendingUpdateToCommit.images.map((image) => { return image.id }),
+            ]
+
+            const fileIdsToRemove = oldFileIds.filter((oldFileId) => {
+              return !newFileIds.includes(oldFileId)
+            })
+
+            // TODO: maybe verify hases here? e.g.:
+            // pendingUpdateToCommit.nameHash === nameHash
+            // pendingUpdateToCommit.descriptionHash === descriptionHash
+
+            codexTitleMetadata.name = pendingUpdateToCommit.name
+            codexTitleMetadata.files = pendingUpdateToCommit.files
+            codexTitleMetadata.images = pendingUpdateToCommit.images
+            codexTitleMetadata.nameHash = pendingUpdateToCommit.nameHash
+            codexTitleMetadata.mainImage = pendingUpdateToCommit.mainImage
+            codexTitleMetadata.description = pendingUpdateToCommit.description
+            codexTitleMetadata.descriptionHash = pendingUpdateToCommit.descriptionHash
+
+            // TODO: create provenance record here (before saving anything else)
+            return codexTitleMetadata.save()
+              .then(() => {
+                return models.CodexTitleFile.remove({ _id: { $in: fileIdsToRemove } })
+              })
+              .then(() => {
+                return pendingUpdateToCommit.remove()
+              })
+          })
+      })
+
+  },
+
   transfer: (oldOwnerAddress, newOwnerAddress, tokenId, transactionHash) => {
 
     return models.CodexTitle.findById(tokenId)
