@@ -57,7 +57,7 @@ export default {
   create: (ownerAddress, tokenId, transactionHash) => {
 
     return contracts.CodexTitle.methods.getTokenById(tokenId).call()
-      .then(({ nameHash, descriptionHash, imageHashes }) => {
+      .then(({ nameHash, descriptionHash, fileHashes }) => {
 
         const newCodexTitleTransferEventData = {
           newOwnerAddress: ownerAddress,
@@ -70,7 +70,7 @@ export default {
         return new models.CodexTitleTransferEvent(newCodexTitleTransferEventData).save()
           .then((newCodexTitleTransferEvent) => {
 
-            // TODO: store imageHashes
+            // TODO: store fileHashes?
             const newCodexTitleData = {
               provenance: [newCodexTitleTransferEvent],
               descriptionHash,
