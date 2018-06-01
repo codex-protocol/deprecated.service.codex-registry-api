@@ -18,10 +18,10 @@ export default {
     mainImage: fileSchema.required(),
     name: Joi.string().required(),
     images: Joi.array().items(
-      fileSchema.required()
+      fileSchema.required(),
     ).single().default([]),
     files: Joi.array().items(
-      fileSchema.required()
+      fileSchema.required(),
     ).single().default([]),
   }),
 
@@ -35,11 +35,9 @@ export default {
 
     return newCodexTitleMetadata.save()
       .then(() => {
-
         return newCodexTitleMetadata
-          .populate('mainImage images files')
+          .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
           .execPopulate()
-
       })
 
   },

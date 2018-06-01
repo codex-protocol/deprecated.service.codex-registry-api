@@ -23,31 +23,29 @@ export default {
         codexTitle.providerId = providerId
 
         // TODO: sort out proper provider ID functionality
-        if (codexTitle.providerId === '1') {
-          return models.CodexTitleMetadata.findById(providerMetadataId)
-            .then((codexTitleMetadata) => {
-
-              if (!codexTitleMetadata) {
-                throw new Error(`Can not confirm CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
-              }
-
-              codexTitleMetadata.codexTitleTokenId = codexTitle.tokenId
-
-              // TODO: maybe verify hases here? e.g.:
-              // codexTitleMetadata.nameHash === codexTitle.nameHash
-              // codexTitleMetadata.descriptionHash === codexTitle.descriptionHash
-
-              return codexTitleMetadata.save()
-                .then(() => {
-                  codexTitle.metadata = codexTitleMetadata
-                  return codexTitle
-                })
-
-            })
+        if (codexTitle.providerId !== '1') {
+          return codexTitle
         }
 
-        return codexTitle
+        return models.CodexTitleMetadata.findById(providerMetadataId)
+          .then((codexTitleMetadata) => {
 
+            if (!codexTitleMetadata) {
+              throw new Error(`Can not confirm CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+            }
+
+            codexTitleMetadata.codexTitleTokenId = codexTitle.tokenId
+
+            // TODO: maybe verify hases here? e.g.:
+            // codexTitleMetadata.nameHash === codexTitle.nameHash
+            // codexTitleMetadata.descriptionHash === codexTitle.descriptionHash
+
+            return codexTitleMetadata.save()
+              .then(() => {
+                codexTitle.metadata = codexTitleMetadata
+                return codexTitle
+              })
+          })
       })
 
       .then((codexTitle) => {
