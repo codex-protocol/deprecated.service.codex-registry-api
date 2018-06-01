@@ -13,7 +13,7 @@ export default {
   ],
 
   handler(request, response) {
-    return contracts.CodexToken.methods.balanceOf(response.locals.userAddress).call()
+    return contracts.CodexCoin.methods.balanceOf(response.locals.userAddress).call()
       .then((balance) => {
         return {
           balance,
