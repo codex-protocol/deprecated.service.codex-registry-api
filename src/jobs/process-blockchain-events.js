@@ -139,7 +139,7 @@ export default {
 
                 return promise
                   .catch((error) => {
-                    logger.error(`[${this.name}]`, 'could not process blockchainEvent:', { blockchainEvent, error })
+                    logger.error(`[${this.name}]`, `could not process blockchainEvent with id ${blockchainEvent.id} (${blockchainEvent.eventName}):`, error)
                   })
 
               })
