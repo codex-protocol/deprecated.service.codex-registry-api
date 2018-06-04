@@ -13,10 +13,10 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
-  codexTitleTokenId: {
+  codexRecordTokenId: {
     type: String,
     default: null,
-    ref: 'CodexTitle',
+    ref: 'CodexRecord',
   },
   creatorAddress: {
     type: String,
@@ -42,19 +42,19 @@ const schema = new mongoose.Schema({
   },
   mainImage: {
     required: true,
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   },
   images: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
   files: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
   pendingUpdates: [{
-    ref: 'CodexTitleMetadataPendingUpdate',
+    ref: 'CodexRecordMetadataPendingUpdate',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
@@ -128,8 +128,8 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
   ]
 
   return {
-    contractAddress: contracts.CodexTitle.options.address,
-    mintTransactionData: contracts.CodexTitle.methods.mint(...mintArguments).encodeABI(),
+    contractAddress: contracts.CodexRecord.options.address,
+    mintTransactionData: contracts.CodexRecord.methods.mint(...mintArguments).encodeABI(),
   }
 
 }
@@ -141,7 +141,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
   }
 
   const modifyMetadataHashesArguments = [
-    this.codexTitleTokenId,
+    this.codexRecordTokenId,
     pendingUpdate.nameHash,
     pendingUpdate.descriptionHash || '',
     pendingUpdate.fileHashes,
@@ -150,8 +150,8 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
   ]
 
   return {
-    contractAddress: contracts.CodexTitle.options.address,
-    mintTransactionData: contracts.CodexTitle.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
+    contractAddress: contracts.CodexRecord.options.address,
+    mintTransactionData: contracts.CodexRecord.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
   }
 
 }
@@ -187,10 +187,10 @@ function setHashesBeforeValidation(next) {
   next()
 }
 
-function setTitleHashesBeforeSave(next) {
-  return models.CodexTitle
+function setParentHashesBeforeSave(next) {
+  return models.CodexRecord
     .updateOne(
-      { _id: this.codexTitleTokenId },
+      { _id: this.codexRecordTokenId },
       { $set: { nameHash: this.nameHash, descriptionHash: this.descriptionHash } }
     )
     .then(next)
@@ -198,14 +198,14 @@ function setTitleHashesBeforeSave(next) {
 }
 
 schema.pre('validate', setHashesBeforeValidation)
-schema.pre('save', setTitleHashesBeforeSave)
+schema.pre('save', setParentHashesBeforeSave)
 
 // unless an ID is specified in the bulk update query, there's no way to
-//  update the parent CodexTitle records without first running the query and
+//  update the parent CodexRecord records without first running the query and
 //  grabbing all matching IDs... and if an ID is passed, then why not just
 //  find & save?
 schema.pre('update', (next) => {
-  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexTitle record. Please find & save instead.'))
+  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexRecord record. Please find & save instead.'))
 })
 
-export default mongooseService.codexRegistry.model('CodexTitleMetadata', schema)
+export default mongooseService.codexRegistry.model('CodexRecordMetadata', schema)

@@ -3,10 +3,10 @@ import mongoose from 'mongoose'
 import mongooseService from '../services/mongoose'
 
 const schema = new mongoose.Schema({
-  codexTitleTokenId: {
+  codexRecordTokenId: {
     type: String,
     required: true,
-    ref: 'CodexTitle',
+    ref: 'CodexRecord',
   },
   type: {
     type: String,
@@ -37,8 +37,8 @@ const schema = new mongoose.Schema({
   },
 
   // data specific to "modified" events
-  codexTitleModifiedEvent: {
-    ref: 'CodexTitleModifiedEvent',
+  codexRecordModifiedEvent: {
+    ref: 'CodexRecordModifiedEvent',
     type: mongoose.Schema.Types.ObjectId,
   },
 
@@ -61,7 +61,7 @@ schema.set('toJSON', {
     delete transformedDocument._id
     delete transformedDocument.id
 
-    delete transformedDocument.codexTitleTokenId
+    delete transformedDocument.codexRecordTokenId
 
     return transformedDocument
 
@@ -85,7 +85,7 @@ schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
 // always get images, files, and pendingUpdates
 function populate(next) {
-  this.populate('codexTitleModifiedEvent')
+  this.populate('codexRecordModifiedEvent')
   next()
 }
 
@@ -93,4 +93,4 @@ schema.pre('find', populate)
 schema.pre('findOne', populate)
 schema.pre('findOneAndUpdate', populate)
 
-export default mongooseService.codexRegistry.model('CodexTitleProvenanceEvent', schema)
+export default mongooseService.codexRegistry.model('CodexRecordProvenanceEvent', schema)

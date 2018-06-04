@@ -6,7 +6,7 @@ import models from '../../../../models'
 export default {
 
   method: 'delete',
-  path: '/users?/titles?/:tokenId/whitelisted-address(es)?',
+  path: '/users?/records?/:tokenId/whitelisted-address(es)?',
 
   requireAuthentication: true,
 
@@ -21,29 +21,29 @@ export default {
       ownerAddress: response.locals.userAddress,
     }
 
-    return models.CodexTitle.findOne(conditions)
-      .then((codexTitle) => {
+    return models.CodexRecord.findOne(conditions)
+      .then((codexRecord) => {
 
-        if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+        if (!codexRecord) {
+          throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        const existingWhitelistedAddressIndex = codexTitle.whitelistedAddresses
+        const existingWhitelistedAddressIndex = codexRecord.whitelistedAddresses
           .findIndex((whitelistedAddress) => {
             return whitelistedAddress === request.parameters.address
           })
 
         if (existingWhitelistedAddressIndex === -1) {
-          return codexTitle.whitelistedAddresses
+          return codexRecord
         }
 
-        codexTitle.whitelistedAddresses.splice(existingWhitelistedAddressIndex, 1)
+        codexRecord.whitelistedAddresses.splice(existingWhitelistedAddressIndex, 1)
 
-        return codexTitle.save()
+        return codexRecord.save()
 
       })
-      .then((codexTitle) => {
-        return codexTitle.whitelistedAddresses
+      .then((codexRecord) => {
+        return codexRecord.whitelistedAddresses
       })
 
   },

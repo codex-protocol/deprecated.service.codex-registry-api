@@ -61,15 +61,15 @@ const schema = new mongoose.Schema({
   },
   newMainImage: {
     default: null,
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   },
   newImages: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
   newFiles: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
 
@@ -83,15 +83,15 @@ const schema = new mongoose.Schema({
   },
   oldMainImage: {
     default: null,
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   },
   oldImages: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
   oldFiles: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
 
@@ -106,7 +106,7 @@ const schema = new mongoose.Schema({
 schema.virtual('changedData').get(function getChangedData() {
 
   // if this instance was created as a result of processing a Modified event for
-  //  a third-party hosted Title, none of the non-hash value will exist
+  //  a third-party hosted Record, none of the non-hash value will exist
   //
   // TODO: sort out proper provider ID functionality
   if (this.providerId !== '1') {
@@ -199,4 +199,4 @@ schema.pre('validate', function changeEmptyDescriptionHashesToNull(next) {
   next()
 })
 
-export default mongooseService.codexRegistry.model('CodexTitleModifiedEvent', schema)
+export default mongooseService.codexRegistry.model('CodexRecordModifiedEvent', schema)

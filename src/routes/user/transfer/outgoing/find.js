@@ -46,7 +46,7 @@ export default {
       }
     })
 
-    return models.CodexTitle.find(conditions)
+    return models.CodexRecord.find(conditions)
       .limit(request.parameters.limit)
       .skip(request.parameters.offset)
       .sort(request.parameters.order)

@@ -1,23 +1,23 @@
-import CodexTitleMetadataPendingUpdate from './codex-title-metadata-pending-update'
-import CodexTitleProvenanceEvent from './codex-title-provenance-event'
-import CodexTitleModifiedEvent from './codex-title-modified-event'
-import CodexTitleMetadata from './codex-title-metadata'
+import CodexRecordMetadataPendingUpdate from './codex-record-metadata-pending-update'
+import CodexRecordProvenanceEvent from './codex-record-provenance-event'
+import CodexRecordModifiedEvent from './codex-record-modified-event'
+import CodexRecordMetadata from './codex-record-metadata'
 import BlockchainEvent from './blockchain-event'
-import CodexTitleFile from './codex-title-file'
+import CodexRecordFile from './codex-record-file'
 import Transaction from './transaction'
-import CodexTitle from './codex-title'
+import CodexRecord from './codex-record'
 import User from './user'
 import Job from './job'
 
 export default {
-  CodexTitleMetadataPendingUpdate,
-  CodexTitleProvenanceEvent,
-  CodexTitleModifiedEvent,
-  CodexTitleMetadata,
+  CodexRecordMetadataPendingUpdate,
+  CodexRecordProvenanceEvent,
+  CodexRecordModifiedEvent,
+  CodexRecordMetadata,
   BlockchainEvent,
-  CodexTitleFile,
+  CodexRecordFile,
   Transaction,
-  CodexTitle,
+  CodexRecord,
   User,
   Job,
 }

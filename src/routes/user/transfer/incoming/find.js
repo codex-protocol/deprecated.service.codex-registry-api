@@ -53,19 +53,19 @@ export default {
       }
     })
 
-    return models.CodexTitle.find(conditions)
+    return models.CodexRecord.find(conditions)
       .limit(request.parameters.limit)
       .skip(request.parameters.offset)
       .sort(request.parameters.order)
       .populate(populateConditions)
 
-      .then((codexTitles) => {
+      .then((codexRecords) => {
 
-        codexTitles.forEach((codexTitle) => {
-          return codexTitle.applyPrivacyFilters(response.locals.userAddress)
+        codexRecords.forEach((codexRecord) => {
+          return codexRecord.applyPrivacyFilters(response.locals.userAddress)
         })
 
-        return codexTitles
+        return codexRecords
 
       })
 

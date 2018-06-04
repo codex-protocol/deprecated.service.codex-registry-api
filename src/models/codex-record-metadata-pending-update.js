@@ -27,15 +27,15 @@ const schema = new mongoose.Schema({
   },
   mainImage: {
     required: true,
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   },
   images: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
   files: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
@@ -108,11 +108,11 @@ function setHashesBeforeValidation(next) {
 schema.pre('validate', setHashesBeforeValidation)
 
 // unless an ID is specified in the bulk update query, there's no way to
-//  update the parent CodexTitle records without first running the query and
+//  update the parent CodexRecord records without first running the query and
 //  grabbing all matching IDs... and if an ID is passed, then why not just
 //  find & save?
 schema.pre('update', (next) => {
-  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexTitleMetadata record. Please find & save instead.'))
+  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexRecordMetadata record. Please find & save instead.'))
 })
 
-export default mongooseService.codexRegistry.model('CodexTitleMetadataPendingUpdate', schema)
+export default mongooseService.codexRegistry.model('CodexRecordMetadataPendingUpdate', schema)

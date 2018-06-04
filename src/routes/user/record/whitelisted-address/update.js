@@ -6,7 +6,7 @@ import models from '../../../../models'
 export default {
 
   method: 'put',
-  path: '/users?/titles?/:tokenId/whitelisted-address(es)?',
+  path: '/users?/records?/:tokenId/whitelisted-address(es)?',
 
   requireAuthentication: true,
 
@@ -23,22 +23,22 @@ export default {
       ownerAddress: response.locals.userAddress,
     }
 
-    return models.CodexTitle.findOne(conditions)
-      .then((codexTitle) => {
+    return models.CodexRecord.findOne(conditions)
+      .then((codexRecord) => {
 
-        if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+        if (!codexRecord) {
+          throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        codexTitle.whitelistedAddresses = request.parameters.addresses.filter((address) => {
+        codexRecord.whitelistedAddresses = request.parameters.addresses.filter((address) => {
           return address !== response.locals.userAddress
         })
 
-        return codexTitle.save()
+        return codexRecord.save()
 
       })
-      .then((codexTitle) => {
-        return codexTitle.whitelistedAddresses
+      .then((codexRecord) => {
+        return codexRecord.whitelistedAddresses
       })
 
   },

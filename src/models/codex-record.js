@@ -13,7 +13,7 @@ const schemaOptions = {
 const schema = new mongoose.Schema({
   // instead of using an auto-generated ObjectId, let's just use the tokenId
   //  stored in the smart contract since it's already a unique identifier for
-  //  this title (and also makes mapping DB records to smart contract records
+  //  this Record (and also makes mapping DB records to smart contract records
   //  easier)
   _id: {
     type: String,
@@ -60,14 +60,14 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  // has this title been ignored by the approvedAddress? this essentially just
+  // has this Record been ignored by the approvedAddress? this essentially just
   //  hides it from the frontend "incoming transfer" view and has no real
   //  correlation to anything in the smart contract
   isIgnored: {
     type: Boolean,
     default: false,
   },
-  // this is a list of addresses explicitly allowed to view this title even if
+  // this is a list of addresses explicitly allowed to view this Record even if
   //  it's private
   //
   // NOTE: this will not include the ownerAddress and approvedAddress addresses
@@ -81,11 +81,11 @@ const schema = new mongoose.Schema({
   },
   metadata: {
     default: null,
-    ref: 'CodexTitleMetadata',
+    ref: 'CodexRecordMetadata',
     type: mongoose.Schema.Types.ObjectId,
   },
   provenance: [{
-    ref: 'CodexTitleProvenanceEvent',
+    ref: 'CodexRecordProvenanceEvent',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
@@ -94,7 +94,7 @@ const schema = new mongoose.Schema({
 //  would just require all routes to pass the userAddress in the options
 //  though... e.g.:
 //
-// return codexTitle.toJSON({ userAddress: response.locals.userAddress })
+// return codexRecord.toJSON({ userAddress: response.locals.userAddress })
 //
 // this has the potential to cause problems if a save() operation is called
 //  after maskOwnerOnlyFields()... hmm...
@@ -118,7 +118,7 @@ schema.methods.maskOwnerOnlyFields = function maskOwnerOnlyFields(userAddress) {
 
 schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
 
-  // if this isn't a private title, apply no filters
+  // if this isn't a private Record, apply no filters
   if (!this.isPrivate) {
     return this.maskOwnerOnlyFields(userAddress)
   }
@@ -197,4 +197,4 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-export default mongooseService.codexRegistry.model('CodexTitle', schema)
+export default mongooseService.codexRegistry.model('CodexRecord', schema)

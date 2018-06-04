@@ -10,7 +10,7 @@ const fileSchema = Joi.object().keys({
 export default {
 
   method: 'put',
-  path: '/users?/titles?/:tokenId/metadata',
+  path: '/users?/records?/:tokenId/metadata',
 
   requireAuthentication: true,
 
@@ -39,15 +39,15 @@ export default {
       ownerAddress: response.locals.userAddress,
     }
 
-    return models.CodexTitle.findOne(conditions)
+    return models.CodexRecord.findOne(conditions)
       .populate('metadata')
-      .then((codexTitle) => {
+      .then((codexRecord) => {
 
-        if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+        if (!codexRecord) {
+          throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        const newPendingUpdateData = Object.assign({}, codexTitle.metadata.toObject(), request.parameters)
+        const newPendingUpdateData = Object.assign({}, codexRecord.metadata.toObject(), request.parameters)
 
         // delete some things we don't really want to copy over because they'll
         //  get set independently by mongoose
@@ -62,7 +62,7 @@ export default {
 
         // TODO: dedupe pendingUpdates to make sure that two of the exact same
         //  updates aren't saved?
-        const newPendingUpdate = new models.CodexTitleMetadataPendingUpdate(newPendingUpdateData)
+        const newPendingUpdate = new models.CodexRecordMetadataPendingUpdate(newPendingUpdateData)
 
         return newPendingUpdate.save()
           .then(() => {
@@ -71,8 +71,8 @@ export default {
               .execPopulate()
           })
           .then(() => {
-            codexTitle.metadata.pendingUpdates.push(newPendingUpdate)
-            return codexTitle.metadata.save() // TODO: should this route just return newPendingUpdate only?
+            codexRecord.metadata.pendingUpdates.push(newPendingUpdate)
+            return codexRecord.metadata.save() // TODO: should this route just return newPendingUpdate only?
           })
 
       })

@@ -6,7 +6,7 @@ import models from '../../models'
 export default {
 
   method: 'get',
-  path: '/titles?/:tokenId',
+  path: '/records?/:tokenId',
 
   parameters: Joi.object().keys({
 
@@ -41,17 +41,17 @@ export default {
       }
     })
 
-    return models.CodexTitle.findById(request.params.tokenId)
+    return models.CodexRecord.findById(request.params.tokenId)
       .populate(populateConditions)
-      .then((codexTitle) => {
+      .then((codexRecord) => {
 
-        if (!codexTitle) {
-          throw new RestifyErrors.NotFoundError(`CodexTitle with tokenId ${request.params.tokenId} does not exist.`)
+        if (!codexRecord) {
+          throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        codexTitle.applyPrivacyFilters(response.locals.userAddress)
+        codexRecord.applyPrivacyFilters(response.locals.userAddress)
 
-        return codexTitle
+        return codexRecord
 
       })
 

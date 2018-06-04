@@ -5,22 +5,20 @@ import models from '../../../../models'
 
 export default {
 
-  method: 'put',
-  path: '/users?/transfers?/incoming/:tokenId',
+  method: 'post',
+  path: '/users?/records?/:tokenId/whitelisted-address(es)?',
 
   requireAuthentication: true,
 
   parameters: Joi.object().keys({
-    isIgnored: Joi.boolean(),
-  }).or(
-    'isIgnored',
-  ),
+    address: Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
+  }),
 
   handler(request, response) {
 
     const conditions = {
       _id: request.params.tokenId,
-      approvedAddress: response.locals.userAddress,
+      ownerAddress: response.locals.userAddress,
     }
 
     return models.CodexRecord.findOne(conditions)
@@ -30,18 +28,17 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        Object.assign(codexRecord, request.parameters)
+        if (codexRecord.whitelistedAddresses.includes(request.parameters.address)) {
+          return codexRecord
+        }
+
+        codexRecord.whitelistedAddresses.push(request.parameters.address)
 
         return codexRecord.save()
 
       })
-
       .then((codexRecord) => {
-
-        codexRecord.applyPrivacyFilters(response.locals.userAddress)
-
-        return codexRecord
-
+        return codexRecord.whitelistedAddresses
       })
 
   },

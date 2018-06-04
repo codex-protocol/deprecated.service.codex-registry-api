@@ -5,7 +5,7 @@ import models from '../../../models'
 export default {
 
   method: 'get',
-  path: '/users?/titles?',
+  path: '/users?/records?',
 
   requireAuthentication: true,
 
@@ -43,7 +43,7 @@ export default {
       }
     })
 
-    return models.CodexTitle.find(conditions)
+    return models.CodexRecord.find(conditions)
       .limit(request.parameters.limit)
       .skip(request.parameters.offset)
       .sort(request.parameters.order)
