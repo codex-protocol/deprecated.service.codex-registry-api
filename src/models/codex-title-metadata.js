@@ -68,7 +68,7 @@ schema.virtual('fileHashes').get(function getFileHashes() {
     this.mainImage.hash,
     ...this.images.map((image) => { return image.hash }),
     ...this.files.map((file) => { return file.hash }),
-  ]
+  ].sort()
 })
 
 schema.set('toObject', {
