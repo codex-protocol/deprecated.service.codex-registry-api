@@ -16,7 +16,7 @@ export default {
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new Error(`Can not confirm CodexTitle with tokenId ${tokenId} because it does not exist.`)
+          throw new Error(`Could not confirm CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
         codexTitle.providerMetadataId = providerMetadataId
@@ -31,7 +31,7 @@ export default {
           .then((codexTitleMetadata) => {
 
             if (!codexTitleMetadata) {
-              throw new Error(`Can not confirm CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+              throw new Error(`Could not confirm CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
             }
 
             codexTitleMetadata.codexTitleTokenId = codexTitle.tokenId
@@ -108,7 +108,7 @@ export default {
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new Error(`Can not modify CodexTitle with tokenId ${tokenId} because it does not exist.`)
+          throw new Error(`Could not modify CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
         codexTitle.nameHash = newNameHash
@@ -197,7 +197,7 @@ export default {
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new Error(`Can not transfer CodexTitle with tokenId ${tokenId} because it does not exist.`)
+          throw new Error(`Could not transfer CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
         const newCodexTitleTransferEventData = {
@@ -232,7 +232,7 @@ export default {
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new Error(`Can not destroy CodexTitle with tokenId ${tokenId} because it does not exist.`)
+          throw new Error(`Could not destroy CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
         const newCodexTitleTransferEventData = {
@@ -263,7 +263,7 @@ export default {
       .then((codexTitle) => {
 
         if (!codexTitle) {
-          throw new Error(`Can not update approved address for CodexTitle with tokenId ${tokenId} because it does not exist.`)
+          throw new Error(`Could not update approved address for CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
         codexTitle.approvedAddress = approvedAddress
