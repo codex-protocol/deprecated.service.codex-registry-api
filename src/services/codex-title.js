@@ -59,7 +59,7 @@ export default {
     return contracts.CodexTitle.methods.getTokenById(tokenId).call()
       .then(({ nameHash, descriptionHash, fileHashes }) => {
 
-        const newCodexTitleTransferEventData = {
+        const newCodexTitleProvenanceEventData = {
           newOwnerAddress: ownerAddress,
           oldOwnerAddress: zeroAddress,
           codexTitleTokenId: tokenId,
@@ -67,14 +67,14 @@ export default {
           type: 'create',
         }
 
-        return new models.CodexTitleTransferEvent(newCodexTitleTransferEventData).save()
-          .then((newCodexTitleTransferEvent) => {
+        return new models.CodexTitleProvenanceEvent(newCodexTitleProvenanceEventData).save()
+          .then((newCodexTitleProvenanceEvent) => {
 
-            // TODO: store fileHashes?
             const newCodexTitleData = {
-              provenance: [newCodexTitleTransferEvent],
+              provenance: [newCodexTitleProvenanceEvent],
               descriptionHash,
               ownerAddress,
+              fileHashes,
               nameHash,
               tokenId,
             }
@@ -104,88 +104,132 @@ export default {
       providerMetadataId,
     }
 
+    const newCodexTitleModifiedEvent = new models.CodexTitleModifiedEvent({
+      newDescriptionHash,
+      newFileHashes,
+      newNameHash,
+
+      oldDescriptionHash: null, // set below
+      oldFileHashes: null, // set below
+      oldNameHash: null, // set below
+
+      providerMetadataId,
+      modifierAddress,
+      providerId,
+
+    })
+
     return models.CodexTitle.findOne(findCodexTitleConditions)
+      .populate('metadata')
       .then((codexTitle) => {
 
         if (!codexTitle) {
           throw new Error(`Could not modify CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
-        codexTitle.nameHash = newNameHash
-        codexTitle.descriptionHash = newDescriptionHash
+        newCodexTitleModifiedEvent.oldNameHash = codexTitle.nameHash
+        newCodexTitleModifiedEvent.oldFileHashes = codexTitle.fileHashes
+        newCodexTitleModifiedEvent.oldDescriptionHash = codexTitle.descriptionHash
+
+        return newCodexTitleModifiedEvent.save()
+          .then(() => {
+
+            const newCodexTitleProvenanceEventData = {
+              codexTitleTokenId: tokenId,
+              type: 'modified',
+              transactionHash,
+
+              // these aren't really applicable to Modified events, so we'll just
+              //  set them to the current ownerAddress ¯\_(ツ)_/¯
+              oldOwnerAddress: codexTitle.ownerAddress,
+              newOwnerAddress: codexTitle.ownerAddress,
+
+              codexTitleModifiedEvent: newCodexTitleModifiedEvent,
+            }
+
+            return new models.CodexTitleProvenanceEvent(newCodexTitleProvenanceEventData).save()
+              .then((newCodexTitleProvenanceEvent) => {
+
+                codexTitle.nameHash = newNameHash
+                codexTitle.fileHashes = newFileHashes
+                codexTitle.descriptionHash = newDescriptionHash
+
+                codexTitle.provenance.push(newCodexTitleProvenanceEvent)
+
+                return codexTitle.save()
+
+              })
+          })
+      })
+
+      .then((codexTitle) => {
 
         // TODO: sort out proper provider ID functionality
         if (codexTitle.providerId !== '1') {
           return codexTitle
         }
 
-        return models.CodexTitleMetadata.findById(providerMetadataId)
-          .then((codexTitleMetadata) => {
+        if (!codexTitle.metadata) {
+          throw new Error(`Could not modify CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+        }
 
-            if (!codexTitleMetadata) {
-              throw new Error(`Can not modify CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
-            }
+        const pendingUpdateToCommitIndex = codexTitle.metadata.pendingUpdates.findIndex((pendingUpdate) => {
 
-            const pendingUpdateToCommitIndex = codexTitleMetadata.pendingUpdates.findIndex((pendingUpdate) => {
+          if (
+            newNameHash !== pendingUpdate.nameHash ||
+            newDescriptionHash !== pendingUpdate.descriptionHash ||
+            newFileHashes.length !== pendingUpdate.fileHashes.length
+          ) {
+            return false
+          }
 
-              if (
-                newNameHash !== pendingUpdate.nameHash ||
-                newDescriptionHash !== pendingUpdate.descriptionHash ||
-                newFileHashes.length !== pendingUpdate.fileHashes.length
-              ) {
-                return false
-              }
+          // NOTE: pendingUpdate.fileHashes is already sorted as part of the
+          //  virtual getter
+          newFileHashes.sort()
 
-              newFileHashes.sort()
-              pendingUpdate.fileHashes.sort()
+          return pendingUpdate.fileHashes.every((fileHash, index) => {
+            return fileHash === newFileHashes[index]
+          })
+        })
 
-              return pendingUpdate.fileHashes.every((fileHash, index) => {
-                return fileHash === newFileHashes[index]
-              })
-            })
+        if (pendingUpdateToCommitIndex === -1) {
+          throw new Error(`Could not modify CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} has no matching pending updates.`)
+        }
 
-            if (pendingUpdateToCommitIndex === -1) {
-              throw new Error(`Can not modify CodexTitle with tokenId ${codexTitle.tokenId} because metadata with id ${providerMetadataId} has no matching pending updates.`)
-            }
+        const [pendingUpdateToCommit] = codexTitle.metadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
 
-            const [pendingUpdateToCommit] = codexTitleMetadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
+        // TODO: maybe verify hases here? e.g.:
+        // pendingUpdateToCommit.nameHash === nameHash
+        // pendingUpdateToCommit.descriptionHash === descriptionHash
 
-            const oldFileIds = [
-              codexTitleMetadata.mainImage.id,
-              ...codexTitleMetadata.files.map((file) => { return file.id }),
-              ...codexTitleMetadata.images.map((image) => { return image.id }),
-            ]
+        newCodexTitleModifiedEvent.oldName = codexTitle.metadata.name
+        newCodexTitleModifiedEvent.oldFiles = codexTitle.metadata.files
+        newCodexTitleModifiedEvent.oldImages = codexTitle.metadata.images
+        newCodexTitleModifiedEvent.oldMainImage = codexTitle.metadata.mainImage
+        newCodexTitleModifiedEvent.oldDescription = codexTitle.metadata.description
 
-            const newFileIds = [
-              pendingUpdateToCommit.mainImage.id,
-              ...pendingUpdateToCommit.files.map((file) => { return file.id }),
-              ...pendingUpdateToCommit.images.map((image) => { return image.id }),
-            ]
+        newCodexTitleModifiedEvent.newName = pendingUpdateToCommit.name
+        newCodexTitleModifiedEvent.newFiles = pendingUpdateToCommit.files
+        newCodexTitleModifiedEvent.newImages = pendingUpdateToCommit.images
+        newCodexTitleModifiedEvent.newMainImage = pendingUpdateToCommit.mainImage
+        newCodexTitleModifiedEvent.newDescription = pendingUpdateToCommit.description
 
-            const fileIdsToRemove = oldFileIds.filter((oldFileId) => {
-              return !newFileIds.includes(oldFileId)
-            })
+        return newCodexTitleModifiedEvent.save()
+          .then(() => {
 
-            // TODO: maybe verify hases here? e.g.:
-            // pendingUpdateToCommit.nameHash === nameHash
-            // pendingUpdateToCommit.descriptionHash === descriptionHash
+            codexTitle.metadata.name = pendingUpdateToCommit.name
+            codexTitle.metadata.files = pendingUpdateToCommit.files
+            codexTitle.metadata.images = pendingUpdateToCommit.images
+            codexTitle.metadata.nameHash = pendingUpdateToCommit.nameHash
+            codexTitle.metadata.mainImage = pendingUpdateToCommit.mainImage
+            codexTitle.metadata.description = pendingUpdateToCommit.description
+            codexTitle.metadata.descriptionHash = pendingUpdateToCommit.descriptionHash
 
-            codexTitleMetadata.name = pendingUpdateToCommit.name
-            codexTitleMetadata.files = pendingUpdateToCommit.files
-            codexTitleMetadata.images = pendingUpdateToCommit.images
-            codexTitleMetadata.nameHash = pendingUpdateToCommit.nameHash
-            codexTitleMetadata.mainImage = pendingUpdateToCommit.mainImage
-            codexTitleMetadata.description = pendingUpdateToCommit.description
-            codexTitleMetadata.descriptionHash = pendingUpdateToCommit.descriptionHash
+            return codexTitle.metadata.save()
 
-            // TODO: create provenance record here (before saving anything else)
-            return codexTitleMetadata.save()
-              .then(() => {
-                return models.CodexTitleFile.remove({ _id: { $in: fileIdsToRemove } })
-              })
-              .then(() => {
-                return pendingUpdateToCommit.remove()
-              })
+          })
+          .then(() => {
+            return pendingUpdateToCommit.remove()
           })
       })
 
@@ -200,7 +244,7 @@ export default {
           throw new Error(`Could not transfer CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
-        const newCodexTitleTransferEventData = {
+        const newCodexTitleProvenanceEventData = {
           codexTitleTokenId: tokenId,
           oldOwnerAddress,
           newOwnerAddress,
@@ -208,10 +252,10 @@ export default {
           type: 'transfer',
         }
 
-        return new models.CodexTitleTransferEvent(newCodexTitleTransferEventData).save()
-          .then((newCodexTitleTransferEvent) => {
+        return new models.CodexTitleProvenanceEvent(newCodexTitleProvenanceEventData).save()
+          .then((newCodexTitleProvenanceEvent) => {
 
-            codexTitle.provenance.push(newCodexTitleTransferEvent)
+            codexTitle.provenance.push(newCodexTitleProvenanceEvent)
             codexTitle.ownerAddress = newOwnerAddress
             codexTitle.whitelistedAddresses = []
             codexTitle.approvedAddress = null
@@ -235,7 +279,7 @@ export default {
           throw new Error(`Could not destroy CodexTitle with tokenId ${tokenId} because it does not exist.`)
         }
 
-        const newCodexTitleTransferEventData = {
+        const newCodexTitleProvenanceEventData = {
           oldOwnerAddress: ownerAddress,
           newOwnerAddress: zeroAddress,
           codexTitleTokenId: tokenId,
@@ -243,10 +287,10 @@ export default {
           type: 'destroy',
         }
 
-        return new models.CodexTitleTransferEvent(newCodexTitleTransferEventData).save()
-          .then((newCodexTitleTransferEvent) => {
+        return new models.CodexTitleProvenanceEvent(newCodexTitleProvenanceEventData).save()
+          .then((newCodexTitleProvenanceEvent) => {
 
-            codexTitle.provenance.push(newCodexTitleTransferEvent)
+            codexTitle.provenance.push(newCodexTitleProvenanceEvent)
             codexTitle.ownerAddress = zeroAddress
 
             return codexTitle.save()

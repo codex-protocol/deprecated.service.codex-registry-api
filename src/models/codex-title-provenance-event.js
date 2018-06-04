@@ -14,12 +14,15 @@ const schema = new mongoose.Schema({
       'create',
       'destroy',
       'transfer',
+      'modified',
     ],
   },
   transactionHash: {
     type: String,
     required: true,
   },
+
+  // data specific to "create", "destroy", and "transfer" events
   oldOwnerAddress: {
     type: String,
     required: true,
@@ -32,10 +35,13 @@ const schema = new mongoose.Schema({
     lowercase: true,
     // TODO: add validators to make sure only proper addresses can be specified
   },
-  description: {
-    type: String,
-    default: null,
+
+  // data specific to "modified" events
+  codexTitleModifiedEvent: {
+    ref: 'CodexTitleModifiedEvent',
+    type: mongoose.Schema.Types.ObjectId,
   },
+
   createdAt: {
     type: Date,
     default: () => {
@@ -50,7 +56,7 @@ schema.set('toJSON', {
   versionKey: false,
   transform(document, transformedDocument) {
 
-    // remove some mongo-specicic keys that aren't necessary to send in
+    // remove some mongo-specific keys that aren't necessary to send in
     //  responses
     delete transformedDocument._id
     delete transformedDocument.id
@@ -77,4 +83,14 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-export default mongooseService.codexRegistry.model('CodexTitleTransferEvent', schema)
+// always get images, files, and pendingUpdates
+function populate(next) {
+  this.populate('codexTitleModifiedEvent')
+  next()
+}
+
+schema.pre('find', populate)
+schema.pre('findOne', populate)
+schema.pre('findOneAndUpdate', populate)
+
+export default mongooseService.codexRegistry.model('CodexTitleProvenanceEvent', schema)

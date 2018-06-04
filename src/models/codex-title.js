@@ -8,6 +8,8 @@ const schemaOptions = {
   usePushEach: true, // see https://github.com/Automattic/mongoose/issues/5574
 }
 
+// NOTE: all of the hashes below are NOT calculated by the API and are the
+//  hashes as they exist in the smart contract
 const schema = new mongoose.Schema({
   // instead of using an auto-generated ObjectId, let's just use the tokenId
   //  stored in the smart contract since it's already a unique identifier for
@@ -42,6 +44,9 @@ const schema = new mongoose.Schema({
     default: null,
     lowercase: true,
   },
+  fileHashes: [{
+    type: String,
+  }],
   providerId: {
     type: String, // TODO: use mongoose.Schema.Types.ObjectId?
     default: null,
@@ -80,7 +85,7 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
   },
   provenance: [{
-    ref: 'CodexTitleTransferEvent',
+    ref: 'CodexTitleProvenanceEvent',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
