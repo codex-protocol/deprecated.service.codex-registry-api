@@ -3,7 +3,10 @@ import mongoose from 'mongoose'
 import mongooseService from '../services/mongoose'
 
 const schema = new mongoose.Schema({
-  eventName: String,
+  eventName: {
+    index: true,
+    type: String,
+  },
   blockNumber: Number,
   contractName: String,
   contractAddress: String,
