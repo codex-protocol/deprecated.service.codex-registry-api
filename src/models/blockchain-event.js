@@ -20,4 +20,6 @@ const schema = new mongoose.Schema({
   },
 })
 
+schema.index({ blockNumber: 1, contractName: 1 })
+
 export default mongooseService.eel.model('BlockchainEvent', schema)
