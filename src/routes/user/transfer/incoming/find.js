@@ -59,6 +59,12 @@ export default {
       .sort(request.parameters.order)
       .populate(populateConditions)
 
+      .then((codexRecords) => {
+        return codexRecords.map((codexRecord) => {
+          return codexRecord.setLocals(response.locals)
+        })
+      })
+
   },
 
 }

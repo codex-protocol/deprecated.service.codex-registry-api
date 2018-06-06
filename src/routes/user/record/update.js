@@ -40,6 +40,8 @@ export default {
           return whitelistedAddress !== response.locals.userAddress
         })
 
+        codexRecord.setLocals(response.locals)
+
         return codexRecord.save()
 
       })

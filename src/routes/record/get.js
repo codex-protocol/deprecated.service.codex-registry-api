@@ -41,7 +41,7 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        return codexRecord
+        return codexRecord.setLocals(response.locals)
 
       })
 

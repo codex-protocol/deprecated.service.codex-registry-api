@@ -32,6 +32,8 @@ export default {
 
         Object.assign(codexRecord, request.parameters)
 
+        codexRecord.setLocals(response.locals)
+
         return codexRecord.save()
 
       })
