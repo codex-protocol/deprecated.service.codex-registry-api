@@ -54,44 +54,54 @@ const schema = new mongoose.Schema({
   newName: {
     type: String,
     default: null,
+    permissions: ['approved'],
   },
   newDescription: {
     type: String,
     default: null,
+    permissions: ['approved'],
   },
   newMainImage: {
     default: null,
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   },
   newImages: [{
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
   newFiles: [{
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
 
   oldName: {
     type: String,
     default: null,
+    permissions: ['approved'],
   },
   oldDescription: {
     type: String,
     default: null,
+    permissions: ['approved'],
   },
   oldMainImage: {
     default: null,
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   },
   oldImages: [{
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
   oldFiles: [{
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
 
@@ -132,22 +142,6 @@ schema.virtual('changedData').get(function getChangedData() {
     }),
   }
 })
-
-// schema.virtual('newFileHashes').get(function getNewFileHashes() {
-//   return [
-//     this.newMainImage.hash,
-//     ...this.newImages.map((image) => { return image.hash }),
-//     ...this.newFiles.map((file) => { return file.hash }),
-//   ].sort()
-// })
-//
-// schema.virtual('oldFileHashes').get(function getOldFileHashes() {
-//   return [
-//     this.oldMainImage.hash,
-//     ...this.oldImages.map((image) => { return image.hash }),
-//     ...this.oldFiles.map((file) => { return file.hash }),
-//   ].sort()
-// })
 
 schema.set('toObject', {
   virtuals: true,

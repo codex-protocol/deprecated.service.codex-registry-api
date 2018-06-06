@@ -27,6 +27,7 @@ const schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    permissions: ['approved'],
   },
   nameHash: {
     type: String,
@@ -35,6 +36,7 @@ const schema = new mongoose.Schema({
   description: {
     type: String,
     default: null,
+    permissions: ['approved'],
   },
   descriptionHash: {
     type: String,
@@ -43,17 +45,21 @@ const schema = new mongoose.Schema({
   mainImage: {
     required: true,
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   },
   images: [{
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
   files: [{
     ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
   pendingUpdates: [{
+    permissions: ['owner'],
     ref: 'CodexRecordMetadataPendingUpdate',
     type: mongoose.Schema.Types.ObjectId,
   }],
@@ -84,32 +90,6 @@ schema.set('toJSON', {
     // remove some mongo-specific keys that aren't necessary to send in
     //  responses
     delete transformedDocument._id
-
-    // remove any populations if they weren't populated, since they'll just be
-    //  ObjectIds otherwise and that might expose too much information to
-    //  someone who isn't allowed to view that data
-    //
-    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
-    //  way the front end can always assume the keys will be present
-    if (document.mainImage && !document.populated('mainImage')) {
-      // delete transformedDocument.mainImage
-      transformedDocument.mainImage = null
-    }
-
-    if (document.images.length > 0 && !document.populated('images')) {
-      // delete transformedDocument.images
-      transformedDocument.images = []
-    }
-
-    if (document.files.length > 0 && !document.populated('files')) {
-      // delete transformedDocument.files
-      transformedDocument.files = []
-    }
-
-    if (document.pendingUpdates.length > 0 && !document.populated('pendingUpdates')) {
-      // delete transformedDocument.pendingUpdates
-      transformedDocument.pendingUpdates = []
-    }
 
     return transformedDocument
 

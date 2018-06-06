@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-// import config from '../config'
+import logger from '../services/logger'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -72,79 +72,24 @@ const schema = new mongoose.Schema({
   //
   // NOTE: this will not include the ownerAddress and approvedAddress addresses
   //  since those are implied as whitelisted
-  whitelistedAddresses: {
-    type: [{
-      type: String,
-      lowercase: true,
-      // TODO: add validators to make sure only proper addresses can be specified
-    }],
-  },
+  whitelistedAddresses: [{
+    type: String,
+    lowercase: true,
+    permissions: ['owner'],
+    // TODO: add validators to make sure only proper addresses can be specified
+  }],
   metadata: {
     default: null,
+    permissions: ['approved'],
     ref: 'CodexRecordMetadata',
     type: mongoose.Schema.Types.ObjectId,
   },
   provenance: [{
+    permissions: ['logged-in'],
     ref: 'CodexRecordProvenanceEvent',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
-
-// TODO: maybe insted this should be migrated to the toJSON transform? that
-//  would just require all routes to pass the userAddress in the options
-//  though... e.g.:
-//
-// return codexRecord.toJSON({ userAddress: response.locals.userAddress })
-//
-// this has the potential to cause problems if a save() operation is called
-//  after maskOwnerOnlyFields()... hmm...
-schema.methods.maskOwnerOnlyFields = function maskOwnerOnlyFields(userAddress) {
-
-  if (userAddress === this.ownerAddress) {
-    return false
-  }
-
-  this.whitelistedAddresses = []
-
-  if (this.populated('metadata')) {
-    this.metadata.depopulate('pendingUpdates')
-    this.metadata.depopulate('images')
-    this.metadata.depopulate('files')
-  }
-
-  return true
-
-}
-
-schema.methods.applyPrivacyFilters = function applyPrivacyFilters(userAddress) {
-
-  // if this isn't a private Record, apply no filters
-  if (!this.isPrivate) {
-    return this.maskOwnerOnlyFields(userAddress)
-  }
-
-  const whitelistedAddresses = [
-    this.ownerAddress,
-    this.approvedAddress,
-    ...this.whitelistedAddresses,
-  ]
-
-  // if the user is logged in and a whitelisted address, apply no filters
-  //
-  // NOTE: userAddress could be null, and this.approvedAddress could be null,
-  //  so we must explicity check if userAddress is null first to avoid false
-  //  positives
-  if (userAddress && whitelistedAddresses.includes(userAddress)) {
-    return this.maskOwnerOnlyFields(userAddress)
-  }
-
-  this.depopulate('metadata')
-
-  this.maskOwnerOnlyFields(userAddress)
-
-  return true
-
-}
 
 schema.set('toJSON', {
   getters: true, // essentially converts _id to just id
@@ -152,26 +97,63 @@ schema.set('toJSON', {
   versionKey: false,
   transform(document, transformedDocument) {
 
+    if (!document.locals) logger.warn(`CodexRecord::toJSON() is being called with no locals (instance id: ${document.id})`)
+
+    const { userAddress } = (document.locals || {})
+
+    if (userAddress !== document.ownerAddress) {
+
+      // this will hold a list of "permissions" to REMOVE from this CodexRecord
+      //  instance (and it's nested CodexRecord* children), as specified by the
+      //  "permissions" arrays set in the schema of each model
+      //
+      // NOTE: at the moment these permissions are kind of "mutually exclusive",
+      //  in that only one will really be applicable for any given user
+      const permissionsToApply = []
+
+      const approvedAddresses = [
+        document.ownerAddress,
+        document.approvedAddress,
+        ...document.whitelistedAddresses,
+      ]
+
+      // NOTE: userAddress could be null, and document.approvedAddress could be
+      //  null, so we must explicity check if userAddress is null first to avoid
+      //  false positives
+      if (document.isPrivate && (!userAddress || !approvedAddresses.includes(userAddress))) {
+        permissionsToApply.push('approved')
+      }
+
+      if (userAddress !== document.ownerAddress) {
+        permissionsToApply.push('owner')
+      }
+
+      if (!userAddress) {
+        permissionsToApply.push('logged-in')
+      }
+
+      document.applyPermissions.call(transformedDocument, permissionsToApply)
+
+      if (document.populated('metadata') && transformedDocument.metadata) {
+        console.log()
+        document.metadata.applyPermissions.call(transformedDocument.metadata, permissionsToApply)
+      }
+
+      if (document.populated('provenance') && transformedDocument.provenance) {
+        transformedDocument.provenance.forEach((provenanceEntry, index) => {
+          document.provenance[index].applyPermissions.call(provenanceEntry, permissionsToApply)
+          if (provenanceEntry.codexRecordModifiedEvent) {
+            document.provenance[index].codexRecordModifiedEvent.applyPermissions.call(provenanceEntry.codexRecordModifiedEvent, permissionsToApply)
+          }
+        })
+      }
+
+    }
+
     // remove some mongo-specific keys that aren't necessary to send in
     //  responses
     delete transformedDocument._id
     delete transformedDocument.id
-
-    // remove any populations if they weren't populated, since they'll just be
-    //  ObjectIds otherwise and that might expose too much information to
-    //  someone who isn't allowed to view that data
-    //
-    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
-    //  way the front end can always assume the keys will be present
-    if (document.provenance && document.provenance.length > 0 && !document.populated('provenance')) {
-      // delete transformedDocument.provenance
-      transformedDocument.provenance = []
-    }
-
-    if (document.metadata && !document.populated('metadata')) {
-      // delete transformedDocument.metadata
-      transformedDocument.metadata = null
-    }
 
     return transformedDocument
 

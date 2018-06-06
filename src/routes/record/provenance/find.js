@@ -19,7 +19,11 @@ export default {
 
   handler(request, response) {
 
-    return models.CodexRecord.findById(request.params.tokenId, 'provenance')
+    // NOTE: we must retrieve the entire CodexRecord record (and not just the
+    //  provenance even though that's all we need here) because the toJSON()
+    //  method needs other values to determine if this user should be allowed to
+    //  view the provenance
+    return models.CodexRecord.findById(request.params.tokenId)
       .populate({
         path: 'provenance',
         options: {
@@ -32,7 +36,10 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        return codexRecord.provenance
+        return codexRecord
+          .setLocals(response.locals)
+          .toJSON()
+          .provenance
 
       })
 

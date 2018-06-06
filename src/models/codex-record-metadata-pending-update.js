@@ -62,27 +62,6 @@ schema.set('toJSON', {
     //  responses
     delete transformedDocument._id
 
-    // remove any populations if they weren't populated, since they'll just be
-    //  ObjectIds otherwise and that might expose too much information to
-    //  someone who isn't allowed to view that data
-    //
-    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
-    //  way the front end can always assume the keys will be present
-    if (document.mainImage && !document.populated('mainImage')) {
-      // delete transformedDocument.mainImage
-      transformedDocument.mainImage = null
-    }
-
-    if (document.images.length > 0 && !document.populated('images')) {
-      // delete transformedDocument.images
-      transformedDocument.images = []
-    }
-
-    if (document.files.length > 0 && !document.populated('files')) {
-      // delete transformedDocument.files
-      transformedDocument.files = []
-    }
-
     return transformedDocument
 
   },

@@ -59,16 +59,6 @@ export default {
       .sort(request.parameters.order)
       .populate(populateConditions)
 
-      .then((codexRecords) => {
-
-        codexRecords.forEach((codexRecord) => {
-          return codexRecord.applyPrivacyFilters(response.locals.userAddress)
-        })
-
-        return codexRecords
-
-      })
-
   },
 
 }

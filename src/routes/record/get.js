@@ -24,14 +24,6 @@ export default {
 
   handler(request, response) {
 
-    // even though this is a public route, business logic dictates that we
-    //  should not return provenance if the user isn't logged in
-    if (!response.locals.userAddress) {
-      request.parameters.include = request.parameters.include.filter((include) => {
-        return include !== 'provenance'
-      })
-    }
-
     const populateConditions = request.parameters.include.map((include) => {
       return {
         path: include,
@@ -48,8 +40,6 @@ export default {
         if (!codexRecord) {
           throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
-
-        codexRecord.applyPrivacyFilters(response.locals.userAddress)
 
         return codexRecord
 

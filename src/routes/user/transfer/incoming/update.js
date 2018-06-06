@@ -36,14 +36,6 @@ export default {
 
       })
 
-      .then((codexRecord) => {
-
-        codexRecord.applyPrivacyFilters(response.locals.userAddress)
-
-        return codexRecord
-
-      })
-
   },
 
 }
