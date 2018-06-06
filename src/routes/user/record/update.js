@@ -36,9 +36,11 @@ export default {
 
         Object.assign(codexRecord, request.parameters)
 
-        codexRecord.whitelistedAddresses = request.parameters.whitelistedAddresses.filter((whitelistedAddress) => {
-          return whitelistedAddress !== response.locals.userAddress
-        })
+        if (request.parameters.whitelistedAddresses) {
+          codexRecord.whitelistedAddresses = request.parameters.whitelistedAddresses.filter((whitelistedAddress) => {
+            return whitelistedAddress !== response.locals.userAddress
+          })
+        }
 
         codexRecord.setLocals(response.locals)
 
