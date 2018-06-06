@@ -58,10 +58,13 @@ export default {
             return Bluebird.map(metadata, (metadatum) => {
 
               const fileIds = [
-                metadatum.mainImage.id,
                 ...metadatum.files.map((file) => { return file.id }),
                 ...metadatum.images.map((image) => { return image.id }),
               ]
+
+              if (metadatum.mainImage && metadatum.mainImage.id) {
+                fileIds.unshift(metadatum.mainImage.id)
+              }
 
               logger.verbose(`removing metadatum with id ${metadatum.id} and ${fileIds.length} associated file records`)
 

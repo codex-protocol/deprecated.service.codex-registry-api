@@ -70,11 +70,18 @@ schema.virtual('hasPendingUpdates').get(function getHasPendingUpdates() {
 })
 
 schema.virtual('fileHashes').get(function getFileHashes() {
-  return [
-    this.mainImage.hash,
+
+  const hashes = [
     ...this.images.map((image) => { return image.hash }),
     ...this.files.map((file) => { return file.hash }),
-  ].sort()
+  ]
+
+  if (this.mainImage && this.mainImage.hash) {
+    hashes.unshift(this.mainImage.hash)
+  }
+
+  return hashes.sort()
+
 })
 
 schema.set('toObject', {
