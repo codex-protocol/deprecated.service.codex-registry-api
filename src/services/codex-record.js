@@ -310,7 +310,7 @@ export default {
           throw new Error(`Could not update approved address for CodexRecord with tokenId ${tokenId} because it does not exist.`)
         }
 
-        codexRecord.approvedAddress = approvedAddress
+        codexRecord.approvedAddress = approvedAddress === zeroAddress ? null : approvedAddress
         codexRecord.isIgnored = false
 
         return codexRecord.save()
