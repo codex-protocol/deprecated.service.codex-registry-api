@@ -40,7 +40,6 @@ export default {
     }
 
     return models.CodexRecord.findOne(conditions)
-      .populate('metadata')
       .then((codexRecord) => {
 
         if (!codexRecord) {

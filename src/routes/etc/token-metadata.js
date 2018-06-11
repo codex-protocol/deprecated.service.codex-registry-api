@@ -14,7 +14,6 @@ export default {
   handler(request, response) {
 
     return models.CodexRecord.findById(request.params.tokenId)
-      .populate('metadata')
       .then((codexRecord) => {
 
         if (!codexRecord) {

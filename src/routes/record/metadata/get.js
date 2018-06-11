@@ -14,7 +14,6 @@ export default {
     //  method needs other values to determine if this user should be allowed to
     //  view the metadata
     return models.CodexRecord.findById(request.params.tokenId)
-      .populate('metadata')
       .then((codexRecord) => {
 
         if (!codexRecord) {

@@ -179,4 +179,20 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
+// always get provenance & metadata
+function populate(next) {
+  this.populate('metadata')
+  this.populate({
+    path: 'provenance',
+    options: {
+      sort: '-createdAt',
+    },
+  })
+  next()
+}
+
+schema.pre('find', populate)
+schema.pre('findOne', populate)
+schema.pre('findOneAndUpdate', populate)
+
 export default mongooseService.codexRegistry.model('CodexRecord', schema)
