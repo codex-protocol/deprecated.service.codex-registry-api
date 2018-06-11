@@ -153,7 +153,7 @@ export default {
                 codexRecord.fileHashes = newFileHashes
                 codexRecord.descriptionHash = newDescriptionHash
 
-                codexRecord.provenance.push(newCodexRecordProvenanceEvent)
+                codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
 
                 return codexRecord.save()
 
@@ -254,7 +254,7 @@ export default {
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
           .then((newCodexRecordProvenanceEvent) => {
 
-            codexRecord.provenance.push(newCodexRecordProvenanceEvent)
+            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
             codexRecord.ownerAddress = newOwnerAddress
             codexRecord.whitelistedAddresses = []
             codexRecord.approvedAddress = null
@@ -289,7 +289,7 @@ export default {
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
           .then((newCodexRecordProvenanceEvent) => {
 
-            codexRecord.provenance.push(newCodexRecordProvenanceEvent)
+            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
             codexRecord.ownerAddress = zeroAddress
 
             return codexRecord.save()
