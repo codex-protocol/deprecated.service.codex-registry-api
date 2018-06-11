@@ -138,7 +138,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
 
   return {
     contractAddress: contracts.CodexRecord.options.address,
-    mintTransactionData: contracts.CodexRecord.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
+    modifyMetadataHashesTransactionData: contracts.CodexRecord.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
   }
 
 }

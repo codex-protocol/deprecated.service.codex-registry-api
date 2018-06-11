@@ -83,7 +83,7 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-// always get images, files, and pendingUpdates
+// always get codexRecordModifiedEvents if they exist
 function populate(next) {
   this.populate('codexRecordModifiedEvent')
   next()
