@@ -2,6 +2,7 @@ import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
 import models from '../../../../models'
+import SocketService from '../../../../services/socket'
 
 export default {
 
@@ -35,6 +36,17 @@ export default {
         codexRecord.whitelistedAddresses.push(request.parameters.address)
 
         return codexRecord.save()
+          .then(() => {
+
+            const whitelistedAddressResponse = codexRecord.setLocals({ userAddress: request.parameters.address }).toJSON()
+            SocketService.emitToAddress(request.parameters.address, 'address-whitelisted', whitelistedAddressResponse)
+
+            // we need to set the userAddress back to the owner's address after
+            //  setting it in the loop above, otherwise whitelistedAddresses
+            //  will be stripped because it's owner only
+            return codexRecord.setLocals(response.locals)
+
+          })
 
       })
       .then((codexRecord) => {
