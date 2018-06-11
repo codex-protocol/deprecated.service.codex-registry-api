@@ -103,17 +103,17 @@ export default {
                     // "transfer" events FROM address 0x0 are really "create"
                     //  events
                     if (fromAddress === zeroAddress) {
-                      promise = codexRecordService.create(toAddress, tokenId, transactionHash)
+                      promise = codexRecordService.create(toAddress.toLowerCase(), tokenId, transactionHash)
 
                     // "transfer" events TO address 0x0 are really "destroy"
                     //  events
                     } else if (toAddress === zeroAddress) {
-                      promise = codexRecordService.destroy(fromAddress, tokenId, transactionHash)
+                      promise = codexRecordService.destroy(fromAddress.toLowerCase(), tokenId, transactionHash)
 
                     // otherwise, this was a "real" transfer from one address to
                     //  another
                     } else {
-                      promise = codexRecordService.transfer(fromAddress, toAddress, tokenId, transactionHash)
+                      promise = codexRecordService.transfer(fromAddress.toLowerCase(), toAddress.toLowerCase(), tokenId, transactionHash)
                     }
 
                     break

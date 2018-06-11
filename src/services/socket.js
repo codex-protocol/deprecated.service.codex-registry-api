@@ -4,7 +4,7 @@ export default {
 
   addSocket(socket) {
 
-    const { userAddress } = socket.decoded_token
+    const userAddress = socket.decoded_token.userAddress.toLowerCase()
 
     sockets[userAddress] = sockets[userAddress] || []
     sockets[userAddress].push(socket)
@@ -12,7 +12,7 @@ export default {
 
   removeSocket(socket) {
 
-    const { userAddress } = socket.decoded_token
+    const userAddress = socket.decoded_token.userAddress.toLowerCase()
 
     const userSockets = sockets[userAddress] || []
     const userSocketIndexToRemove = userSockets.indexOf(socket)
@@ -24,7 +24,7 @@ export default {
 
   emitToAddress(userAddress, eventName, eventData) {
 
-    const userSockets = sockets[userAddress] || []
+    const userSockets = sockets[userAddress.toLowerCase()] || []
 
     userSockets.forEach((socket) => {
       socket.emit('user-event', { name: eventName, data: eventData })

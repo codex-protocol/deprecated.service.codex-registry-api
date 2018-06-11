@@ -18,6 +18,7 @@ export default (app) => {
     // NOTE: at the moment, this is only really used for the CodexTitle model,
     //  maybe it should just be moved to a local method?
     schema.methods.setLocals = function setLocals(locals) {
+      if (locals.userAddress) locals.userAddress = locals.userAddress.toLowerCase()
       this.locals = locals
       return this
     }
