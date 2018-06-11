@@ -24,6 +24,10 @@ const schema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  giveawaysParticipatedIn: [{
+    ref: 'Giveaway',
+    type: mongoose.Schema.Types.ObjectId,
+  }],
 }, schemaOptions)
 
 schema.virtual('canRequestFaucetTokens').get(function getCanRequestFaucetTokens() {
