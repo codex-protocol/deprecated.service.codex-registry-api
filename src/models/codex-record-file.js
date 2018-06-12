@@ -58,6 +58,11 @@ const schema = new mongoose.Schema({
 }, schemaOptions)
 
 schema.virtual('uri').get(function getUri() {
+  // @TODO: Investigate why, some policy issue
+  if (process.env.NODE_ENV === 'production') {
+    return `https://s3-us-west-2.amazonaws.com/${this.s3Bucket}/${this.s3Key}`
+  }
+
   return `https://s3.amazonaws.com/${this.s3Bucket}/${this.s3Key}`
 })
 
