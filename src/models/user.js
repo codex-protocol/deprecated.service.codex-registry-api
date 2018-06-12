@@ -5,6 +5,7 @@ import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
   timestamps: true, // let mongoose handle the createdAt and updatedAt fields
+  usePushEach: true, // see https://github.com/Automattic/mongoose/issues/5574
 }
 
 const schema = new mongoose.Schema({
@@ -24,6 +25,10 @@ const schema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  giveawaysParticipatedIn: [{
+    ref: 'Giveaway',
+    type: mongoose.Schema.Types.ObjectId,
+  }],
 }, schemaOptions)
 
 schema.virtual('canRequestFaucetTokens').get(function getCanRequestFaucetTokens() {
