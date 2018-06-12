@@ -1,4 +1,3 @@
-import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
 import models from '../../models'
@@ -9,23 +8,32 @@ export default {
 
   path: '/giveaways?',
 
-  parameters: Joi.object().keys({
-    active: Joi.boolean(),
-  }),
+  requireAuthentication: true,
 
   handler(request, response) {
 
-    // @TODO: Filter for ones the user has not participated in
-    // @TODO: Filter for ones that have editions remaining (if active=true)
+    return models.User.findById(response.locals.userAddress)
+      .then((user) => {
 
-    return models.Giveaway.find()
-      .then((giveaways) => {
-
-        if (!giveaways) {
-          throw new RestifyErrors.NotFoundError('No Giveaway documents found.')
+        const conditions = {
+          _id: {
+            $nin: user.giveawaysParticipatedIn,
+          },
+          numberOfEditionsRemaining: {
+            $gt: 0,
+          },
         }
 
-        return giveaways
+        return models.Giveaway.find(conditions)
+          .then((giveaways) => {
+
+            if (!giveaways) {
+              throw new RestifyErrors.NotFoundError('No Giveaway documents found.')
+            }
+
+            return giveaways
+
+          })
 
       })
 

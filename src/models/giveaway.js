@@ -11,6 +11,10 @@ const schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  numberOfEditionsRemaining: {
+    type: Number,
+    required: true,
+  },
 
   metadata: {
     default: null,
@@ -19,5 +23,15 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
   },
 })
+
+// always get metadata
+function populate(next) {
+  this.populate('metadata')
+  next()
+}
+
+schema.pre('find', populate)
+schema.pre('findOne', populate)
+schema.pre('findOneAndUpdate', populate)
 
 export default mongooseService.codexRegistry.model('Giveaway', schema)

@@ -20,7 +20,9 @@ export default {
           throw new RestifyErrors.NotFoundError(`Giveaway with giveawayId ${request.params.giveawayId} does not exist.`)
         }
 
-        return giveaway
+        giveaway.numberOfEditionsRemaining -= 1
+
+        return giveaway.save()
 
       })
       .then((giveaway) => {
@@ -28,7 +30,7 @@ export default {
           .then((user) => {
 
             if (user.giveawaysParticipatedIn && user.giveawaysParticipatedIn.length && user.giveawaysParticipatedIn.includes[giveaway.id]) {
-              throw new RestifyErrors.ForbiddenError('You have already participated in this give away.')
+              throw new RestifyErrors.ForbiddenError('You have already participated in this giveaway.')
             }
 
             return user
@@ -38,22 +40,23 @@ export default {
             return models.CodexRecordMetadata.findById(giveaway.metadata)
               .lean()
               .then((giveawayMetadata) => {
-                // const newCodexRecordMetadataData = Object.assign({
-                //   creatorAddress: user.address,
-                // }, giveawayMetadata)
 
+                // Deleting the temporary codexRecordTokenId because a real one will get provisioned after the token has been minted
                 delete giveawayMetadata.codexRecordTokenId
+
+                // Deleting the original metadata ID so a new one is provisioned for this new metadata document
+                // This prevents any metadata documents relying on the same Giveaway metadata from being cleaned up if one gets orphaned
                 delete giveawayMetadata._id
+
+                const editionNumber = giveaway.numberOfEditions - giveaway.numberOfEditionsRemaining
+                giveawayMetadata.name += ` (Edition ${editionNumber} of ${giveaway.numberOfEditions})`
+
+                // Assign the new metadata to the user participating in the giveaway
                 giveawayMetadata.creatorAddress = user.address
 
                 const newCodexRecordMetadata = new models.CodexRecordMetadata(giveawayMetadata)
 
                 return newCodexRecordMetadata.save()
-                  .then(() => {
-                    return newCodexRecordMetadata
-                      .populate('mainImage images files') // @TODO: move this to a post-save hook (but check that they haven't been populated already)
-                      .execPopulate()
-                  })
               })
               .then((codexRecordMetadata) => {
 

@@ -8,6 +8,8 @@ export default {
 
   path: '/giveaways?/:giveawayId',
 
+  requireAuthentication: true,
+
   handler(request, response) {
 
     return models.Giveaway.findById(request.params.giveawayId)
