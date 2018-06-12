@@ -13,7 +13,7 @@ export default {
 
     // @TODO: Create a scalable way to do this in the future w/o hardcoding
     // @TODO: Update w/ the giveaway art
-    return models.CodexRecordFile.findById('5b1fdc11b9a435238854f448')
+    return models.CodexRecordFile.findById('5b20076ae59eb92f5aeb54cd')
       .lean()
       .then((leanMainImage) => {
         delete leanMainImage._id
@@ -28,9 +28,16 @@ export default {
           // @TODO: Use some Mongo ObjectId instead so new giveaways can be created in the future
           codexRecordTokenId: 'giveaway',
 
-          name: 'Codex Original Art',
-          description: 'Designed by Seb',
           mainImage: giveawayMainImage,
+
+          name: 'Full Assembly',
+          description:
+            'Artist: Sebastian Tory-Pratt\r\n' +
+            'Medium: Digital Collage\r\n' +
+            '\r\n' +
+            'https://www.instagram.com/sebcreates/\r\n' +
+            '\r\n' +
+            'Created exclusively for early users of Codex Viewer.',
         }
 
         const newCodexRecordMetadata = new models.CodexRecordMetadata(giveawayMetadata)
