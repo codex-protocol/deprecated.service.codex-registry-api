@@ -13,10 +13,10 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
-  codexTitleTokenId: {
+  codexRecordTokenId: {
     type: String,
     default: null,
-    ref: 'CodexTitle',
+    ref: 'CodexRecord',
   },
   creatorAddress: {
     type: String,
@@ -27,6 +27,7 @@ const schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    permissions: ['approved'],
   },
   nameHash: {
     type: String,
@@ -35,6 +36,7 @@ const schema = new mongoose.Schema({
   description: {
     type: String,
     default: null,
+    permissions: ['approved'],
   },
   descriptionHash: {
     type: String,
@@ -42,19 +44,23 @@ const schema = new mongoose.Schema({
   },
   mainImage: {
     required: true,
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   },
   images: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
   files: [{
-    ref: 'CodexTitleFile',
+    ref: 'CodexRecordFile',
+    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
   }],
   pendingUpdates: [{
-    ref: 'CodexTitleMetadataPendingUpdate',
+    permissions: ['owner'],
+    ref: 'CodexRecordMetadataPendingUpdate',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
@@ -64,11 +70,18 @@ schema.virtual('hasPendingUpdates').get(function getHasPendingUpdates() {
 })
 
 schema.virtual('fileHashes').get(function getFileHashes() {
-  return [
-    this.mainImage.hash,
+
+  const hashes = [
     ...this.images.map((image) => { return image.hash }),
     ...this.files.map((file) => { return file.hash }),
   ]
+
+  if (this.mainImage && this.mainImage.hash) {
+    hashes.unshift(this.mainImage.hash)
+  }
+
+  return hashes.sort()
+
 })
 
 schema.set('toObject', {
@@ -81,35 +94,9 @@ schema.set('toJSON', {
   versionKey: false,
   transform(document, transformedDocument) {
 
-    // remove some mongo-specicic keys that aren't necessary to send in
+    // remove some mongo-specific keys that aren't necessary to send in
     //  responses
     delete transformedDocument._id
-
-    // remove any populations if they weren't populated, since they'll just be
-    //  ObjectIds otherwise and that might expose too much information to
-    //  someone who isn't allowed to view that data
-    //
-    // NOTE: instead of deleting keys, we'll just pretend they're empty, that
-    //  way the front end can always assume the keys will be present
-    if (document.mainImage && !document.populated('mainImage')) {
-      // delete transformedDocument.mainImage
-      transformedDocument.mainImage = null
-    }
-
-    if (document.images.length > 0 && !document.populated('images')) {
-      // delete transformedDocument.images
-      transformedDocument.images = []
-    }
-
-    if (document.files.length > 0 && !document.populated('files')) {
-      // delete transformedDocument.files
-      transformedDocument.files = []
-    }
-
-    if (document.pendingUpdates.length > 0 && !document.populated('pendingUpdates')) {
-      // delete transformedDocument.pendingUpdates
-      transformedDocument.pendingUpdates = []
-    }
 
     return transformedDocument
 
@@ -128,8 +115,8 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
   ]
 
   return {
-    contractAddress: contracts.CodexTitle.options.address,
-    mintTransactionData: contracts.CodexTitle.methods.mint(...mintArguments).encodeABI(),
+    contractAddress: contracts.CodexRecord.options.address,
+    mintTransactionData: contracts.CodexRecord.methods.mint(...mintArguments).encodeABI(),
   }
 
 }
@@ -141,7 +128,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
   }
 
   const modifyMetadataHashesArguments = [
-    this.codexTitleTokenId,
+    this.codexRecordTokenId,
     pendingUpdate.nameHash,
     pendingUpdate.descriptionHash || '',
     pendingUpdate.fileHashes,
@@ -150,8 +137,8 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
   ]
 
   return {
-    contractAddress: contracts.CodexTitle.options.address,
-    mintTransactionData: contracts.CodexTitle.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
+    contractAddress: contracts.CodexRecord.options.address,
+    modifyMetadataHashesTransactionData: contracts.CodexRecord.methods.modifyMetadataHashes(...modifyMetadataHashesArguments).encodeABI(),
   }
 
 }
@@ -187,10 +174,10 @@ function setHashesBeforeValidation(next) {
   next()
 }
 
-function setTitleHashesBeforeSave(next) {
-  return models.CodexTitle
+function setParentHashesBeforeSave(next) {
+  return models.CodexRecord
     .updateOne(
-      { _id: this.codexTitleTokenId },
+      { _id: this.codexRecordTokenId },
       { $set: { nameHash: this.nameHash, descriptionHash: this.descriptionHash } }
     )
     .then(next)
@@ -198,14 +185,14 @@ function setTitleHashesBeforeSave(next) {
 }
 
 schema.pre('validate', setHashesBeforeValidation)
-schema.pre('save', setTitleHashesBeforeSave)
+schema.pre('save', setParentHashesBeforeSave)
 
 // unless an ID is specified in the bulk update query, there's no way to
-//  update the parent CodexTitle records without first running the query and
+//  update the parent CodexRecord records without first running the query and
 //  grabbing all matching IDs... and if an ID is passed, then why not just
 //  find & save?
 schema.pre('update', (next) => {
-  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexTitle record. Please find & save instead.'))
+  return next(new Error('Bulk updating metadata is not supported as it has some tricky implications with updating hashes on the parent CodexRecord record. Please find & save instead.'))
 })
 
-export default mongooseService.codexRegistry.model('CodexTitleMetadata', schema)
+export default mongooseService.codexRegistry.model('CodexRecordMetadata', schema)

@@ -21,16 +21,16 @@ export default {
   handler(request, response) {
 
     const s3Bucket = config.aws.s3.buckets.codexRegistry
-    const s3Path = `${process.env.NODE_ENV}/title-files`
+    const s3Path = `${process.env.NODE_ENV}/files`
 
     return s3Service.uploadFiles(request.files, s3Bucket, s3Path)
-      .then((newCodexTitleFilesData) => {
+      .then((newCodexRecordFilesData) => {
 
-        newCodexTitleFilesData.forEach((newCodexTitleFileData) => {
-          newCodexTitleFileData.creatorAddress = response.locals.userAddress
+        newCodexRecordFilesData.forEach((newCodexRecordFileData) => {
+          newCodexRecordFileData.creatorAddress = response.locals.userAddress
         })
 
-        return models.CodexTitleFile.insertMany(newCodexTitleFilesData, insertManyOptions)
+        return models.CodexRecordFile.insertMany(newCodexRecordFilesData, insertManyOptions)
 
       })
 
