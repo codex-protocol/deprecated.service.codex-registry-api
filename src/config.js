@@ -20,6 +20,7 @@ const fullConfig = {
     personalMessageToSign,
 
     faucet: {
+      enabled: true,
       gasLimit: 300000,
       gasPrice: 5000000000, // 5 gwei
       cooldown: 1 * 60 * 1000, // 1 minute
@@ -73,6 +74,7 @@ const fullConfig = {
     personalMessageToSign,
 
     faucet: {
+      enabled: true,
       gasLimit: 300000,
       gasPrice: 5000000000, // 5 gwei
       cooldown: 24 * 60 * 60 * 1000, // 24 hours
@@ -121,12 +123,50 @@ const fullConfig = {
     },
   },
 
-  // TODO: populate when a production environment is set up
   production: {
+
+    personalMessageToSign,
+
+    faucet: {
+      enabled: true,
+      gasLimit: 300000,
+      gasPrice: 5000000000, // 5 gwei
+      cooldown: 24 * 60 * 60 * 1000, // 24 hours
+      amount: new BigNumber(10).pow(18).times(100), // 100 CODX
+    },
+
+    orphanedMetadata: {
+      jobFrequency: '1 day',
+      expiryThreshold: 7 * 24 * 60 * 60 * 1000, // 1 week
+    },
+
+    mongodb: {
+      dbUris: {
+        // DB URI for Ethereum Event Listener service
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+
+        // DB URI for this project
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+      },
+    },
+
     process: {
       port: 3000,
-      logLevel: 'info',
+      logLevel: 'verbose',
     },
+
+    blockchain: {
+      minConfirmations: 5,
+      startingBlockHeight: 2449841, // TODO: update this when production is pointing to mainnet (non-beta)
+      averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
+
+      // remove 0x from beginning of signerPrivateKey and store in a Buffer for
+      //  use in various methods that require the private key as a hex buffer
+      signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
+      signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
+      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+    },
+
     aws: {
       region: 'us-west-2',
       s3: {

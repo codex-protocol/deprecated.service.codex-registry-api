@@ -20,17 +20,23 @@ export default {
 
   handler(request, response) {
 
+    let s3Path = 'files'
     const s3Bucket = config.aws.s3.buckets.codexRegistry
-    const s3Path = `${process.env.NODE_ENV}/title-files`
+
+    // production has it's own dedicated bucket, so there's no need to prefix
+    //  the path with the environment
+    if (process.env.NODE_ENV !== 'production') {
+      s3Path = `${process.env.NODE_ENV}/${s3Path}`
+    }
 
     return s3Service.uploadFiles(request.files, s3Bucket, s3Path)
-      .then((newCodexTitleFilesData) => {
+      .then((newCodexRecordFilesData) => {
 
-        newCodexTitleFilesData.forEach((newCodexTitleFileData) => {
-          newCodexTitleFileData.creatorAddress = response.locals.userAddress
+        newCodexRecordFilesData.forEach((newCodexRecordFileData) => {
+          newCodexRecordFileData.creatorAddress = response.locals.userAddress
         })
 
-        return models.CodexTitleFile.insertMany(newCodexTitleFilesData, insertManyOptions)
+        return models.CodexRecordFile.insertMany(newCodexRecordFilesData, insertManyOptions)
 
       })
 

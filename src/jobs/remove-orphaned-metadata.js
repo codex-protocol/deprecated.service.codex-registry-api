@@ -35,16 +35,16 @@ export default {
 
     const now = Date.now()
 
-    // find all metadata records that have not been tied to a CodexTitle after
+    // find all metadata records that have not been tied to a CodexRecord after
     //  the specified expiry threshold
     const findOrphanedMetadataConditions = {
-      codexTitleTokenId: null,
+      codexRecordTokenId: null,
       createdAt: {
         $lte: now - config.orphanedMetadata.expiryThreshold,
       },
     }
 
-    return models.CodexTitleMetadata
+    return models.CodexRecordMetadata
       .find(findOrphanedMetadataConditions)
       .then((metadata) => {
 
@@ -58,16 +58,19 @@ export default {
             return Bluebird.map(metadata, (metadatum) => {
 
               const fileIds = [
-                metadatum.mainImage.id,
                 ...metadatum.files.map((file) => { return file.id }),
                 ...metadatum.images.map((image) => { return image.id }),
               ]
+
+              if (metadatum.mainImage && metadatum.mainImage.id) {
+                fileIds.unshift(metadatum.mainImage.id)
+              }
 
               logger.verbose(`removing metadatum with id ${metadatum.id} and ${fileIds.length} associated file records`)
 
               const removeMetadataFilesConditions = { _id: { $in: fileIds } }
 
-              return models.CodexTitleFile
+              return models.CodexRecordFile
                 .remove(removeMetadataFilesConditions)
                 .then(() => {
                   // TODO: remove old pendingUpdates here?

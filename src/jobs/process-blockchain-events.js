@@ -4,7 +4,7 @@ import ethUtil from 'ethereumjs-util'
 import config from '../config'
 import models from '../models'
 import logger from '../services/logger'
-import codexTitleService from '../services/codex-title'
+import codexRecordService from '../services/codex-record'
 
 const zeroAddress = ethUtil.zeroAddress()
 
@@ -39,7 +39,7 @@ export default {
       .then((job) => {
 
         const conditions = {
-          contractName: 'CodexTitle',
+          contractName: 'CodexRecord',
           blockNumber: {
             $gt: job.data.lastProcessedEventBlockNumber,
           },
@@ -93,7 +93,7 @@ export default {
                 switch (blockchainEvent.eventName) {
 
                   case 'Minted':
-                    promise = codexTitleService.confirmMint(...returnValues)
+                    promise = codexRecordService.confirmMint(...returnValues)
                     break
 
                   case 'Transfer': {
@@ -103,17 +103,17 @@ export default {
                     // "transfer" events FROM address 0x0 are really "create"
                     //  events
                     if (fromAddress === zeroAddress) {
-                      promise = codexTitleService.create(toAddress, tokenId, transactionHash)
+                      promise = codexRecordService.create(toAddress.toLowerCase(), tokenId, transactionHash)
 
                     // "transfer" events TO address 0x0 are really "destroy"
                     //  events
                     } else if (toAddress === zeroAddress) {
-                      promise = codexTitleService.destroy(fromAddress, tokenId, transactionHash)
+                      promise = codexRecordService.destroy(fromAddress.toLowerCase(), tokenId, transactionHash)
 
                     // otherwise, this was a "real" transfer from one address to
                     //  another
                     } else {
-                      promise = codexTitleService.transfer(fromAddress, toAddress, tokenId, transactionHash)
+                      promise = codexRecordService.transfer(fromAddress.toLowerCase(), toAddress.toLowerCase(), tokenId, transactionHash)
                     }
 
                     break
@@ -121,15 +121,15 @@ export default {
                   }
 
                   case 'Modified':
-                    promise = codexTitleService.modify(...returnValues)
+                    promise = codexRecordService.modify(...returnValues)
                     break
 
                   case 'Approval':
-                    promise = codexTitleService.approveAddress(...returnValues)
+                    promise = codexRecordService.approveAddress(...returnValues)
                     break
 
                   case 'ApprovalForAll':
-                    promise = codexTitleService.approveOperator(...returnValues)
+                    promise = codexRecordService.approveOperator(...returnValues)
                     break
 
                   case 'OwnershipTransferred':

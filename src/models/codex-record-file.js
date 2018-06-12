@@ -67,7 +67,7 @@ schema.set('toJSON', {
   versionKey: false,
   transform(document, transformedDocument) {
 
-    // remove some mongo-specicic keys that aren't necessary to send in
+    // remove some mongo-specific keys that aren't necessary to send in
     //  responses
     delete transformedDocument._id
 
@@ -94,4 +94,4 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-export default mongooseService.codexRegistry.model('CodexTitleFile', schema)
+export default mongooseService.codexRegistry.model('CodexRecordFile', schema)

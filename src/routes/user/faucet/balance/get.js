@@ -1,5 +1,7 @@
 import { contracts } from '@codex-protocol/ethereum-service'
 
+import config from '../../../../config'
+
 export default {
 
   method: 'get',
@@ -8,8 +10,7 @@ export default {
   requireAuthentication: true,
 
   restrictToEnvironments: [
-    'development',
-    'staging',
+    config.faucet.enabled ? process.env.NODE_ENV : '',
   ],
 
   handler(request, response) {

@@ -11,10 +11,6 @@ export default {
 
   parameters: Joi.object().keys({
 
-    include: Joi.array().items(
-      Joi.string().valid('metadata', 'provenance'),
-    ).single().default([]),
-
     filters: Joi.object({
       isIgnored: Joi.array().items(
         Joi.boolean().required()
@@ -25,12 +21,6 @@ export default {
     limit: Joi.number().integer().min(1).max(100).default(100),
 
     order: Joi.string().valid('createdAt', '-createdAt').default('createdAt'),
-
-    includeOrder: Joi.object().keys({
-      provenance: Joi.string().valid('createdAt', '-createdAt'),
-    }).default({
-      provenance: '-createdAt',
-    }),
 
   }),
 
@@ -44,29 +34,15 @@ export default {
       conditions[key] = { $in: value }
     })
 
-    const populateConditions = request.parameters.include.map((include) => {
-      return {
-        path: include,
-        options: {
-          sort: request.parameters.includeOrder[include],
-        },
-      }
-    })
-
-    return models.CodexTitle.find(conditions)
+    return models.CodexRecord.find(conditions)
       .limit(request.parameters.limit)
       .skip(request.parameters.offset)
       .sort(request.parameters.order)
-      .populate(populateConditions)
 
-      .then((codexTitles) => {
-
-        codexTitles.forEach((codexTitle) => {
-          return codexTitle.applyPrivacyFilters(response.locals.userAddress)
+      .then((codexRecords) => {
+        return codexRecords.map((codexRecord) => {
+          return codexRecord.setLocals(response.locals)
         })
-
-        return codexTitles
-
       })
 
   },

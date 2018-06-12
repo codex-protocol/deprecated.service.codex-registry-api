@@ -5,27 +5,14 @@ import models from '../../../models'
 export default {
 
   method: 'get',
-  path: '/users?/titles?',
+  path: '/users?/records?',
 
   requireAuthentication: true,
 
   parameters: Joi.object().keys({
-
-    include: Joi.array().items(
-      Joi.string().valid('metadata', 'provenance'),
-    ).single().default([]),
-
     offset: Joi.number().integer().min(0).default(0),
     limit: Joi.number().integer().min(1).max(100).default(100),
-
     order: Joi.string().valid('createdAt', '-createdAt').default('createdAt'),
-
-    includeOrder: Joi.object().keys({
-      provenance: Joi.string().valid('createdAt', '-createdAt'),
-    }).default({
-      provenance: '-createdAt',
-    }),
-
   }),
 
   handler(request, response) {
@@ -34,20 +21,16 @@ export default {
       ownerAddress: response.locals.userAddress,
     }
 
-    const populateConditions = request.parameters.include.map((include) => {
-      return {
-        path: include,
-        options: {
-          sort: request.parameters.includeOrder[include],
-        },
-      }
-    })
-
-    return models.CodexTitle.find(conditions)
+    return models.CodexRecord.find(conditions)
       .limit(request.parameters.limit)
       .skip(request.parameters.offset)
       .sort(request.parameters.order)
-      .populate(populateConditions)
+
+      .then((codexRecords) => {
+        return codexRecords.map((codexRecord) => {
+          return codexRecord.setLocals(response.locals)
+        })
+      })
 
   },
 

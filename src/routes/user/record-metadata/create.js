@@ -9,7 +9,7 @@ const fileSchema = Joi.object().keys({
 export default {
 
   method: 'post',
-  path: '/users?/title-metadata',
+  path: '/users?/record-metadata',
 
   requireAuthentication: true,
 
@@ -27,20 +27,20 @@ export default {
 
   handler(request, response) {
 
-    const newCodexTitleMetadataData = Object.assign({
+    const newCodexRecordMetadataData = Object.assign({
       creatorAddress: response.locals.userAddress,
     }, request.parameters)
 
     // remove the main image from the images array if it exists in both places
-    newCodexTitleMetadataData.images = newCodexTitleMetadataData.images.filter((image) => {
-      return image._id !== newCodexTitleMetadataData.mainImage._id
+    newCodexRecordMetadataData.images = newCodexRecordMetadataData.images.filter((image) => {
+      return image._id !== newCodexRecordMetadataData.mainImage._id
     })
 
-    const newCodexTitleMetadata = new models.CodexTitleMetadata(newCodexTitleMetadataData)
+    const newCodexRecordMetadata = new models.CodexRecordMetadata(newCodexRecordMetadataData)
 
-    return newCodexTitleMetadata.save()
+    return newCodexRecordMetadata.save()
       .then(() => {
-        return newCodexTitleMetadata
+        return newCodexRecordMetadata
           .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
           .execPopulate()
       })

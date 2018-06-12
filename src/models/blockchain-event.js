@@ -3,7 +3,10 @@ import mongoose from 'mongoose'
 import mongooseService from '../services/mongoose'
 
 const schema = new mongoose.Schema({
-  eventName: String,
+  eventName: {
+    index: true,
+    type: String,
+  },
   blockNumber: Number,
   contractName: String,
   contractAddress: String,
@@ -16,5 +19,7 @@ const schema = new mongoose.Schema({
     },
   },
 })
+
+schema.index({ blockNumber: 1, contractName: 1 })
 
 export default mongooseService.eel.model('BlockchainEvent', schema)
