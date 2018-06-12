@@ -7,7 +7,6 @@ export default {
 
   method: 'get',
 
-  // @TODO: How to filter?
   path: '/giveaways?',
 
   parameters: Joi.object().keys({
@@ -16,26 +15,8 @@ export default {
 
   handler(request, response) {
 
-    // const populateConditions = request.parameters.include.map((active) => {
-    //   return {
-    //   }
-    // })
-
     // @TODO: Filter for ones the user has not participated in
-
-    if (request.params.giveawayId) {
-      return models.Giveaway.findById(request.params.giveawayId)
-        .then((giveaway) => {
-
-          if (!giveaway) {
-            throw new RestifyErrors.NotFoundError(`Giveaway with giveawayId ${request.params.giveawayId} does not exist.`)
-          }
-
-          // @TODO: What does setLocals do?
-          return giveaway
-
-        })
-    }
+    // @TODO: Filter for ones that have editions remaining (if active=true)
 
     return models.Giveaway.find()
       .then((giveaways) => {

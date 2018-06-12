@@ -1,3 +1,5 @@
+import ethUtil from 'ethereumjs-util'
+
 import models from '../../models'
 
 export default {
@@ -9,18 +11,19 @@ export default {
 
   handler(request, response) {
 
-    // @TODO: This is getting claned up by the orphan job
-    return models.CodexRecordFile.findById('5b1ef57078d795dc2bae3560')
+    return models.CodexRecordFile.findById('5b1f1f456b39260fbcc5ed7f')
       .lean()
       .then((leanMainImage) => {
         delete leanMainImage._id
 
-        return models.CodexRecordFile.create(leanMainImage)
+        return new models.CodexRecordFile(leanMainImage).save()
       })
       .then((giveawayMainImage) => {
         const giveawayMetadata = {
-          creatorAddress: '0x0', // placeholder because it's required
-          codexRecordTokenId: 'giveaway', // placeholder so it doesn't get cleaned up by the remove-orphans job
+          creatorAddress: ethUtil.zeroAddress(),
+
+          // placeholder so it doesn't get cleaned up by the remove-orphans job
+          codexRecordTokenId: 'giveaway',
 
           name: 'Codex Original Art',
           description: 'Designed by Seb',
@@ -30,20 +33,15 @@ export default {
         const newCodexRecordMetadata = new models.CodexRecordMetadata(giveawayMetadata)
 
         return newCodexRecordMetadata.save()
-          .then(() => {
-            return newCodexRecordMetadata
-              .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
-              .execPopulate()
-          })
       })
       .then((codexRecordMetadata) => {
-        const giveawayData = {
+        const newGiveawayData = {
           name: 'New User Giveaway!',
           numberOfEditions: 1000,
           metadata: codexRecordMetadata,
         }
 
-        return models.Giveaway.create(giveawayData)
+        return models.Giveaway.create(newGiveawayData)
       })
 
   },

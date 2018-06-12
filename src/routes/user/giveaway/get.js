@@ -57,7 +57,6 @@ export default {
               })
               .then((codexRecordMetadata) => {
 
-                // @TODO: Need to do anything in the event listener to handle this?
                 const txData = codexRecordMetadata.generateMintTransactionData()
                 const newTransactionData = {
                   status: 'created',
