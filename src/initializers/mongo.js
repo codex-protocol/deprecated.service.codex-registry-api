@@ -15,7 +15,7 @@ export default (app) => {
     // give every model a setLocals() method that can be used to give a "user
     //  context" for toJSON methods (for hiding private fields, etc)
     //
-    // NOTE: at the moment, this is only really used for the CodexTitle model,
+    // NOTE: at the moment, this is only really used for the CodexRecord model,
     //  maybe it should just be moved to a local method?
     schema.methods.setLocals = function setLocals(locals) {
       if (locals.userAddress) locals.userAddress = locals.userAddress.toLowerCase()

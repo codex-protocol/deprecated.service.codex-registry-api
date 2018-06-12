@@ -12,6 +12,7 @@ const schema = new mongoose.Schema({
     type: String,
     enum: [
       'faucet-transfer',
+      'giveaway-mint',
     ],
   },
   status: {

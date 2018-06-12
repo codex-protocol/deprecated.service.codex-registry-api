@@ -6,6 +6,7 @@ import BlockchainEvent from './blockchain-event'
 import CodexRecordFile from './codex-record-file'
 import Transaction from './transaction'
 import CodexRecord from './codex-record'
+import Giveaway from './giveaway'
 import User from './user'
 import Job from './job'
 
@@ -18,6 +19,7 @@ export default {
   CodexRecordFile,
   Transaction,
   CodexRecord,
+  Giveaway,
   User,
   Job,
 }
