@@ -3,7 +3,6 @@ import { contracts } from '@codex-protocol/ethereum-service'
 
 import config from '../../../config'
 import models from '../../../models'
-// import logger from '../../../services/logger'
 
 export default {
 
@@ -13,8 +12,7 @@ export default {
   requireAuthentication: true,
 
   restrictToEnvironments: [
-    'development',
-    'staging',
+    config.faucet.enabled ? process.env.NODE_ENV : '',
   ],
 
   handler(request, response) {

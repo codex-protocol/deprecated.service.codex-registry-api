@@ -27,7 +27,7 @@ const schema = new mongoose.Schema({
 }, schemaOptions)
 
 schema.virtual('canRequestFaucetTokens').get(function getCanRequestFaucetTokens() {
-  return process.env.NODE_ENV !== 'production' && (this.faucetLastRequestedAt === null || Date.now() - this.faucetLastRequestedAt.getTime() >= config.faucet.cooldown)
+  return config.faucet.enabled && (this.faucetLastRequestedAt === null || Date.now() - this.faucetLastRequestedAt.getTime() >= config.faucet.cooldown)
 })
 
 schema.set('toJSON', {
