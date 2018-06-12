@@ -3,6 +3,7 @@ import { contracts } from '@codex-protocol/ethereum-service'
 
 import logger from './logger'
 import models from '../models'
+import SocketService from './socket'
 
 const zeroAddress = ethUtil.zeroAddress()
 
@@ -50,6 +51,15 @@ export default {
 
       .then((codexRecord) => {
         return codexRecord.save()
+      })
+
+      .then((codexRecord) => {
+        // TODO: sort out proper provider ID functionality
+        if (codexRecord.providerId === '1') {
+          codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
+          SocketService.emitToAddress(codexRecord.ownerAddress, 'mint-confirmed', codexRecord)
+        }
+        return codexRecord
       })
 
   },
@@ -153,7 +163,7 @@ export default {
                 codexRecord.fileHashes = newFileHashes
                 codexRecord.descriptionHash = newDescriptionHash
 
-                codexRecord.provenance.push(newCodexRecordProvenanceEvent)
+                codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
 
                 return codexRecord.save()
 
@@ -230,6 +240,17 @@ export default {
           .then(() => {
             return pendingUpdateToCommit.remove()
           })
+          .then(() => {
+            return codexRecord
+          })
+      })
+      .then((codexRecord) => {
+        // TODO: sort out proper provider ID functionality
+        if (codexRecord.providerId === '1') {
+          codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
+          SocketService.emitToAddress(codexRecord.ownerAddress, 'record-modified', codexRecord)
+        }
+        return codexRecord
       })
 
   },
@@ -254,7 +275,7 @@ export default {
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
           .then((newCodexRecordProvenanceEvent) => {
 
-            codexRecord.provenance.push(newCodexRecordProvenanceEvent)
+            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
             codexRecord.ownerAddress = newOwnerAddress
             codexRecord.whitelistedAddresses = []
             codexRecord.approvedAddress = null
@@ -265,6 +286,25 @@ export default {
 
           })
 
+      })
+
+      .then((codexRecord) => {
+        // TODO: sort out proper provider ID functionality
+        if (codexRecord.providerId === '1') {
+          // @NOTE: normally we'd want to use
+          //  codexRecord.setLocals({ userAddress: oldOwnerAddress }) when
+          //  constructing the JSON for the old owner... but if we do that then
+          //  the Record's name will not be available in the front end
+          //  notification
+          //
+          // so instead we'll just send the full "owner" Record to both people,
+          //  since this really won't give away any new info to the old owner,
+          //  (because he literally just had access to all that info)
+          const responseJSON = codexRecord.setLocals({ userAddress: newOwnerAddress }).toJSON()
+          SocketService.emitToAddress(newOwnerAddress, 'record-transferred:new-owner', responseJSON)
+          SocketService.emitToAddress(oldOwnerAddress, 'record-transferred:old-owner', responseJSON)
+        }
+        return codexRecord
       })
 
   },
@@ -289,13 +329,22 @@ export default {
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
           .then((newCodexRecordProvenanceEvent) => {
 
-            codexRecord.provenance.push(newCodexRecordProvenanceEvent)
+            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
             codexRecord.ownerAddress = zeroAddress
 
             return codexRecord.save()
 
           })
 
+      })
+
+      .then((codexRecord) => {
+        // TODO: sort out proper provider ID functionality
+        if (codexRecord.providerId === '1') {
+          codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
+          SocketService.emitToAddress(codexRecord.ownerAddress, 'record-destroyed', codexRecord)
+        }
+        return codexRecord
       })
 
   },
@@ -314,6 +363,31 @@ export default {
 
         return codexRecord.save()
 
+      })
+
+      .then((codexRecord) => {
+        // TODO: sort out proper provider ID functionality
+        if (codexRecord.providerId === '1') {
+
+          const ownerResponse = codexRecord.setLocals({ userAddress: codexRecord.ownerAddress }).toJSON()
+          const approvedResponse = codexRecord.setLocals({ userAddress: codexRecord.approvedAddress }).toJSON()
+
+          if (!codexRecord.approvedAddress) {
+            // @NOTE: there's no way to know if this was emitted from
+            //  clearApproval() or just an explicit cancel via
+            //  transferFrom(owner, zeroAddress) so I guess we just have to
+            //  settle for not notifying the owner of a successful cancel :/
+            //
+            // (if we just emit this either way, then a successfull transfer
+            //  will also emit this socket event)
+            //
+            // SocketService.emitToAddress(codexRecord.ownerAddress, 'address-approved:cancel', ownerResponse)
+          } else {
+            SocketService.emitToAddress(codexRecord.ownerAddress, 'address-approved:owner', ownerResponse)
+            SocketService.emitToAddress(codexRecord.approvedAddress, 'address-approved:approved', approvedResponse)
+          }
+        }
+        return codexRecord
       })
 
   },

@@ -2,6 +2,7 @@ import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
 import models from '../../../models'
+import SocketService from '../../../services/socket'
 
 export default {
 
@@ -34,17 +35,32 @@ export default {
           throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
         }
 
-        Object.assign(codexRecord, request.parameters)
+        let newWhitelistedAddresses = []
 
         if (request.parameters.whitelistedAddresses) {
-          codexRecord.whitelistedAddresses = request.parameters.whitelistedAddresses.filter((whitelistedAddress) => {
-            return whitelistedAddress !== response.locals.userAddress
+          newWhitelistedAddresses = request.parameters.whitelistedAddresses.filter((address) => {
+            return address !== response.locals.userAddress && !codexRecord.whitelistedAddresses.includes(address)
           })
         }
 
-        codexRecord.setLocals(response.locals)
+        Object.assign(codexRecord, request.parameters)
 
         return codexRecord.save()
+          .then(() => {
+
+            newWhitelistedAddresses.forEach((address) => {
+              const whitelistedAddressResponse = codexRecord.setLocals({ userAddress: address }).toJSON()
+              SocketService.emitToAddress(address, 'address-whitelisted', whitelistedAddressResponse)
+            })
+
+            // we need to set the userAddress back to the owner's address after
+            //  setting it in the loop above, otherwise non-owner fields will be
+            //  stripped
+            codexRecord.setLocals(response.locals)
+
+            return codexRecord
+
+          })
 
       })
 
