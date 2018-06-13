@@ -2,7 +2,6 @@ import 'babel-polyfill'
 
 import http from 'http'
 import io from 'socket.io'
-import redisAdapter from 'socket.io-redis'
 import express from 'express'
 
 
@@ -12,12 +11,7 @@ import initialize from './initializers'
 
 const app = express()
 const httpApp = http.Server(app)
-
 const socketApp = io(httpApp, { serveClient: false })
-
-if (process.env.NODE_ENV === 'production') {
-  socketApp.adapter(redisAdapter(config.redis))
-}
 
 initialize(app, socketApp)
   .then(() => {
