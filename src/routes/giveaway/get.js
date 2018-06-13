@@ -16,9 +16,7 @@ export default {
       .then((user) => {
 
         const conditions = {
-          _id: {
-            $nin: user.giveawaysParticipatedIn,
-          },
+          _id: '5b20316fbaad057952794aa7',
           numberOfEditionsRemaining: {
             $gt: 0,
           },
