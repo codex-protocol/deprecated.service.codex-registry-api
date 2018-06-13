@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 
+import config from '../config'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -58,12 +59,7 @@ const schema = new mongoose.Schema({
 }, schemaOptions)
 
 schema.virtual('uri').get(function getUri() {
-  // @TODO: Investigate why, some policy issue
-  if (process.env.NODE_ENV === 'production') {
-    return `https://s3-us-west-2.amazonaws.com/${this.s3Bucket}/${this.s3Key}`
-  }
-
-  return `https://s3.amazonaws.com/${this.s3Bucket}/${this.s3Key}`
+  return `${config.aws.s3.uriPrefix}/${this.s3Bucket}/${this.s3Key}`
 })
 
 schema.set('toJSON', {
@@ -98,5 +94,7 @@ schema.pre('update', makeQueryAddressesCaseInsensitive)
 schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
+
+export { schema }
 
 export default mongooseService.codexRegistry.model('CodexRecordFile', schema)

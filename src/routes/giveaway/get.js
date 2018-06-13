@@ -6,37 +6,21 @@ export default {
 
   method: 'get',
 
-  path: '/giveaways?',
+  path: '/giveaways?/:giveawayId',
 
   requireAuthentication: true,
 
   handler(request, response) {
 
-    return models.User.findById(response.locals.userAddress)
-      .then((user) => {
+    return models.Giveaway.findById(request.params.giveawayId)
+      .then((giveaway) => {
 
-        const conditions = {
-          _id: {
-            $nin: user.giveawaysParticipatedIn,
-          },
-          numberOfEditionsRemaining: {
-            $gt: 0,
-          },
+        if (!giveaway) {
+          throw new RestifyErrors.NotFoundError(`Giveaway with giveawayId ${request.params.giveawayId} does not exist.`)
         }
 
-        return models.Giveaway.find(conditions)
-          .then((giveaways) => {
-
-            if (!giveaways) {
-              throw new RestifyErrors.NotFoundError('No Giveaway documents found.')
-            }
-
-            return giveaways
-
-          })
+        return giveaway
 
       })
-
   },
-
 }
