@@ -67,6 +67,11 @@ const fullConfig = {
         },
       },
     },
+
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    },
   },
 
   staging: {
@@ -121,6 +126,11 @@ const fullConfig = {
         },
       },
     },
+
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    },
   },
 
   production: {
@@ -174,6 +184,11 @@ const fullConfig = {
           codexRegistry: 'codex.registry-production',
         },
       },
+    },
+
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
     },
   },
 }

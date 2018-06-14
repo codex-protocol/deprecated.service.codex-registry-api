@@ -3,7 +3,7 @@ import 'babel-polyfill'
 import http from 'http'
 import io from 'socket.io'
 import express from 'express'
-
+import redisAdapter from 'socket.io-redis'
 
 import config from './config'
 import logger from './services/logger'
@@ -12,6 +12,10 @@ import initialize from './initializers'
 const app = express()
 const httpApp = http.Server(app)
 const socketApp = io(httpApp, { serveClient: false })
+
+if (config.redis.host && config.redis.port) {
+  socketApp.adapter(redisAdapter(config.redis))
+}
 
 initialize(app, socketApp)
   .then(() => {
