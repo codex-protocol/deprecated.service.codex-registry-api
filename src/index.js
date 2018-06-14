@@ -2,9 +2,8 @@ import 'babel-polyfill'
 
 import http from 'http'
 import io from 'socket.io'
-import redisAdapter from 'socket.io-redis'
 import express from 'express'
-
+import redisAdapter from 'socket.io-redis'
 
 import config from './config'
 import logger from './services/logger'
@@ -15,7 +14,7 @@ const httpApp = http.Server(app)
 
 const socketApp = io(httpApp, { serveClient: false })
 
-if (process.env.NODE_ENV === 'production') {
+if (config.redis.host && config.redis.port) {
   socketApp.adapter(redisAdapter(config.redis))
 }
 
