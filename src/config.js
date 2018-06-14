@@ -108,7 +108,7 @@ const fullConfig = {
 
     blockchain: {
       minConfirmations: 5,
-      startingBlockHeight: 2053830,
+      startingBlockHeight: 3436527,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for
