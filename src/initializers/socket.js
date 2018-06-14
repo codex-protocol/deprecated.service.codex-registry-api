@@ -5,6 +5,8 @@ import socketService from '../services/socket'
 
 export default (socketApp) => {
 
+  socketService.socketApp = socketApp
+
   socketApp.use(socketioJwt.authorize({
     secret: process.env.JWT_SECRET,
     handshake: true,
