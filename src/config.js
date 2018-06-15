@@ -123,8 +123,8 @@ const fullConfig = {
 
     aws: {
       region: 'us-east-1',
-      uriPrefix: 'https://s3.amazonaws.com',
       s3: {
+        uriPrefix: 'https://s3.amazonaws.com',
         buckets: {
           codexRegistry: 'codex.registry',
         },
