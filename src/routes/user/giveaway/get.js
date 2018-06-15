@@ -29,7 +29,7 @@ export default {
         return models.User.findById(response.locals.userAddress)
           .then((user) => {
 
-            if (user.giveawaysParticipatedIn && user.giveawaysParticipatedIn.length && user.giveawaysParticipatedIn.includes(giveaway.id)) {
+            if (user.giveawaysParticipatedIn && user.giveawaysParticipatedIn.length && user.giveawaysParticipatedIn.includes[giveaway.id]) {
               throw new RestifyErrors.ForbiddenError('You have already participated in this giveaway.')
             }
 
