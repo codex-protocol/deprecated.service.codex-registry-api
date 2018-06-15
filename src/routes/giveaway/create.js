@@ -13,7 +13,7 @@ export default {
 
     // @TODO: Create a scalable way to do this in the future w/o hardcoding
     // @TODO: Update w/ the giveaway art
-    return models.CodexRecordFile.findById('5b20107416342d0bf196eb1a')
+    return models.CodexRecordFile.findById('5b20076ae59eb92f5aeb54cd')
       .lean()
       .then((leanMainImage) => {
         delete leanMainImage._id
