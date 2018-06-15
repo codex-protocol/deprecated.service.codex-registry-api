@@ -45,6 +45,9 @@ schema.set('toJSON', {
     delete transformedDocument._id
     delete transformedDocument.id
 
+    // this is more of an internal tracking array so no need to expose this
+    delete transformedDocument.giveawaysParticipatedIn
+
     return transformedDocument
 
   },

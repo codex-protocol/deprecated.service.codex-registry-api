@@ -60,12 +60,12 @@ export default {
         ]
 
         const newTransactionData = {
-          status: 'created',
           type: 'faucet-transfer',
+          status: 'created',
           tx: {
             value: 0,
-            gasPrice: config.faucet.gasPrice,
-            gasLimit: config.faucet.gasLimit,
+            gasPrice: config.blockchain.gasPrice,
+            gasLimit: config.blockchain.gasLimit,
             to: contracts.CodexCoin.options.address,
             from: config.blockchain.signerPublicAddress,
             data: contracts.CodexCoin.methods.transfer(...transferArguments).encodeABI(),

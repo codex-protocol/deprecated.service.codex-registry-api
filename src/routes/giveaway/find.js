@@ -1,26 +1,31 @@
-import RestifyErrors from 'restify-errors'
-
 import models from '../../models'
 
 export default {
 
   method: 'get',
 
-  path: '/giveaways?/:giveawayId',
+  path: '/giveaways?',
 
   requireAuthentication: true,
 
   handler(request, response) {
 
-    return models.Giveaway.findById(request.params.giveawayId)
-      .then((giveaway) => {
+    return models.User.findById(response.locals.userAddress)
+      .then((user) => {
 
-        if (!giveaway) {
-          throw new RestifyErrors.NotFoundError(`Giveaway with giveawayId ${request.params.giveawayId} does not exist.`)
+        const conditions = {
+          _id: {
+            $nin: user.giveawaysParticipatedIn,
+          },
+          numberOfEditionsRemaining: {
+            $gt: 0,
+          },
         }
 
-        return giveaway
+        return models.Giveaway.find(conditions)
 
       })
+
   },
+
 }
