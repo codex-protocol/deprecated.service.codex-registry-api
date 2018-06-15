@@ -21,8 +21,6 @@ const fullConfig = {
 
     faucet: {
       enabled: true,
-      gasLimit: 300000,
-      gasPrice: 5000000000, // 5 gwei
       cooldown: 1 * 60 * 1000, // 1 minute
       amount: new BigNumber(10).pow(18).times(100), // 100 CODX
     },
@@ -48,6 +46,9 @@ const fullConfig = {
     },
 
     blockchain: {
+      gasLimit: 300000,
+      gasPrice: 5000000000, // 5 gwei
+
       minConfirmations: 0,
       startingBlockHeight: 0,
       averageBlockTime: 5, // in seconds, this dictates how frequently to run agenda jobs
@@ -62,6 +63,7 @@ const fullConfig = {
     aws: {
       region: 'us-east-1',
       s3: {
+        uriPrefix: 'https://s3.amazonaws.com',
         buckets: {
           codexRegistry: 'codex.registry',
         },
@@ -80,8 +82,6 @@ const fullConfig = {
 
     faucet: {
       enabled: true,
-      gasLimit: 300000,
-      gasPrice: 5000000000, // 5 gwei
       cooldown: 24 * 60 * 60 * 1000, // 24 hours
       amount: new BigNumber(10).pow(18).times(100), // 100 CODX
     },
@@ -107,8 +107,11 @@ const fullConfig = {
     },
 
     blockchain: {
+      gasLimit: 300000,
+      gasPrice: 5000000000, // 5 gwei
+
       minConfirmations: 5,
-      startingBlockHeight: 2053830,
+      startingBlockHeight: 3436527,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for
@@ -121,6 +124,7 @@ const fullConfig = {
     aws: {
       region: 'us-east-1',
       s3: {
+        uriPrefix: 'https://s3.amazonaws.com',
         buckets: {
           codexRegistry: 'codex.registry',
         },
@@ -139,8 +143,6 @@ const fullConfig = {
 
     faucet: {
       enabled: true,
-      gasLimit: 300000,
-      gasPrice: 5000000000, // 5 gwei
       cooldown: 24 * 60 * 60 * 1000, // 24 hours
       amount: new BigNumber(10).pow(18).times(100), // 100 CODX
     },
@@ -166,6 +168,9 @@ const fullConfig = {
     },
 
     blockchain: {
+      gasLimit: 300000,
+      gasPrice: 5000000000, // 5 gwei
+
       minConfirmations: 5,
       startingBlockHeight: 2449841, // TODO: update this when production is pointing to mainnet (non-beta)
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
@@ -180,6 +185,7 @@ const fullConfig = {
     aws: {
       region: 'us-west-2',
       s3: {
+        uriPrefix: 'https://s3-us-west-2.amazonaws.com',
         buckets: {
           codexRegistry: 'codex.registry-production',
         },
