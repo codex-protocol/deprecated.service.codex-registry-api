@@ -31,7 +31,11 @@ export default {
         return models.User.findById(response.locals.userAddress)
           .then((user) => {
 
-            if (user.giveawaysParticipatedIn.includes(giveaway.id)) {
+            const alreadyClaimed = user.giveawaysParticipatedIn.some((giveawayId) => {
+              return giveawayId.toString() === giveaway.id.toString()
+            })
+
+            if (alreadyClaimed) {
               throw new RestifyErrors.ForbiddenError('You have already participated in this giveaway.')
             }
 
