@@ -135,7 +135,6 @@ schema.set('toJSON', {
       document.applyPermissions.call(transformedDocument, permissionsToApply)
 
       if (document.populated('metadata') && transformedDocument.metadata) {
-        console.log()
         document.metadata.applyPermissions.call(transformedDocument.metadata, permissionsToApply)
       }
 
