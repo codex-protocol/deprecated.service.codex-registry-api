@@ -266,7 +266,7 @@ export default {
 
         const newCodexRecordProvenanceEventData = {
           codexRecordTokenId: tokenId,
-          type: 'transfered',
+          type: 'transferred',
           oldOwnerAddress,
           newOwnerAddress,
           transactionHash,
