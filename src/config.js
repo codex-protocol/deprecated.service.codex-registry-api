@@ -164,7 +164,7 @@ const fullConfig = {
 
     process: {
       port: 3000,
-      logLevel: 'verbose',
+      logLevel: 'info',
     },
 
     blockchain: {
