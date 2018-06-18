@@ -54,7 +54,7 @@ export default {
 
     } catch (error) {
 
-      logger.info(`failed login attempt for userAddress ${request.parameters.userAddress}:`, {
+      logger.warn(`failed login attempt for userAddress ${request.parameters.userAddress}:`, {
         signedData: request.parameters.signedData,
         error,
       })
