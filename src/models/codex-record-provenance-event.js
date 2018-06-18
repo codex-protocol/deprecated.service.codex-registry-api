@@ -11,10 +11,10 @@ const schema = new mongoose.Schema({
   type: {
     type: String,
     enum: [
-      'create',
-      'destroy',
-      'transfer',
+      'created',
       'modified',
+      'destroyed',
+      'transfered',
     ],
   },
   transactionHash: {
