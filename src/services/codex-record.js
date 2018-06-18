@@ -186,8 +186,8 @@ export default {
 
           if (
             newNameHash !== pendingUpdate.nameHash ||
-            newDescriptionHash !== pendingUpdate.descriptionHash ||
-            newFileHashes.length !== pendingUpdate.fileHashes.length
+            newFileHashes.length !== pendingUpdate.fileHashes.length ||
+            (pendingUpdate.descriptionHash && newDescriptionHash !== pendingUpdate.descriptionHash)
           ) {
             return false
           }
