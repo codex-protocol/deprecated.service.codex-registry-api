@@ -123,23 +123,27 @@ schema.virtual('changedData').get(function getChangedData() {
     return null
   }
 
-  const sortedNewImages = Array.from(this.oldImages).sort(sortByFileHash)
+  const sortedNewImages = Array.from(this.newImages).sort(sortByFileHash)
   const sortedOldImages = Array.from(this.oldImages).sort(sortByFileHash)
-  const sortedNewFiles = Array.from(this.oldImages).sort(sortByFileHash)
-  const sortedOldFiles = Array.from(this.oldImages).sort(sortByFileHash)
+  const sortedNewFiles = Array.from(this.newFiles).sort(sortByFileHash)
+  const sortedOldFiles = Array.from(this.oldFiles).sort(sortByFileHash)
+
+  const imagesChanged = this.newImages.length !== this.oldImages.length || sortedOldImages.some((oldImage, index) => {
+    return oldImage.hash !== sortedNewImages[index].hash
+  })
+
+  const filesChanged = this.newFiles.length !== this.oldFiles.length || sortedOldFiles.some((oldFile, index) => {
+    return oldFile.hash !== sortedNewFiles[index].hash
+  })
+
+  const mainImageChanged = (this.oldMainImage && this.newMainImage) ? this.oldMainImage.hash !== this.newMainImage.hash : false
 
   return {
+    files: filesChanged,
+    images: imagesChanged,
+    mainImage: mainImageChanged,
     name: this.oldName !== this.newName,
     description: this.oldDescription !== this.newDescription,
-    mainImage: this.oldMainImage.hash !== this.newMainImage.hash,
-
-    images: !sortedOldImages.every((oldImage, index) => {
-      return oldImage.hash === sortedNewImages[index].hash
-    }),
-
-    files: !sortedOldFiles.every((oldFile, index) => {
-      return oldFile.hash === sortedNewFiles[index].hash
-    }),
   }
 })
 

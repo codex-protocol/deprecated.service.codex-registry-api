@@ -82,7 +82,7 @@ export default {
             return Bluebird
               .mapSeries(blockchainEvents, (blockchainEvent) => {
 
-                logger.info(`[${this.name}]`, `found blockchain event on block number ${blockchainEvent.blockNumber}:`, blockchainEvent.eventName)
+                logger.verbose(`[${this.name}]`, `found blockchain event on block number ${blockchainEvent.blockNumber}:`, blockchainEvent.eventName)
 
                 const returnValues = Object.values(blockchainEvent.returnValues)
 

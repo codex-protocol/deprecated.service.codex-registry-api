@@ -74,7 +74,7 @@ export default {
           oldOwnerAddress: zeroAddress,
           codexRecordTokenId: tokenId,
           transactionHash,
-          type: 'create',
+          type: 'created',
         }
 
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
@@ -186,8 +186,8 @@ export default {
 
           if (
             newNameHash !== pendingUpdate.nameHash ||
-            newDescriptionHash !== pendingUpdate.descriptionHash ||
-            newFileHashes.length !== pendingUpdate.fileHashes.length
+            newFileHashes.length !== pendingUpdate.fileHashes.length ||
+            (pendingUpdate.descriptionHash && newDescriptionHash !== pendingUpdate.descriptionHash)
           ) {
             return false
           }
@@ -266,10 +266,10 @@ export default {
 
         const newCodexRecordProvenanceEventData = {
           codexRecordTokenId: tokenId,
+          type: 'transfered',
           oldOwnerAddress,
           newOwnerAddress,
           transactionHash,
-          type: 'transfer',
         }
 
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
@@ -322,8 +322,8 @@ export default {
           oldOwnerAddress: ownerAddress,
           newOwnerAddress: zeroAddress,
           codexRecordTokenId: tokenId,
+          type: 'destroyed',
           transactionHash,
-          type: 'destroy',
         }
 
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
