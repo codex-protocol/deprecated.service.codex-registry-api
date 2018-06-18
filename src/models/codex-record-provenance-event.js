@@ -14,7 +14,7 @@ const schema = new mongoose.Schema({
       'created',
       'modified',
       'destroyed',
-      'transfered',
+      'transferred',
     ],
   },
   transactionHash: {
