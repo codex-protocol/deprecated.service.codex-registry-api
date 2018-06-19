@@ -20,7 +20,7 @@ if (config.useSentry) {
       level: 'info',
       config: {
         captureUnhandledRejections: true,
-        name: 'biddable-api',
+        name: 'codex-registry-api',
       },
     }),
   )
