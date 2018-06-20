@@ -196,7 +196,7 @@ Now you should be able to make requests to the API! To check and see if it's res
 
 ## Contribute
 
-If you have any questions, feel free to reach out to one of the repository [maintainers](#maintainers) or simply [open an issue](https://github.com/codex-protocol/service.codex-registry-api/issues/new) here on GitHub.
+If you have any questions, feel free to reach out to one of the repository [maintainers](#maintainers) or simply [open an issue](https://github.com/codex-protocol/service.codex-registry-api/issues/new) here on GitHub. If you have questions about Codex Protocol in general, feel free to [reach out to us Telegram!](https://t.me/codexprotocol)
 
 [Pull Requests](https://github.com/codex-protocol/service.codex-registry-api/pulls) are not only allowed, but highly encouraged! All Pull Requests must pass CI checks (if applicable) and be approved by at least one repository [maintainer](#maintainers) before being considered for merge.
 
