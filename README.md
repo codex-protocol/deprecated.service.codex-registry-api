@@ -53,13 +53,13 @@ $ git clone https://github.com/codex-protocol/service.eel
 ```bash
 $ cd service.codex-registry-api
 $ npm install
-$
+
 $ cd ../contract.codex-registry
 $ npm install
-$
+
 $ cd ../npm.ethereum-service
 $ npm install
-$
+
 $ cd ../service.eel
 $ npm install
 ```
@@ -69,7 +69,7 @@ $ npm install
 ```bash
 $ cd npm.ethereum-service
 $ npm link
-$
+
 $ cd ../service.codex-registry-api
 $ npm link @codex-protocol/ethereum-service
 ```
