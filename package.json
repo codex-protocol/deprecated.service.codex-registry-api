@@ -1,17 +1,23 @@
 {
   "name": "@codex-protocol/service.codex-registry-api",
   "version": "0.1.0",
-  "description": "API for Codex Registry",
+  "description": "Node API for Codex Registry",
   "repository": {
     "type": "git",
     "url": "https://github.com/codex-protocol/service.codex-registry-api"
   },
   "contributors": [
     {
-      "name": "John Forrest"
+      "name": "John Forrest",
+      "email": "john@codexprotocol.com"
     },
     {
-      "name": "Colin Wood"
+      "name": "Colin Wood",
+      "email": "colin@codexprotocol.com"
+    },
+    {
+      "name": "Shawn Price",
+      "email": "shawn@codexprotocol.com"
     }
   ],
   "license": "AGPL-3.0-or-later",

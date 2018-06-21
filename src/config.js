@@ -60,6 +60,7 @@ const fullConfig = {
       signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
+    // @TODO: move this to .env
     aws: {
       region: 'us-east-1',
       s3: {
@@ -121,6 +122,7 @@ const fullConfig = {
       signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
+    // @TODO: move this to .env
     aws: {
       region: 'us-east-1',
       s3: {
@@ -182,6 +184,7 @@ const fullConfig = {
       signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
+    // @TODO: move this to .env
     aws: {
       region: 'us-west-2',
       s3: {
