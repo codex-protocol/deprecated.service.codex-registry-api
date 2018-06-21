@@ -9,13 +9,11 @@ This is the Node API that serves as the off-chain backend for the [Codex Viewer]
 ## Table of Contents
 
 - [Security](#security)
-- [Background](#background)
 - [Install](#install)
   - [Clone & Set Up Required Repositories](#clone--set-up-required-repositories)
   - [Dependencies](#dependencies)
   - [Configure](#configure)
 - [Usage](#usage)
-- [API](#api)
 - [Maintainers](#maintainers)
 - [Contribute](#contribute)
 - [License](#license)
