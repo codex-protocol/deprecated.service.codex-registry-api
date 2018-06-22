@@ -61,12 +61,10 @@ const fullConfig = {
     },
 
     aws: {
-      region: 'us-east-1',
+      region: process.env.AWS_REGION,
       s3: {
-        uriPrefix: 'https://s3.amazonaws.com',
-        buckets: {
-          codexRegistry: 'codex.registry',
-        },
+        bucket: process.env.AWS_S3_BUCKET,
+        uriPrefix: process.env.AWS_S3_URI_PREFIX,
       },
     },
 
@@ -122,12 +120,10 @@ const fullConfig = {
     },
 
     aws: {
-      region: 'us-east-1',
+      region: process.env.AWS_REGION,
       s3: {
-        uriPrefix: 'https://s3.amazonaws.com',
-        buckets: {
-          codexRegistry: 'codex.registry',
-        },
+        bucket: process.env.AWS_S3_BUCKET,
+        uriPrefix: process.env.AWS_S3_URI_PREFIX,
       },
     },
 
@@ -183,12 +179,10 @@ const fullConfig = {
     },
 
     aws: {
-      region: 'us-west-2',
+      region: process.env.AWS_REGION,
       s3: {
-        uriPrefix: 'https://s3-us-west-2.amazonaws.com',
-        buckets: {
-          codexRegistry: 'codex.registry-production',
-        },
+        bucket: process.env.AWS_S3_BUCKET,
+        uriPrefix: process.env.AWS_S3_URI_PREFIX,
       },
     },
 

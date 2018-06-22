@@ -36,7 +36,7 @@ export default {
 
         mainImage: {
           hash: '0x8d0bb7f5b53f4908e8a89c33bf34ac33b9840e8ce1d0e4a2d1ced9c02627e7ef',
-          s3Bucket: config.aws.s3.buckets.codexRegistry,
+          s3Bucket: config.aws.s3.bucket,
           creatorAddress: ethUtil.zeroAddress(),
           s3Key: 'giveaways/full-assembly.jpg',
           name: 'full-assembly.jpg',

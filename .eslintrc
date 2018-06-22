@@ -1,5 +1,9 @@
 {
-  "extends": [
-    "@codex-protocol/eslint-config-base"
-  ]
+  extends: [
+    '@codex-protocol/eslint-config-base'
+  ],
+  rules: {
+    // this is off mainly for writing single-line Joi validations
+    'newline-per-chained-call': 'off',
+  },
 }
