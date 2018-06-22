@@ -23,7 +23,7 @@ export default {
         const tokenMetadata = {
           name: `Codex Record #${codexRecord.tokenId}`,
           description: 'A Private Record in the Codex Registry',
-          image: `https://s3.amazonaws.com/${config.aws.s3.buckets.codexRegistry}/assets/generic-record-image.png`,
+          image: `https://s3.amazonaws.com/${config.aws.s3.bucket}/assets/generic-record-image.png`,
         }
 
         if (!codexRecord.isPrivate && codexRecord.populated('metadata')) {
