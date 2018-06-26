@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import BigNumber from 'bignumber.js'
 import ethereumUtil from 'ethereumjs-util'
 
-// Reads environment variables stored in the '.env' file and writes them to the
+// reads environment variables stored in the '.env' file and writes them to the
 //  process.env object
 const dotenvResult = dotenv.config({ path: `${__dirname}/../.env` })
 
@@ -33,10 +33,10 @@ const fullConfig = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -92,10 +92,10 @@ const fullConfig = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -151,10 +151,10 @@ const fullConfig = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -168,7 +168,7 @@ const fullConfig = {
       gasPrice: 5000000000, // 5 gwei
 
       minConfirmations: 5,
-      startingBlockHeight: 2449841, // TODO: update this when production is pointing to mainnet (non-beta)
+      startingBlockHeight: 2449841, // @TODO: update this when production is pointing to mainnet (non-beta)
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for

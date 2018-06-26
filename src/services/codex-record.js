@@ -23,7 +23,7 @@ export default {
         codexRecord.providerMetadataId = providerMetadataId
         codexRecord.providerId = providerId
 
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId !== '1') {
           return codexRecord
         }
@@ -37,7 +37,7 @@ export default {
 
             codexRecordMetadata.codexRecordTokenId = codexRecord.tokenId
 
-            // TODO: maybe verify hases here? e.g.:
+            // @TODO: maybe verify hases here? e.g.:
             // codexRecordMetadata.nameHash === codexRecord.nameHash
             // codexRecordMetadata.descriptionHash === codexRecord.descriptionHash
 
@@ -54,7 +54,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'mint-confirmed', codexRecord)
@@ -173,7 +173,7 @@ export default {
 
       .then((codexRecord) => {
 
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId !== '1') {
           return codexRecord
         }
@@ -192,7 +192,7 @@ export default {
             return false
           }
 
-          // NOTE: pendingUpdate.fileHashes is already sorted as part of the
+          // @NOTE: pendingUpdate.fileHashes is already sorted as part of the
           //  virtual getter
           newFileHashes.sort()
 
@@ -207,7 +207,7 @@ export default {
 
         const [pendingUpdateToCommit] = codexRecord.metadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
 
-        // TODO: maybe verify hases here? e.g.:
+        // @TODO: maybe verify hases here? e.g.:
         // pendingUpdateToCommit.nameHash === nameHash
         // pendingUpdateToCommit.descriptionHash === descriptionHash
 
@@ -245,7 +245,7 @@ export default {
           })
       })
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'record-modified', codexRecord)
@@ -289,7 +289,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           // @NOTE: normally we'd want to use
           //  codexRecord.setLocals({ userAddress: oldOwnerAddress }) when
@@ -339,7 +339,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'record-destroyed', codexRecord)
@@ -366,7 +366,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
 
           const ownerResponse = codexRecord.setLocals({ userAddress: codexRecord.ownerAddress }).toJSON()
@@ -393,7 +393,7 @@ export default {
   },
 
   approveOperator: (ownerAddress, operatorAddress, isApproved, transactionHash) => {
-    // TODO: implement approveOperator functionality here?
+    // @TODO: implement approveOperator functionality here?
     logger.debug('codexRecordService.approveOperator() called', { ownerAddress, operatorAddress, isApproved })
   },
 

@@ -41,7 +41,7 @@ export default {
     return newCodexRecordMetadata.save()
       .then(() => {
         return newCodexRecordMetadata
-          .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
+          .populate('mainImage images files') // @TODO: move this to a post-save hook (but check that they haven't been populated already)
           .execPopulate()
       })
 

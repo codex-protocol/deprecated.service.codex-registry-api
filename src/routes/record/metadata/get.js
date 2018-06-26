@@ -9,7 +9,7 @@ export default {
 
   handler(request, response) {
 
-    // NOTE: we must retrieve the entire CodexRecord record (and not just the
+    // @NOTE: we must retrieve the entire CodexRecord record (and not just the
     //  metadata even though that's all we need here) because the toJSON()
     //  method needs other values to determine if this user should be allowed to
     //  view the metadata

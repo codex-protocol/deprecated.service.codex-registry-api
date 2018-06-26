@@ -39,7 +39,7 @@ export default (app) => {
   //  found error" middleware, then we know no route touched the request and a
   //  404 error should be returned
   //
-  // NOTE: this is set to true in the routes initializer
+  // @NOTE: this is set to true in the routes initializer
   app.use((request, response, next) => {
     response.locals.wasRequestProcessedByRoute = false
     next()

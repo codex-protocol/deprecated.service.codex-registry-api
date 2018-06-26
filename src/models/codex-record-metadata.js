@@ -22,7 +22,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     lowercase: true,
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
   name: {
     type: String,
@@ -110,7 +110,7 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
     this.nameHash,
     this.descriptionHash || '',
     this.fileHashes,
-    '1', // TODO: sort out proper provider ID functionality
+    '1', // @TODO: sort out proper provider ID functionality
     this.id,
   ]
 
@@ -132,7 +132,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
     pendingUpdate.nameHash,
     pendingUpdate.descriptionHash || '',
     pendingUpdate.fileHashes,
-    '1', // TODO: sort out proper provider ID functionality
+    '1', // @TODO: sort out proper provider ID functionality
     this.id,
   ]
 

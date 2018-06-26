@@ -54,7 +54,7 @@ export default {
             Bucket: s3Bucket,
             Body: file.buffer,
             ContentType: file.mimetype,
-            ACL: 'public-read', // TODO: change this to only allow api IAM user?
+            ACL: 'public-read', // @TODO: change this to only allow api IAM user?
           }
 
           return s3PutObject(s3Params)

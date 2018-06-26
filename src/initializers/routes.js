@@ -121,7 +121,7 @@ export default (app) => {
       //  and add response.locals.user if the specified token corresponds to a
       //  valid user record
       //
-      // NOTE: we always call the authenticate middleware even if the route is
+      // @NOTE: we always call the authenticate middleware even if the route is
       //  public, so that routes can know if the user is "logged in" or not
       //
       // routes are responsible for returning appropriate data based on whether

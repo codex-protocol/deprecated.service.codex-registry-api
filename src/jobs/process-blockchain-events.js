@@ -55,8 +55,9 @@ export default {
             // save the block number of the last event we processed so we know
             //  where to start looking the next time this job runs
             //
-            // NOTE: since we're sorting the query by blockNumber, we can be
-            //  certain that the last event will have the most recent blockNumber
+            // @NOTE: since we're sorting the query by blockNumber, we can be
+            //  certain that the last event will have the most recent
+            //  blockNumber
             job.data.lastProcessedEventBlockNumber = blockchainEvents[blockchainEvents.length - 1].blockNumber
             job.markModified('data')
 
@@ -69,11 +70,11 @@ export default {
             //  no guarantee that mongoose will retrieve them in the correct
             //  order (Transfer -> Minted)
             //
-            // NOTE: this MUST come before the lastProcessedEventBlockNumber
+            // @NOTE: this MUST come before the lastProcessedEventBlockNumber
             //  update performed above since it relies on blockchainEvents being
             //  sorted by blockNumber
             //
-            // NOTE: the weird conditional moves all Minted events to the end
+            // @NOTE: the weird conditional moves all Minted events to the end
             //  while preserving their relative order (i.e. blockNumber)
             blockchainEvents.sort((a, b) => {
               return a.eventName === 'Minted' && b.eventName !== 'Minted'

@@ -61,7 +61,7 @@ export default {
             //  that have those images assigned to them. if the images aren't
             //  referenced anywhere else, we delete them.
             //
-            // TODO: maybe this is entirely unnecessary??
+            // @TODO: maybe this is entirely unnecessary??
 
             const fileIdsToSave = []
             const metadataIdsToRemove = []
@@ -172,12 +172,12 @@ export default {
                   promises.push(models.CodexRecordFile.remove({ _id: { $in: fileIdsToRemove } }))
                 }
 
-                // TODO: remove old pendingUpdates here too?
+                // @TODO: remove old pendingUpdates here too?
                 return Bluebird.all(promises)
 
               })
               .then(() => {
-                // NOTE: for some reason, returning the CommandResult objects
+                // @NOTE: for some reason, returning the CommandResult objects
                 //  that mongoose resolves Model.remove() calls with makes
                 //  Agenda flip a shit and throw an error about cyclic
                 //  dependencies... so let's just return something else...

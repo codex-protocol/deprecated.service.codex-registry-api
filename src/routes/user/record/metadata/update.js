@@ -59,19 +59,19 @@ export default {
           return image._id !== newPendingUpdateData.mainImage._id
         })
 
-        // TODO: dedupe pendingUpdates to make sure that two of the exact same
+        // @TODO: dedupe pendingUpdates to make sure that two of the exact same
         //  updates aren't saved?
         const newPendingUpdate = new models.CodexRecordMetadataPendingUpdate(newPendingUpdateData)
 
         return newPendingUpdate.save()
           .then(() => {
             return newPendingUpdate
-              .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
+              .populate('mainImage images files') // @TODO: move this to a post-save hook (but check that they haven't been populated already)
               .execPopulate()
           })
           .then(() => {
             codexRecord.metadata.pendingUpdates.push(newPendingUpdate)
-            return codexRecord.metadata.save() // TODO: should this route just return newPendingUpdate only?
+            return codexRecord.metadata.save() // @TODO: should this route just return newPendingUpdate only?
           })
 
       })

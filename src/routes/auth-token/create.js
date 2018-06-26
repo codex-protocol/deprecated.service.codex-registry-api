@@ -16,14 +16,14 @@ export default {
 
   parameters: Joi.object().keys({
 
-    // NOTE: the length of the signedData may change if the ethereumjs-util
+    // @NOTE: the length of the signedData may change if the ethereumjs-util
     //  package is ever updated and the fromRpcSignature method changes it's
     //  length validation, as indicated by a comment in the source
     //
     // see: https://github.com/ethereumjs/ethereumjs-util/blob/fde15dd/index.js
     //
-    // NOTE: signedData should not have the 0x prefix as Joi will validate it as
-    //  a raw Buffer
+    // @NOTE: signedData should not have the 0x prefix as Joi will validate it
+    //  as a raw Buffer
     signedData: Joi.binary().encoding('hex').length(65).required(),
 
     userAddress: Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase().required(),

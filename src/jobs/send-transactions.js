@@ -56,7 +56,7 @@ export default {
         return this.getJob()
           .then((job) => {
 
-            // NOTE: use Bluebird.mapSeries instead of Bluebird.map so that the
+            // @NOTE: use Bluebird.mapSeries instead of Bluebird.map so that the
             //  transactions are processed one at a time, in order
             return Bluebird.mapSeries(transactions, (transaction) => {
 
@@ -67,11 +67,11 @@ export default {
               //  lookup a "pending" transaction to remove it from mongo when we
               //  see the transaction confirmed
               //
-              // NOTE: the transaction.save() call is done below in the
+              // @NOTE: the transaction.save() call is done below in the
               //  sendSignedTransaction() event handlers
               transaction.tx.nonce = job.data.currentNonce
 
-              // NOTE: the sendSignedTransaction() call below does return a
+              // @NOTE: the sendSignedTransaction() call below does return a
               //  promise (well, a promise/event emitter hybrid), but it's
               //  resolved when the transaction is mined (i.e when the "receipt"
               //  event is fired)
@@ -121,10 +121,10 @@ export default {
                     transaction.markModified('tx')
                     transaction.save()
 
-                    // NOTE: don't reject when there's an error, since we don't want
-                    //  to prevent any subsequent transactions in this job from
-                    //  running - just marking the transaction as failed is good
-                    //  enough for now
+                    // @NOTE: don't reject when there's an error, since we don't
+                    //  want to prevent any subsequent transactions in this job
+                    //  from running - just marking the transaction as failed is
+                    //  good enough for now
                     resolve()
 
                   })
@@ -133,7 +133,7 @@ export default {
                 // increase the nonce after we know this transaction was
                 //  submitted to the blockchain
                 //
-                // NOTE: we use finally here in case the logic above ever
+                // @NOTE: we use finally here in case the logic above ever
                 //  rejects or throws an error because technically that was a
                 //  transaction attempt
                 .finally(() => {
