@@ -13,12 +13,14 @@ export default {
 
   parameters: Joi.object().keys({
     isPrivate: Joi.boolean(),
+    isHistoricalProvenancePrivate: Joi.boolean(),
     whitelistedAddresses: Joi.array().items(
       Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
     ).unique(),
   }).or(
     'isPrivate',
     'whitelistedAddresses',
+    'isHistoricalProvenancePrivate',
   ),
 
   handler(request, response) {
