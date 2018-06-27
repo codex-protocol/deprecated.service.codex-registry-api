@@ -56,7 +56,7 @@ const schema = new mongoose.Schema({
   files: [{
     ref: 'CodexRecordFile',
     type: mongoose.Schema.Types.ObjectId,
-    permissions: ['approved-unless-historical-provenance-is-private'],
+    permissions: ['approved-unless-historical-provenance-is-public'],
   }],
   pendingUpdates: [{
     permissions: ['owner'],

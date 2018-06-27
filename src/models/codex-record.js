@@ -127,7 +127,7 @@ schema.set('toJSON', {
       //  false positives
       if (!userAddress || !approvedAddresses.includes(userAddress)) {
         if (document.isPrivate) permissionsToApply.push('approved')
-        if (document.isHistoricalProvenancePrivate) permissionsToApply.push('approved-unless-historical-provenance-is-private')
+        if (document.isHistoricalProvenancePrivate) permissionsToApply.push('approved-unless-historical-provenance-is-public')
       }
 
       if (userAddress !== document.ownerAddress) {
