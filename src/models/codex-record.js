@@ -60,6 +60,10 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isHistoricalProvenancePrivate: {
+    type: Boolean,
+    default: true,
+  },
   // has this Record been ignored by the approvedAddress? this essentially just
   //  hides it from the frontend "incoming transfer" view and has no real
   //  correlation to anything in the smart contract
@@ -121,8 +125,9 @@ schema.set('toJSON', {
       // @NOTE: userAddress could be null, and document.approvedAddress could be
       //  null, so we must explicity check if userAddress is null first to avoid
       //  false positives
-      if (document.isPrivate && (!userAddress || !approvedAddresses.includes(userAddress))) {
-        permissionsToApply.push('approved')
+      if (!userAddress || !approvedAddresses.includes(userAddress)) {
+        if (document.isPrivate) permissionsToApply.push('approved')
+        if (document.isHistoricalProvenancePrivate) permissionsToApply.push('approved-unless-historical-provenance-is-public')
       }
 
       if (userAddress !== document.ownerAddress) {

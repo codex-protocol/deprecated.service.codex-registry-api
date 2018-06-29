@@ -55,13 +55,13 @@ const schema = new mongoose.Schema({
   }],
   files: [{
     ref: 'CodexRecordFile',
-    permissions: ['approved'],
     type: mongoose.Schema.Types.ObjectId,
+    permissions: ['approved-unless-historical-provenance-is-public'],
   }],
   pendingUpdates: [{
     permissions: ['owner'],
-    ref: 'CodexRecordMetadataPendingUpdate',
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'CodexRecordMetadataPendingUpdate',
   }],
 }, schemaOptions)
 
