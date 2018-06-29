@@ -8,6 +8,8 @@ import models from '../models'
 import mongooseService from '../services/mongoose'
 import codexRecordService from '../services/codex-record'
 
+const nullDescriptionHash = `0x${new Array(64).fill(0).join('')}`
+
 const schemaOptions = {
   timestamps: true, // let mongoose handle the createdAt and updatedAt fields
   usePushEach: true, // see https://github.com/Automattic/mongoose/issues/5574
@@ -115,7 +117,7 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
   const mintArguments = [
     this.creatorAddress,
     this.nameHash,
-    this.descriptionHash || '',
+    this.descriptionHash || nullDescriptionHash,
     this.fileHashes,
     providerData,
   ]
@@ -142,7 +144,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
   const modifyMetadataHashesArguments = [
     this.codexRecordTokenId,
     pendingUpdate.nameHash,
-    pendingUpdate.descriptionHash || '',
+    pendingUpdate.descriptionHash || nullDescriptionHash,
     pendingUpdate.fileHashes,
     providerData,
   ]
