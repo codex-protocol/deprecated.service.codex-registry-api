@@ -38,6 +38,7 @@ export default {
 
     const newCodexRecordMetadata = new models.CodexRecordMetadata(newCodexRecordMetadataData)
 
+    // @TODO: ensure that mainImage & images array are of type "image"?
     return newCodexRecordMetadata.save()
       .then(() => {
         return newCodexRecordMetadata

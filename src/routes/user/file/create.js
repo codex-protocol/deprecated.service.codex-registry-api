@@ -16,6 +16,7 @@ export default {
   fileOptions: {
     as: 'files',
     multiple: true,
+    required: true,
   },
 
   handler(request, response) {
