@@ -9,9 +9,11 @@ const zeroAddress = ethUtil.zeroAddress()
 
 export default {
 
+  providerDataDelimeter: '::',
+
   // this links a CodexRecord record to a CodexRecordMetadata record based on
   //  the info emitted by the Minted event
-  confirmMint(tokenId, providerId, providerMetadataId, transactionHash) {
+  confirmMint(tokenId, providerData, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -19,6 +21,8 @@ export default {
         if (!codexRecord) {
           throw new Error(`Could not confirm CodexRecord with tokenId ${tokenId} because it does not exist.`)
         }
+
+        const [providerId, providerMetadataId] = this.decodeProviderData(providerData)
 
         codexRecord.providerMetadataId = providerMetadataId
         codexRecord.providerId = providerId
@@ -103,10 +107,11 @@ export default {
     newNameHash,
     newDescriptionHash,
     newFileHashes,
-    providerId,
-    providerMetadataId,
+    providerData,
     transactionHash,
   ) {
+
+    const [providerId, providerMetadataId] = this.decodeProviderData(providerData)
 
     const findCodexRecordConditions = {
       providerId,
@@ -395,6 +400,25 @@ export default {
   approveOperator(ownerAddress, operatorAddress, isApproved, transactionHash) {
     // @TODO: implement approveOperator functionality here?
     logger.debug('codexRecordService.approveOperator() called', { ownerAddress, operatorAddress, isApproved })
+  },
+
+  encodeProviderData(...args) {
+
+    // allow an array or a list of arguments to be passed in
+    const providerData = (Object.prototype.toString.call(args[0]) === '[object Array]') ? args[0] : args
+
+    const hexString = Buffer
+      .from(providerData.join(this.providerDataDelimeter))
+      .toString('hex')
+
+    return `0x${hexString}`
+  },
+
+  decodeProviderData(providerData) {
+    return Buffer
+      .from(providerData.substr(2), 'hex')
+      .toString()
+      .split(this.providerDataDelimeter)
   },
 
 }

@@ -6,6 +6,7 @@ import {
 
 import models from '../models'
 import mongooseService from '../services/mongoose'
+import codexRecordService from '../services/codex-record'
 
 const schemaOptions = {
   timestamps: true, // let mongoose handle the createdAt and updatedAt fields
@@ -105,13 +106,18 @@ schema.set('toJSON', {
 
 schema.methods.generateMintTransactionData = function generateMintTransactionData() {
 
+  // @TODO: sort out proper provider ID functionality
+  const providerData = codexRecordService.encodeProviderData([
+    '1', // providerId
+    this.id, // providerMetadataId
+  ])
+
   const mintArguments = [
     this.creatorAddress,
     this.nameHash,
     this.descriptionHash || '',
     this.fileHashes,
-    '1', // @TODO: sort out proper provider ID functionality
-    this.id,
+    providerData,
   ]
 
   return {
@@ -127,13 +133,18 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
     throw new Error('generateModifyMetadataHashesTransactionData could not be called because a pendingUpdate was not specified.')
   }
 
+  // @TODO: sort out proper provider ID functionality
+  const providerData = codexRecordService.encodeProviderData([
+    '1', // providerId
+    this.id, // providerMetadataId
+  ])
+
   const modifyMetadataHashesArguments = [
     this.codexRecordTokenId,
     pendingUpdate.nameHash,
     pendingUpdate.descriptionHash || '',
     pendingUpdate.fileHashes,
-    '1', // @TODO: sort out proper provider ID functionality
-    this.id,
+    providerData,
   ]
 
   return {
