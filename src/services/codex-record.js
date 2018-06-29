@@ -11,7 +11,7 @@ export default {
 
   // this links a CodexRecord record to a CodexRecordMetadata record based on
   //  the info emitted by the Minted event
-  confirmMint: (tokenId, providerId, providerMetadataId, transactionHash) => {
+  confirmMint(tokenId, providerId, providerMetadataId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -64,7 +64,7 @@ export default {
 
   },
 
-  create: (ownerAddress, tokenId, transactionHash) => {
+  create(ownerAddress, tokenId, transactionHash) {
 
     return contracts.CodexRecord.methods.getTokenById(tokenId).call()
       .then(({ nameHash, descriptionHash, fileHashes }) => {
@@ -97,7 +97,7 @@ export default {
 
   },
 
-  modify: (
+  modify(
     modifierAddress,
     tokenId,
     newNameHash,
@@ -106,7 +106,7 @@ export default {
     providerId,
     providerMetadataId,
     transactionHash,
-  ) => {
+  ) {
 
     const findCodexRecordConditions = {
       providerId,
@@ -255,7 +255,7 @@ export default {
 
   },
 
-  transfer: (oldOwnerAddress, newOwnerAddress, tokenId, transactionHash) => {
+  transfer(oldOwnerAddress, newOwnerAddress, tokenId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -309,7 +309,7 @@ export default {
 
   },
 
-  destroy: (ownerAddress, tokenId, transactionHash) => {
+  destroy(ownerAddress, tokenId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -349,7 +349,7 @@ export default {
 
   },
 
-  approveAddress: (ownerAddress, approvedAddress, tokenId, transactionHash) => {
+  approveAddress(ownerAddress, approvedAddress, tokenId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -392,7 +392,7 @@ export default {
 
   },
 
-  approveOperator: (ownerAddress, operatorAddress, isApproved, transactionHash) => {
+  approveOperator(ownerAddress, operatorAddress, isApproved, transactionHash) {
     // @TODO: implement approveOperator functionality here?
     logger.debug('codexRecordService.approveOperator() called', { ownerAddress, operatorAddress, isApproved })
   },
