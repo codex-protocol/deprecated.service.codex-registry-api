@@ -109,7 +109,7 @@ schema.set('toJSON', {
 schema.methods.generateMintTransactionData = function generateMintTransactionData() {
 
   // @TODO: sort out proper provider ID functionality
-  const providerData = codexRecordService.encodeProviderData([
+  const additionalData = codexRecordService.encodeAdditionalData([
     '1', // providerId
     this.id, // providerMetadataId
   ])
@@ -119,7 +119,7 @@ schema.methods.generateMintTransactionData = function generateMintTransactionDat
     this.nameHash,
     this.descriptionHash || nullDescriptionHash,
     this.fileHashes,
-    providerData,
+    additionalData,
   ]
 
   return {
@@ -136,7 +136,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
   }
 
   // @TODO: sort out proper provider ID functionality
-  const providerData = codexRecordService.encodeProviderData([
+  const additionalData = codexRecordService.encodeAdditionalData([
     '1', // providerId
     this.id, // providerMetadataId
   ])
@@ -146,7 +146,7 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
     pendingUpdate.nameHash,
     pendingUpdate.descriptionHash || nullDescriptionHash,
     pendingUpdate.fileHashes,
-    providerData,
+    additionalData,
   ]
 
   return {
