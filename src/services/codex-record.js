@@ -342,7 +342,7 @@ export default {
         // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
-          SocketService.emitToAddress(codexRecord.ownerAddress, 'record-destroyed', codexRecord)
+          SocketService.emitToAddress(ownerAddress, 'record-destroyed', codexRecord)
         }
         return codexRecord
       })
