@@ -1,12 +1,9 @@
 import Bluebird from 'bluebird'
-import ethUtil from 'ethereumjs-util'
 
 import config from '../config'
 import models from '../models'
 import logger from '../services/logger'
 import codexRecordService from '../services/codex-record'
-
-const zeroAddress = ethUtil.zeroAddress()
 
 export default {
 
@@ -103,12 +100,12 @@ export default {
 
                     // "transfer" events FROM address 0x0 are really "create"
                     //  events
-                    if (fromAddress === zeroAddress) {
+                    if (fromAddress === config.zeroAddress) {
                       promise = codexRecordService.create(toAddress.toLowerCase(), tokenId, transactionHash)
 
                     // "transfer" events TO address 0x0 are really "destroy"
                     //  events
-                    } else if (toAddress === zeroAddress) {
+                    } else if (toAddress === config.zeroAddress) {
                       promise = codexRecordService.destroy(fromAddress.toLowerCase(), tokenId, transactionHash)
 
                     // otherwise, this was a "real" transfer from one address to

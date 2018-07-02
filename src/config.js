@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import BigNumber from 'bignumber.js'
-import ethereumUtil from 'ethereumjs-util'
+import ethUtil from 'ethereumjs-util'
 
 // reads environment variables stored in the '.env' file and writes them to the
 //  process.env object
@@ -57,7 +57,7 @@ const fullConfig = {
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
-      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+      signerPublicAddress: ethUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
@@ -116,7 +116,7 @@ const fullConfig = {
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
-      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+      signerPublicAddress: ethUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
@@ -175,7 +175,7 @@ const fullConfig = {
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
-      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+      signerPublicAddress: ethUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
@@ -198,5 +198,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const envConfig = fullConfig[process.env.NODE_ENV]
 
 envConfig.useSentry = !!process.env.SENTRY_DSN
+envConfig.zeroAddress = ethUtil.zeroAddress()
 
 export default envConfig
