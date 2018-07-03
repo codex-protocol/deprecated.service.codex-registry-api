@@ -1,5 +1,6 @@
 import RestifyErrors from 'restify-errors'
 
+import config from '../../config'
 import models from '../../models'
 
 export default {
@@ -9,7 +10,14 @@ export default {
 
   handler(request, response) {
 
-    return models.CodexRecord.findById(request.params.tokenId)
+    const conditions = {
+      _id: request.params.tokenId,
+      ownerAddress: {
+        $ne: config.zeroAddress,
+      },
+    }
+
+    return models.CodexRecord.findOne(conditions)
       .then((codexRecord) => {
 
         if (!codexRecord) {

@@ -8,7 +8,7 @@ const schemaOptions = {
   usePushEach: true, // see https://github.com/Automattic/mongoose/issues/5574
 }
 
-// NOTE: all of the hashes below are NOT calculated by the API and are the
+// @NOTE: all of the hashes below are NOT calculated by the API and are the
 //  hashes as they exist in the smart contract
 const schema = new mongoose.Schema({
   // instead of using an auto-generated ObjectId, let's just use the tokenId
@@ -25,14 +25,14 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     lowercase: true,
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
   approvedAddress: {
     type: String,
     sparse: true,
     default: null,
     lowercase: true,
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
   nameHash: {
     type: String,
@@ -48,15 +48,19 @@ const schema = new mongoose.Schema({
     type: String,
   }],
   providerId: {
-    type: String, // TODO: use mongoose.Schema.Types.ObjectId?
+    type: String, // @TODO: use mongoose.Schema.Types.ObjectId?
     default: null,
-    // ref: 'Provider', // TODO: link this to a Provider model?
+    // ref: 'Provider', // @TODO: link this to a Provider model?
   },
   providerMetadataId: {
     type: String,
     default: null,
   },
   isPrivate: {
+    type: Boolean,
+    default: true,
+  },
+  isHistoricalProvenancePrivate: {
     type: Boolean,
     default: true,
   },
@@ -70,13 +74,13 @@ const schema = new mongoose.Schema({
   // this is a list of addresses explicitly allowed to view this Record even if
   //  it's private
   //
-  // NOTE: this will not include the ownerAddress and approvedAddress addresses
+  // @NOTE: this will not include the ownerAddress and approvedAddress addresses
   //  since those are implied as whitelisted
   whitelistedAddresses: [{
     type: String,
     lowercase: true,
     permissions: ['owner'],
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   }],
   metadata: {
     default: null,
@@ -107,8 +111,9 @@ schema.set('toJSON', {
       //  instance (and it's nested CodexRecord* children), as specified by the
       //  "permissions" arrays set in the schema of each model
       //
-      // NOTE: at the moment these permissions are kind of "mutually exclusive",
-      //  in that only one will really be applicable for any given user
+      // @NOTE: at the moment these permissions are kind of "mutually
+      //  exclusive", in that only one will really be applicable for any given
+      //  user
       const permissionsToApply = []
 
       const approvedAddresses = [
@@ -117,11 +122,12 @@ schema.set('toJSON', {
         ...document.whitelistedAddresses,
       ]
 
-      // NOTE: userAddress could be null, and document.approvedAddress could be
+      // @NOTE: userAddress could be null, and document.approvedAddress could be
       //  null, so we must explicity check if userAddress is null first to avoid
       //  false positives
-      if (document.isPrivate && (!userAddress || !approvedAddresses.includes(userAddress))) {
-        permissionsToApply.push('approved')
+      if (!userAddress || !approvedAddresses.includes(userAddress)) {
+        if (document.isPrivate) permissionsToApply.push('approved')
+        if (document.isHistoricalProvenancePrivate) permissionsToApply.push('approved-unless-historical-provenance-is-public')
       }
 
       if (userAddress !== document.ownerAddress) {

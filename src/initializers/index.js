@@ -14,7 +14,7 @@ export default (app, socketApp) => {
   //  lines cleaner & chainable since addPreRouteMiddleware and
   //  addPostRouteMiddleware are not really asynchronous
   //
-  // NOTE: just make sure each initializer resolve it's promise(s) with `app`
+  // @NOTE: just make sure each initializer resolve it's promise(s) with `app`
   return Bluebird.resolve(app)
     .then(connectToMongoDb)
     .then(addPreRouteMiddleware)

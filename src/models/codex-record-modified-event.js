@@ -8,19 +8,19 @@ const sortByFileHash = (a, b) => {
 
 const nullDescriptionHash = `0x${new Array(64).fill(0).join('')}`
 
-// NOTE: all of the hashes below are NOT calculated by the API and are the
+// @NOTE: all of the hashes below are NOT calculated by the API and are the
 //  hashes as they exist in the smart contract
 const schema = new mongoose.Schema({
   modifierAddress: {
     type: String,
     required: true,
     lowercase: true,
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
   providerId: {
-    type: String, // TODO: use mongoose.Schema.Types.ObjectId?
+    type: String, // @TODO: use mongoose.Schema.Types.ObjectId?
     required: true,
-    // ref: 'Provider', // TODO: link this to a Provider model?
+    // ref: 'Provider', // @TODO: link this to a Provider model?
   },
   providerMetadataId: {
     type: String,
@@ -118,7 +118,7 @@ schema.virtual('changedData').get(function getChangedData() {
   // if this instance was created as a result of processing a Modified event for
   //  a third-party hosted Record, none of the non-hash value will exist
   //
-  // TODO: sort out proper provider ID functionality
+  // @TODO: sort out proper provider ID functionality
   if (this.providerId !== '1') {
     return null
   }

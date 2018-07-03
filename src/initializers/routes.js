@@ -7,6 +7,7 @@ import Bluebird from 'bluebird'
 import filewalker from 'filewalker'
 
 import logger from '../services/logger'
+import validateFilesMiddleware from '../middleware/validate-files'
 import authenticateUserMiddleware from '../middleware/authenticate-user'
 import validateParametersMiddleware from '../middleware/validate-parameters'
 import restrictToEnvironmentsMiddleware from '../middleware/restrict-to-environments'
@@ -17,8 +18,8 @@ const upload = multer({
       callback(null, '/tmp')
     },
     filename(request, file, callback) {
-      const extension = file.originalname.split('.').pop().toLowerCase()
-      callback(null, `${Date.now()}.${uuid.v4()}.${extension}`)
+      file.extension = file.originalname.split('.').pop().toLowerCase()
+      callback(null, `${Date.now()}.${uuid.v4()}.${file.extension}`)
     },
   }),
 })
@@ -71,6 +72,8 @@ export default (app) => {
       //   {
       //     as: 'image', // specifies the field name for the file(s) to be read from (default is "file(s)")
       //     multiple: true, // should this route accept an array of files or only one?
+      //     required: true, // should this route reject requests if the file is missing?
+      //     validationOptions: {}, // validate file size, mime type, etc (see services/s3.js for details)
       //   }
       if (route.fileOptions) {
 
@@ -79,6 +82,8 @@ export default (app) => {
         } else {
           middleware.push(upload.single(route.fileOptions.as || 'file'))
         }
+
+        middleware.push(validateFilesMiddleware(route.fileOptions))
 
       } else {
         // not specifying a file name for upload.array() allows routes to accept
@@ -121,7 +126,7 @@ export default (app) => {
       //  and add response.locals.user if the specified token corresponds to a
       //  valid user record
       //
-      // NOTE: we always call the authenticate middleware even if the route is
+      // @NOTE: we always call the authenticate middleware even if the route is
       //  public, so that routes can know if the user is "logged in" or not
       //
       // routes are responsible for returning appropriate data based on whether

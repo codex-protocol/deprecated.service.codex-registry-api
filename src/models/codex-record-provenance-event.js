@@ -27,13 +27,13 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     lowercase: true,
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
   newOwnerAddress: {
     type: String,
     required: true,
     lowercase: true,
-    // TODO: add validators to make sure only proper addresses can be specified
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
 
   // data specific to "modified" events

@@ -7,6 +7,7 @@ import { web3 } from '@codex-protocol/ethereum-service'
 
 import { s3 } from './aws'
 import logger from './logger'
+import mimeTypes from '../data/mime-types'
 
 const readFile = Bluebird.promisify(fs.readFile)
 const s3PutObject = Bluebird.promisify(s3.putObject, { context: s3 })
@@ -25,27 +26,8 @@ export default {
 
     return Bluebird.map(files, (file) => {
 
-      const getFileBufferPromise = Bluebird.resolve(file.buffer || readFile(file.path))
-
-      return getFileBufferPromise
-        .catch((error) => {
-          logger.warn('could not read tmp file', file.path, error)
-          throw new RestifyErrors.InternalServerError(
-            'Could not read file.'
-          )
-        })
-        .then((fileBuffer) => {
-
-          file.buffer = fileBuffer
-
-          // try to calculate the real mime type based on the "magic number" of
-          //  the binary data instead of relying on the extension (what multer
-          //  does)
-          const bufferFileType = getFileType(file.buffer)
-
-          if (bufferFileType) {
-            file.mimetype = bufferFileType.mime || file.mimetype
-          }
+      return this.validateFile(file, options.validationOptions)
+        .then(() => {
 
           const s3Key = `${s3Path}/${file.filename}`
 
@@ -54,25 +36,24 @@ export default {
             Bucket: s3Bucket,
             Body: file.buffer,
             ContentType: file.mimetype,
-            ACL: 'public-read', // TODO: change this to only allow api IAM user?
+            ACL: 'public-read', // @TODO: change this to only allow api IAM user?
           }
 
           return s3PutObject(s3Params)
             .then(() => {
 
-              let fileType = null
+              file.dimensions = { width: null, height: null }
 
               // if this is an image, get it's size
-              if (/^image\//.test(file.mimetype)) {
-                fileType = 'image'
-                file.dimensions = file.dimensions || probeImageSize.sync(file.buffer) || { width: null, height: null }
+              if (file.type === 'image') {
+                file.dimensions = probeImageSize.sync(file.buffer)
               }
 
               return {
                 s3Key,
                 s3Bucket,
-                fileType,
                 size: file.size,
+                fileType: file.type,
                 name: file.originalname,
                 mimeType: file.mimetype,
                 width: file.dimensions.width,
@@ -106,6 +87,75 @@ export default {
         Objects,
       },
     })
+  },
+
+  // options.maxSize:
+  //  the maximum size to allow for files (in bytes)
+  //
+  //  note that there is also an app-wide limit set in
+  //  src/initializers/pre-route-middleware.js, as well as a server-wide limit
+  //  set in the nginx config
+  //
+  // options.mimeTypeWhitelist
+  //  an array of mime types to allow, e.g ['text/plain', 'application/pdf', ...]
+  //
+  // options.fileTypeWhitelist
+  //  an array of file types to allow, e.g ['image', 'video', 'audio', 'document']
+  validateFile(file, options = {}) {
+
+    const getFileBufferPromise = Bluebird.resolve(file.buffer || readFile(file.path))
+
+    return getFileBufferPromise
+      .catch((error) => {
+        logger.warn('could not read tmp file', file.path, error)
+        throw new RestifyErrors.InternalServerError(
+          'Could not read file.'
+        )
+      })
+      .then((fileBuffer) => {
+
+        file.buffer = fileBuffer
+
+        // try to calculate the real mime type based on the "magic number" of
+        //  the binary data instead of relying on the extension (what multer
+        //  does)
+        const bufferFileType = getFileType(file.buffer)
+
+        if (bufferFileType) {
+          file.mimetype = bufferFileType.mime || file.mimetype
+        }
+
+        if (options.maxSize && file.size > options.maxSize) {
+          throw new RestifyErrors.InvalidArgumentError(
+            `File must be less than ${options.maxSize / (1024 ** 2)}mb in size.`
+          )
+        }
+
+        const mimeType = mimeTypes.find((type) => {
+          return type.name === file.mimetype
+        })
+
+        if (
+          !mimeType ||
+          (options.mimeTypeWhitelist && !options.mimeTypeWhitelist.includes(mimeType.name)) ||
+          (options.fileTypeWhitelist && !options.fileTypeWhitelist.includes(mimeType.fileType))
+        ) {
+          throw new RestifyErrors.InvalidArgumentError(
+            'This type of file is not allowed.'
+          )
+        }
+
+        if (!mimeType.extensionRegex.test(file.extension)) {
+          throw new RestifyErrors.InvalidArgumentError(
+            'Extension does not match mime type.'
+          )
+        }
+
+        file.type = mimeType.fileType
+
+        return file
+
+      })
   },
 
 }
