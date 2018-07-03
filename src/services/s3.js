@@ -42,19 +42,18 @@ export default {
           return s3PutObject(s3Params)
             .then(() => {
 
-              let fileType = null
+              file.dimensions = { width: null, height: null }
 
               // if this is an image, get it's size
-              if (/^image\//.test(file.mimetype)) {
-                fileType = 'image'
-                file.dimensions = file.dimensions || probeImageSize.sync(file.buffer) || { width: null, height: null }
+              if (file.type === 'image') {
+                file.dimensions = probeImageSize.sync(file.buffer)
               }
 
               return {
                 s3Key,
                 s3Bucket,
-                fileType,
                 size: file.size,
+                fileType: file.type,
                 name: file.originalname,
                 mimeType: file.mimetype,
                 width: file.dimensions.width,
@@ -151,6 +150,8 @@ export default {
             'Extension does not match mime type.'
           )
         }
+
+        file.type = mimeType.fileType
 
         return file
 
