@@ -1,8 +1,8 @@
 import dotenv from 'dotenv'
 import BigNumber from 'bignumber.js'
-import ethereumUtil from 'ethereumjs-util'
+import ethUtil from 'ethereumjs-util'
 
-// Reads environment variables stored in the '.env' file and writes them to the
+// reads environment variables stored in the '.env' file and writes them to the
 //  process.env object
 const dotenvResult = dotenv.config({ path: `${__dirname}/../.env` })
 
@@ -33,10 +33,10 @@ const fullConfig = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -57,16 +57,14 @@ const fullConfig = {
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
-      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+      signerPublicAddress: ethUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
-      region: 'us-east-1',
+      region: process.env.AWS_REGION,
       s3: {
-        uriPrefix: 'https://s3.amazonaws.com',
-        buckets: {
-          codexRegistry: 'codex.registry',
-        },
+        bucket: process.env.AWS_S3_BUCKET,
+        uriPrefix: process.env.AWS_S3_URI_PREFIX,
       },
     },
 
@@ -94,10 +92,10 @@ const fullConfig = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -118,16 +116,14 @@ const fullConfig = {
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
-      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+      signerPublicAddress: ethUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
-      region: 'us-east-1',
+      region: process.env.AWS_REGION,
       s3: {
-        uriPrefix: 'https://s3.amazonaws.com',
-        buckets: {
-          codexRegistry: 'codex.registry',
-        },
+        bucket: process.env.AWS_S3_BUCKET,
+        uriPrefix: process.env.AWS_S3_URI_PREFIX,
       },
     },
 
@@ -155,10 +151,10 @@ const fullConfig = {
     mongodb: {
       dbUris: {
         // DB URI for Ethereum Event Listener service
-        eel: encodeURI(process.env.EEL_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        eel: encodeURI(process.env.EEL_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
 
         // DB URI for this project
-        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // NOTE: encodeURI is necessary for passwords with URI reserved characters
+        codexRegistry: encodeURI(process.env.CODEX_REGISTRY_MONGODB_URI), // @NOTE: encodeURI is necessary for passwords with URI reserved characters
       },
     },
 
@@ -172,23 +168,21 @@ const fullConfig = {
       gasPrice: 5000000000, // 5 gwei
 
       minConfirmations: 5,
-      startingBlockHeight: 2449841, // TODO: update this when production is pointing to mainnet (non-beta)
+      startingBlockHeight: 2449841, // @TODO: update this when production is pointing to mainnet (non-beta)
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for
       //  use in various methods that require the private key as a hex buffer
       signerPrivateKey: process.env.SIGNER_PRIVATE_KEY,
       signerPrivateKeyBuffer: Buffer.from(process.env.SIGNER_PRIVATE_KEY.substr(2), 'hex'),
-      signerPublicAddress: ethereumUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
+      signerPublicAddress: ethUtil.privateToAddress(process.env.SIGNER_PRIVATE_KEY).toString('hex'),
     },
 
     aws: {
-      region: 'us-west-2',
+      region: process.env.AWS_REGION,
       s3: {
-        uriPrefix: 'https://s3-us-west-2.amazonaws.com',
-        buckets: {
-          codexRegistry: 'codex.registry-production',
-        },
+        bucket: process.env.AWS_S3_BUCKET,
+        uriPrefix: process.env.AWS_S3_URI_PREFIX,
       },
     },
 
@@ -204,5 +198,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const envConfig = fullConfig[process.env.NODE_ENV]
 
 envConfig.useSentry = !!process.env.SENTRY_DSN
+envConfig.zeroAddress = ethUtil.zeroAddress()
 
 export default envConfig

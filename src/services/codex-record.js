@@ -1,17 +1,15 @@
-import ethUtil from 'ethereumjs-util'
 import { contracts } from '@codex-protocol/ethereum-service'
 
 import logger from './logger'
+import config from '../config'
 import models from '../models'
 import SocketService from './socket'
-
-const zeroAddress = ethUtil.zeroAddress()
 
 export default {
 
   // this links a CodexRecord record to a CodexRecordMetadata record based on
   //  the info emitted by the Minted event
-  confirmMint: (tokenId, providerId, providerMetadataId, transactionHash) => {
+  confirmMint(tokenId, providerId, providerMetadataId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -23,7 +21,7 @@ export default {
         codexRecord.providerMetadataId = providerMetadataId
         codexRecord.providerId = providerId
 
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId !== '1') {
           return codexRecord
         }
@@ -37,7 +35,7 @@ export default {
 
             codexRecordMetadata.codexRecordTokenId = codexRecord.tokenId
 
-            // TODO: maybe verify hases here? e.g.:
+            // @TODO: maybe verify hases here? e.g.:
             // codexRecordMetadata.nameHash === codexRecord.nameHash
             // codexRecordMetadata.descriptionHash === codexRecord.descriptionHash
 
@@ -54,7 +52,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'mint-confirmed', codexRecord)
@@ -64,14 +62,14 @@ export default {
 
   },
 
-  create: (ownerAddress, tokenId, transactionHash) => {
+  create(ownerAddress, tokenId, transactionHash) {
 
     return contracts.CodexRecord.methods.getTokenById(tokenId).call()
       .then(({ nameHash, descriptionHash, fileHashes }) => {
 
         const newCodexRecordProvenanceEventData = {
+          oldOwnerAddress: config.zeroAddress,
           newOwnerAddress: ownerAddress,
-          oldOwnerAddress: zeroAddress,
           codexRecordTokenId: tokenId,
           transactionHash,
           type: 'created',
@@ -97,7 +95,7 @@ export default {
 
   },
 
-  modify: (
+  modify(
     modifierAddress,
     tokenId,
     newNameHash,
@@ -106,7 +104,7 @@ export default {
     providerId,
     providerMetadataId,
     transactionHash,
-  ) => {
+  ) {
 
     const findCodexRecordConditions = {
       providerId,
@@ -173,7 +171,7 @@ export default {
 
       .then((codexRecord) => {
 
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId !== '1') {
           return codexRecord
         }
@@ -192,7 +190,7 @@ export default {
             return false
           }
 
-          // NOTE: pendingUpdate.fileHashes is already sorted as part of the
+          // @NOTE: pendingUpdate.fileHashes is already sorted as part of the
           //  virtual getter
           newFileHashes.sort()
 
@@ -207,7 +205,7 @@ export default {
 
         const [pendingUpdateToCommit] = codexRecord.metadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
 
-        // TODO: maybe verify hases here? e.g.:
+        // @TODO: maybe verify hases here? e.g.:
         // pendingUpdateToCommit.nameHash === nameHash
         // pendingUpdateToCommit.descriptionHash === descriptionHash
 
@@ -245,7 +243,7 @@ export default {
           })
       })
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'record-modified', codexRecord)
@@ -255,7 +253,7 @@ export default {
 
   },
 
-  transfer: (oldOwnerAddress, newOwnerAddress, tokenId, transactionHash) => {
+  transfer(oldOwnerAddress, newOwnerAddress, tokenId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -289,7 +287,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           // @NOTE: normally we'd want to use
           //  codexRecord.setLocals({ userAddress: oldOwnerAddress }) when
@@ -309,7 +307,7 @@ export default {
 
   },
 
-  destroy: (ownerAddress, tokenId, transactionHash) => {
+  destroy(ownerAddress, tokenId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -319,8 +317,8 @@ export default {
         }
 
         const newCodexRecordProvenanceEventData = {
+          newOwnerAddress: config.zeroAddress,
           oldOwnerAddress: ownerAddress,
-          newOwnerAddress: zeroAddress,
           codexRecordTokenId: tokenId,
           type: 'destroyed',
           transactionHash,
@@ -330,7 +328,7 @@ export default {
           .then((newCodexRecordProvenanceEvent) => {
 
             codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
-            codexRecord.ownerAddress = zeroAddress
+            codexRecord.ownerAddress = config.zeroAddress
 
             return codexRecord.save()
 
@@ -339,17 +337,17 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
-          SocketService.emitToAddress(codexRecord.ownerAddress, 'record-destroyed', codexRecord)
+          SocketService.emitToAddress(ownerAddress, 'record-destroyed', codexRecord)
         }
         return codexRecord
       })
 
   },
 
-  approveAddress: (ownerAddress, approvedAddress, tokenId, transactionHash) => {
+  approveAddress(ownerAddress, approvedAddress, tokenId, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -358,7 +356,7 @@ export default {
           throw new Error(`Could not update approved address for CodexRecord with tokenId ${tokenId} because it does not exist.`)
         }
 
-        codexRecord.approvedAddress = approvedAddress === zeroAddress ? null : approvedAddress
+        codexRecord.approvedAddress = approvedAddress === config.zeroAddress ? null : approvedAddress
         codexRecord.isIgnored = false
 
         return codexRecord.save()
@@ -366,7 +364,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // TODO: sort out proper provider ID functionality
+        // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
 
           const ownerResponse = codexRecord.setLocals({ userAddress: codexRecord.ownerAddress }).toJSON()
@@ -392,8 +390,8 @@ export default {
 
   },
 
-  approveOperator: (ownerAddress, operatorAddress, isApproved, transactionHash) => {
-    // TODO: implement approveOperator functionality here?
+  approveOperator(ownerAddress, operatorAddress, isApproved, transactionHash) {
+    // @TODO: implement approveOperator functionality here?
     logger.debug('codexRecordService.approveOperator() called', { ownerAddress, operatorAddress, isApproved })
   },
 

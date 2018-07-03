@@ -23,7 +23,7 @@ export default {
 
   // default expiry is 1 day
   //
-  // NOTE: The expiry is reset when the key is accessed.
+  // @NOTE: The expiry is reset when the key is accessed
   //  see: http://redis.io/commands/expire
   setAndExpire(key, value, seconds = 86400) {
     return client.setexAsync(key, seconds, JSON.stringify(value))
@@ -33,7 +33,7 @@ export default {
     return client.delAsync(key)
   },
 
-  // NOTE: The expiry is reset when the key is accessed.
+  // @NOTE: The expiry is reset when the key is accessed
   //  see: http://redis.io/commands/expire
   expire(key, seconds) {
     return client.expireAsync(key, seconds)

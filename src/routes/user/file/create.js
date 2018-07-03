@@ -16,12 +16,13 @@ export default {
   fileOptions: {
     as: 'files',
     multiple: true,
+    required: true,
   },
 
   handler(request, response) {
 
     let s3Path = 'files'
-    const s3Bucket = config.aws.s3.buckets.codexRegistry
+    const s3Bucket = config.aws.s3.bucket
 
     // production has it's own dedicated bucket, so there's no need to prefix
     //  the path with the environment

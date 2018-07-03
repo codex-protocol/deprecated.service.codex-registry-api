@@ -38,10 +38,11 @@ export default {
 
     const newCodexRecordMetadata = new models.CodexRecordMetadata(newCodexRecordMetadataData)
 
+    // @TODO: ensure that mainImage & images array are of type "image"?
     return newCodexRecordMetadata.save()
       .then(() => {
         return newCodexRecordMetadata
-          .populate('mainImage images files') // TODO: move this to a post-save hook (but check that they haven't been populated already)
+          .populate('mainImage images files') // @TODO: move this to a post-save hook (but check that they haven't been populated already)
           .execPopulate()
       })
 
