@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 
-import config from '../config'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -9,35 +8,35 @@ const schemaOptions = {
 }
 
 const schema = new mongoose.Schema({
-  // instead of using an auto-generated ObjectId, let's just use the user's
-  //  wallet address since it's already a unique identifier
-  _id: {
+  ownerAddress: {
+    index: true,
     type: String,
     required: true,
     lowercase: true,
-    alias: 'address',
+    // @TODO: add validators to make sure only proper addresses can be specified
   },
-  email: {
+  shareCode: {
+    index: true,
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
     type: String,
     default: null,
   },
-  isGalleryEnabled: {
-    type: Boolean,
-    default: false,
-  },
-  faucetLastRequestedAt: {
-    type: Date,
+  slideDuration: {
+    type: Number,
     default: null,
   },
-  giveawaysParticipatedIn: [{
-    ref: 'Giveaway',
+  codexRecords: [{
+    ref: 'CodexRecord',
     type: mongoose.Schema.Types.ObjectId,
   }],
 }, schemaOptions)
-
-schema.virtual('canRequestFaucetTokens').get(function getCanRequestFaucetTokens() {
-  return config.faucet.enabled && (this.faucetLastRequestedAt === null || Date.now() - this.faucetLastRequestedAt.getTime() >= config.faucet.cooldown)
-})
 
 schema.set('toJSON', {
   virtuals: true,
@@ -47,10 +46,6 @@ schema.set('toJSON', {
     // remove some mongo-specific keys that aren't necessary to send in
     //  responses
     delete transformedDocument._id
-    delete transformedDocument.id
-
-    // this is more of an internal tracking array so no need to expose this
-    delete transformedDocument.giveawaysParticipatedIn
 
     return transformedDocument
 
@@ -64,9 +59,7 @@ schema.set('toObject', {
 // make all queries for addresses case insensitive
 function makeQueryAddressesCaseInsensitive(next) {
   const query = this.getQuery()
-  if (typeof query.id === 'string') query.id = query.id.toLowerCase()
-  if (typeof query._id === 'string') query._id = query._id.toLowerCase()
-  if (typeof query.address === 'string') query.address = query.address.toLowerCase()
+  if (typeof query.ownerAddress === 'string') query.ownerAddress = query.ownerAddress.toLowerCase()
   next()
 }
 
@@ -77,4 +70,14 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-export default mongooseService.codexRegistry.model('User', schema)
+// always get codexRecords
+function populate(next) {
+  this.populate('codexRecords')
+  next()
+}
+
+schema.pre('find', populate)
+schema.pre('findOne', populate)
+schema.pre('findOneAndUpdate', populate)
+
+export default mongooseService.codexRegistry.model('Gallery', schema)

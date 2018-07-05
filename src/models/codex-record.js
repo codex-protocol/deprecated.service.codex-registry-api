@@ -60,6 +60,10 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isInGallery: {
+    type: Boolean,
+    default: false,
+  },
   isHistoricalProvenancePrivate: {
     type: Boolean,
     default: true,
