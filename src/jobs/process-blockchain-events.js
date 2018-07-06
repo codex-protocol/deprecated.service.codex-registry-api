@@ -127,10 +127,8 @@ export default {
                     break
 
                   case 'ApprovalForAll':
-                    promise = codexRecordService.approveOperator(...returnValues)
-                    break
-
                   case 'OwnershipTransferred':
+                    // no need to handle these events on the API side
                     break
 
                   default:

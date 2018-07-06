@@ -8,6 +8,7 @@ export default {
 
   requireAuthentication: true,
 
+  // @TODO: add admin authentication and allow this in all environments
   restrictToEnvironments: [
     'development',
   ],
