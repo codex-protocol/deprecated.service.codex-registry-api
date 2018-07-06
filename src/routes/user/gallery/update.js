@@ -45,6 +45,7 @@ export default {
           throw new RestifyErrors.NotFoundError(`Gallery with id ${request.params.galleryId} does not exist.`)
         }
 
+        // @TODO: allow updating of shareCode, enforce uniqueness
         // @TODO: ensure all records are public and owned by the user
 
         Object.assign(gallery, request.parameters)
