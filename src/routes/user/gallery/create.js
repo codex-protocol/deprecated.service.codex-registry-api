@@ -1,5 +1,4 @@
 import Joi from 'joi'
-import shortid from 'shortid'
 
 import models from '../../../models'
 
@@ -30,7 +29,6 @@ export default {
 
     const newGalleryData = Object.assign({
       ownerAddress: response.locals.userAddress,
-      shareCode: shortid.generate(),
     }, request.parameters)
 
     // @TODO: ensure all records are public and owned by the user

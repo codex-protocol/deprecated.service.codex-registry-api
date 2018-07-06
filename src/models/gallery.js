@@ -1,3 +1,4 @@
+import shortid from 'shortid'
 import mongoose from 'mongoose'
 
 import mongooseService from '../services/mongoose'
@@ -19,6 +20,7 @@ const schema = new mongoose.Schema({
     index: true,
     type: String,
     required: true,
+    default: shortid.generate,
   },
   name: {
     type: String,
