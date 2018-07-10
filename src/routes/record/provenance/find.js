@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import RestifyErrors from 'restify-errors'
 
+import config from '../../../config'
 import models from '../../../models'
 
 export default {
@@ -19,11 +20,18 @@ export default {
 
   handler(request, response) {
 
+    const conditions = {
+      _id: request.params.tokenId,
+      ownerAddress: {
+        $ne: config.zeroAddress,
+      },
+    }
+
     // @NOTE: we must retrieve the entire CodexRecord record (and not just the
     //  provenance even though that's all we need here) because the toJSON()
     //  method needs other values to determine if this user should be allowed to
     //  view the provenance
-    return models.CodexRecord.findById(request.params.tokenId)
+    return models.CodexRecord.findOne(conditions)
       .populate({
         path: 'provenance',
         options: {

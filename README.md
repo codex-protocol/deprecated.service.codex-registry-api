@@ -124,7 +124,7 @@ Now you will need to install & set up some dependencies.
     You can download Ganache directly from [the Truffle Framework website](http://truffleframework.com/ganache).
 
 
-1. Create an[AWS Account](https://aws.amazon.com/)
+1. Create an [AWS Account](https://aws.amazon.com/)
 
     This API currently uses S3 to store files for Codex Record metadata, so you will need an AWS account that has access to write to an S3 bucket. You can sign up for a free AWS account [on the AWS website](https://aws.amazon.com/).
 

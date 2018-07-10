@@ -1,11 +1,8 @@
-import ethUtil from 'ethereumjs-util'
 import { contracts } from '@codex-protocol/ethereum-service'
 
-import logger from './logger'
+import config from '../config'
 import models from '../models'
 import SocketService from './socket'
-
-const zeroAddress = ethUtil.zeroAddress()
 
 export default {
 
@@ -77,8 +74,8 @@ export default {
       .then(({ nameHash, descriptionHash, fileHashes }) => {
 
         const newCodexRecordProvenanceEventData = {
+          oldOwnerAddress: config.zeroAddress,
           newOwnerAddress: ownerAddress,
-          oldOwnerAddress: zeroAddress,
           codexRecordTokenId: tokenId,
           transactionHash,
           type: 'created',
@@ -327,8 +324,8 @@ export default {
         }
 
         const newCodexRecordProvenanceEventData = {
+          newOwnerAddress: config.zeroAddress,
           oldOwnerAddress: ownerAddress,
-          newOwnerAddress: zeroAddress,
           codexRecordTokenId: tokenId,
           type: 'destroyed',
           transactionHash,
@@ -338,7 +335,7 @@ export default {
           .then((newCodexRecordProvenanceEvent) => {
 
             codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
-            codexRecord.ownerAddress = zeroAddress
+            codexRecord.ownerAddress = config.zeroAddress
 
             return codexRecord.save()
 
@@ -350,7 +347,7 @@ export default {
         // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
-          SocketService.emitToAddress(codexRecord.ownerAddress, 'record-destroyed', codexRecord)
+          SocketService.emitToAddress(ownerAddress, 'record-destroyed', codexRecord)
         }
         return codexRecord
       })
@@ -366,7 +363,7 @@ export default {
           throw new Error(`Could not update approved address for CodexRecord with tokenId ${tokenId} because it does not exist.`)
         }
 
-        codexRecord.approvedAddress = approvedAddress === zeroAddress ? null : approvedAddress
+        codexRecord.approvedAddress = approvedAddress === config.zeroAddress ? null : approvedAddress
         codexRecord.isIgnored = false
 
         return codexRecord.save()
@@ -398,11 +395,6 @@ export default {
         return codexRecord
       })
 
-  },
-
-  approveOperator(ownerAddress, operatorAddress, isApproved, transactionHash) {
-    // @TODO: implement approveOperator functionality here?
-    logger.debug('codexRecordService.approveOperator() called', { ownerAddress, operatorAddress, isApproved })
   },
 
   // this simply returns all arguments passed concatenated in a string delimited

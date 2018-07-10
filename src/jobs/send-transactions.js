@@ -60,7 +60,7 @@ export default {
             //  transactions are processed one at a time, in order
             return Bluebird.mapSeries(transactions, (transaction) => {
 
-              logger.verbose(`submitting a transaction with nonce ${job.data.currentNonce}`)
+              logger.verbose(`submitting transaction ${transaction.id} with nonce ${job.data.currentNonce}`)
 
               // let's save the current nonce with the transaction, which may be
               //  usefull if we ever want to retry a failed transaction, or
@@ -113,7 +113,7 @@ export default {
                   })
                   .on('error', (error) => {
 
-                    logger.error(`[${this.name}]`, 'sendTransaction failed:', error)
+                    logger.error(`[${this.name}]`, `sendTransaction failed for ${transaction.id}:`, error)
 
                     transaction.tx.error = error.toString()
                     transaction.status = 'error'
