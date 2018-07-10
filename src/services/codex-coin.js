@@ -1,7 +1,3 @@
-// import { contracts } from '@codex-protocol/ethereum-service'
-//
-// import config from '../config'
-// import models from '../models'
 import SocketService from './socket'
 
 export default {
