@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 
-// import config from '../config'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {

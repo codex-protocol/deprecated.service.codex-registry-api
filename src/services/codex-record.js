@@ -54,7 +54,7 @@ export default {
         // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
-          SocketService.emitToAddress(codexRecord.ownerAddress, 'mint-confirmed', codexRecord)
+          SocketService.emitToAddress(codexRecord.ownerAddress, 'codex-record:minted', codexRecord)
         }
         return codexRecord
       })
@@ -245,7 +245,7 @@ export default {
         // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
-          SocketService.emitToAddress(codexRecord.ownerAddress, 'record-modified', codexRecord)
+          SocketService.emitToAddress(codexRecord.ownerAddress, 'codex-record:modified', codexRecord)
         }
         return codexRecord
       })
@@ -298,8 +298,8 @@ export default {
           //  since this really won't give away any new info to the old owner,
           //  (because he literally just had access to all that info)
           const responseJSON = codexRecord.setLocals({ userAddress: newOwnerAddress }).toJSON()
-          SocketService.emitToAddress(newOwnerAddress, 'record-transferred:new-owner', responseJSON)
-          SocketService.emitToAddress(oldOwnerAddress, 'record-transferred:old-owner', responseJSON)
+          SocketService.emitToAddress(newOwnerAddress, 'codex-record:transferred:new-owner', responseJSON)
+          SocketService.emitToAddress(oldOwnerAddress, 'codex-record:transferred:old-owner', responseJSON)
         }
         return codexRecord
       })
@@ -339,7 +339,7 @@ export default {
         // @TODO: sort out proper provider ID functionality
         if (codexRecord.providerId === '1') {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
-          SocketService.emitToAddress(ownerAddress, 'record-destroyed', codexRecord)
+          SocketService.emitToAddress(ownerAddress, 'codex-record:destroyed', codexRecord)
         }
         return codexRecord
       })
@@ -378,10 +378,10 @@ export default {
             // (if we just emit this either way, then a successfull transfer
             //  will also emit this socket event)
             //
-            // SocketService.emitToAddress(codexRecord.ownerAddress, 'address-approved:cancel', ownerResponse)
+            // SocketService.emitToAddress(codexRecord.ownerAddress, 'codex-record:address-approved:cancel', ownerResponse)
           } else {
-            SocketService.emitToAddress(codexRecord.ownerAddress, 'address-approved:owner', ownerResponse)
-            SocketService.emitToAddress(codexRecord.approvedAddress, 'address-approved:approved', approvedResponse)
+            SocketService.emitToAddress(codexRecord.ownerAddress, 'codex-record:address-approved:owner', ownerResponse)
+            SocketService.emitToAddress(codexRecord.approvedAddress, 'codex-record:address-approved:approved', approvedResponse)
           }
         }
         return codexRecord
