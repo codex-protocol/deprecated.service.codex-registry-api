@@ -39,7 +39,7 @@ export default {
           .then(() => {
 
             const whitelistedAddressResponse = codexRecord.setLocals({ userAddress: request.parameters.address }).toJSON()
-            SocketService.emitToAddress(request.parameters.address, 'address-whitelisted', whitelistedAddressResponse)
+            SocketService.emitToAddress(request.parameters.address, 'codex-record:address-whitelisted', whitelistedAddressResponse)
 
             // we need to set the userAddress back to the owner's address after
             //  setting it in the loop above, otherwise whitelistedAddresses

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 
-// import config from '../config'
 import mongooseService from '../services/mongoose'
 
 const schemaOptions = {
@@ -25,5 +24,9 @@ const schema = new mongoose.Schema({
   },
   tx: mongoose.Schema.Types.Mixed,
 }, schemaOptions)
+
+schema.set('toObject', {
+  virtuals: true,
+})
 
 export default mongooseService.codexRegistry.model('Transaction', schema)

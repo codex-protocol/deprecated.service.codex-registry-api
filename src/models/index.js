@@ -7,6 +7,7 @@ import CodexRecordFile from './codex-record-file'
 import Transaction from './transaction'
 import CodexRecord from './codex-record'
 import Giveaway from './giveaway'
+import Gallery from './gallery'
 import User from './user'
 import Job from './job'
 
@@ -20,6 +21,7 @@ export default {
   Transaction,
   CodexRecord,
   Giveaway,
+  Gallery,
   User,
   Job,
 }

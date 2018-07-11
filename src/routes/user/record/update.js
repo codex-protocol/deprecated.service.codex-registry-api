@@ -12,58 +12,77 @@ export default {
   requireAuthentication: true,
 
   parameters: Joi.object().keys({
-    isPrivate: Joi.boolean(),
     isHistoricalProvenancePrivate: Joi.boolean(),
     whitelistedAddresses: Joi.array().items(
       Joi.string().regex(/^0x[0-9a-f]{40}$/i, 'ethereum address').lowercase(),
     ).unique(),
-  }).or(
-    'isPrivate',
-    'whitelistedAddresses',
-    'isHistoricalProvenancePrivate',
-  ),
+
+    // isPrivate and isInGallery are mutually inclusive since a record must be
+    //  public if it's in a gallery
+    isPrivate: Joi.boolean(),
+    isInGallery: Joi.boolean().when('isPrivate', { is: true, then: Joi.valid(false) }),
+  })
+    .and(
+      'isPrivate',
+      'isInGallery',
+    )
+    .or(
+      'isPrivate',
+      'whitelistedAddresses',
+      'isHistoricalProvenancePrivate',
+    ),
 
   handler(request, response) {
 
-    const conditions = {
-      _id: request.params.tokenId,
-      ownerAddress: response.locals.userAddress,
-    }
+    return models.User.findById(response.locals.userAddress)
+      .then((user) => {
 
-    return models.CodexRecord.findOne(conditions)
-      .then((codexRecord) => {
-
-        if (!codexRecord) {
-          throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
+        const conditions = {
+          _id: request.params.tokenId,
+          ownerAddress: user.address,
         }
 
-        let newWhitelistedAddresses = []
+        return models.CodexRecord.findOne(conditions)
+          .then((codexRecord) => {
 
-        if (request.parameters.whitelistedAddresses) {
-          newWhitelistedAddresses = request.parameters.whitelistedAddresses.filter((address) => {
-            return address !== response.locals.userAddress && !codexRecord.whitelistedAddresses.includes(address)
+            if (!codexRecord) {
+              throw new RestifyErrors.NotFoundError(`CodexRecord with tokenId ${request.params.tokenId} does not exist.`)
+            }
+
+            let newWhitelistedAddresses = []
+
+            if (request.parameters.whitelistedAddresses) {
+              newWhitelistedAddresses = request.parameters.whitelistedAddresses.filter((address) => {
+                return address !== user.address && !codexRecord.whitelistedAddresses.includes(address)
+              })
+            }
+
+            Object.assign(codexRecord, request.parameters)
+
+            // make sure someone who isn't allowed to have a gallery doesn't
+            //  try to toggle isInGallery on
+            if (!user.isGalleryEnabled) {
+              codexRecord.isInGallery = false
+            }
+
+            return codexRecord.save()
+              .then(() => {
+
+                newWhitelistedAddresses.forEach((address) => {
+                  const whitelistedAddressResponse = codexRecord.setLocals({ userAddress: address }).toJSON()
+                  SocketService.emitToAddress(address, 'codex-record:address-whitelisted', whitelistedAddressResponse)
+                })
+
+                // we need to set the userAddress back to the owner's address
+                //  after setting it in the loop above, otherwise non-owner
+                //  fields will be stripped
+                codexRecord.setLocals(response.locals)
+
+                return codexRecord
+
+              })
+
           })
-        }
-
-        Object.assign(codexRecord, request.parameters)
-
-        return codexRecord.save()
-          .then(() => {
-
-            newWhitelistedAddresses.forEach((address) => {
-              const whitelistedAddressResponse = codexRecord.setLocals({ userAddress: address }).toJSON()
-              SocketService.emitToAddress(address, 'address-whitelisted', whitelistedAddressResponse)
-            })
-
-            // we need to set the userAddress back to the owner's address after
-            //  setting it in the loop above, otherwise non-owner fields will be
-            //  stripped
-            codexRecord.setLocals(response.locals)
-
-            return codexRecord
-
-          })
-
       })
 
   },
