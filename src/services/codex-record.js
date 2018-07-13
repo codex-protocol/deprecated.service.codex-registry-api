@@ -29,7 +29,7 @@ export default {
           .then((codexRecordMetadata) => {
 
             if (!codexRecordMetadata) {
-              throw new Error(`Could not confirm CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+              throw new Error(`Could not confirm CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exist.`)
             }
 
             codexRecordMetadata.codexRecordTokenId = codexRecord.tokenId
@@ -176,7 +176,7 @@ export default {
         }
 
         if (!codexRecord.metadata) {
-          throw new Error(`Could not modify CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+          throw new Error(`Could not modify CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exist.`)
         }
 
         const pendingUpdateToCommitIndex = codexRecord.metadata.pendingUpdates.findIndex((pendingUpdate) => {
