@@ -53,9 +53,15 @@ export default {
 
   },
 
-  emitToAddress(userAddress, eventName, eventData) {
+  emitToAddress(userAddress, eventName, rawEventData) {
 
     const redisKey = `${this.redisKeyPrefix}:${userAddress.toLowerCase()}`
+
+    // @NOTE: most socket events emit mongoose instances as their data, and the
+    //  .toJSON() seems to fire 3 times for each .emit() below (due to internal
+    //  socket.io stuff?) so we pre-.toJSON() it here to elimiate unnecessary
+    //  serializations
+    const eventData = (typeof rawEventData.toJSON === 'function') ? rawEventData.toJSON() : rawEventData
 
     redis.get(redisKey)
       .then((userSocketIds = []) => {
