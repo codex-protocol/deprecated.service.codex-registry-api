@@ -6,9 +6,14 @@ import SocketService from './socket'
 
 export default {
 
+  // this is the delimiter used to separate providerId, providerMetadataId, etc
+  //  in additionalData strings sent to CodexRecord.mint() and
+  //  CodexRecord.modifyMetadataHashes() contract calls
+  additionalDataDelimiter: '::',
+
   // this links a CodexRecord record to a CodexRecordMetadata record based on
   //  the info emitted by the Minted event
-  confirmMint(tokenId, providerId, providerMetadataId, transactionHash) {
+  confirmMint(tokenId, additionalData, transactionHash) {
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -16,6 +21,8 @@ export default {
         if (!codexRecord) {
           throw new Error(`Could not confirm CodexRecord with tokenId ${tokenId} because it does not exist.`)
         }
+
+        const [providerId, providerMetadataId] = this.decodeAdditionalData(additionalData)
 
         codexRecord.providerMetadataId = providerMetadataId
         codexRecord.providerId = providerId
@@ -100,10 +107,11 @@ export default {
     newNameHash,
     newDescriptionHash,
     newFileHashes,
-    providerId,
-    providerMetadataId,
+    additionalData,
     transactionHash,
   ) {
+
+    const [providerId, providerMetadataId] = this.decodeAdditionalData(additionalData)
 
     const findCodexRecordConditions = {
       providerId,
@@ -387,6 +395,35 @@ export default {
         return codexRecord
       })
 
+  },
+
+  // this simply returns all arguments passed concatenated in a string delimited
+  //  by the additionalDataDelimeter defined above - it also hex-encodes the
+  //  string
+  //
+  // this string should be passed to CodexRecord.mint() and
+  //  CodexRecord.modifyMetadataHashes() contract calls as the additionalData
+  //  parameter
+  encodeAdditionalData(...args) {
+
+    // allow an array or a list of arguments to be passed in
+    const additionalData = (Object.prototype.toString.call(args[0]) === '[object Array]') ? args[0] : args
+
+    const hexString = Buffer
+      .from(additionalData.join(this.additionalDataDelimiter))
+      .toString('hex')
+
+    return `0x${hexString}`
+  },
+
+  // this decodes additionalData strings when a Minted or Modified event is
+  //  processed to determine which CodexRecordMetadata or
+  //  CodexRecordMetadataPendingUpdate record to apply
+  decodeAdditionalData(additionalData) {
+    return Buffer
+      .from(additionalData.substr(2), 'hex')
+      .toString()
+      .split(this.additionalDataDelimiter)
   },
 
 }
