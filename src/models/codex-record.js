@@ -105,7 +105,7 @@ schema.set('toJSON', {
   versionKey: false,
   transform(document, transformedDocument) {
 
-    if (!document.locals) logger.warn(`CodexRecord::toJSON() is being called with no locals (instance id: ${document.id})`)
+    if (!document.locals) logger.warn(`CodexRecord::toJSON() is being called with no locals (tokenId: ${document.tokenId})`)
 
     const { userAddress } = (document.locals || {})
 
