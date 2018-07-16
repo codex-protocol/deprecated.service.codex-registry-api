@@ -424,6 +424,11 @@ export default {
   //  processed to determine which CodexRecordMetadata or
   //  CodexRecordMetadataPendingUpdate record to apply
   decodeAdditionalData(additionalData) {
+
+    if (typeof additionalData !== 'string') {
+      return []
+    }
+
     return Buffer
       .from(additionalData.substr(2), 'hex')
       .toString()
