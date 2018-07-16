@@ -1,10 +1,10 @@
-import config from '../../config'
-import models from '../../models'
+import config from '../../../config'
+import models from '../../../models'
 
 export default {
 
   method: 'post',
-  path: '/giveaways?',
+  path: '/admin/giveaways?',
 
   requireAuthentication: true,
 
