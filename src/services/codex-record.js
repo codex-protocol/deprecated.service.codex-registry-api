@@ -280,12 +280,16 @@ export default {
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
           .then((newCodexRecordProvenanceEvent) => {
 
-            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
-            codexRecord.ownerAddress = newOwnerAddress
-            codexRecord.whitelistedAddresses = []
             codexRecord.approvedAddress = null
-            codexRecord.isIgnored = false
+            codexRecord.whitelistedAddresses = []
+            codexRecord.ownerAddress = newOwnerAddress
+
             codexRecord.isPrivate = true
+            codexRecord.isIgnored = false
+            codexRecord.isInGallery = false
+            codexRecord.isHistoricalProvenancePrivate = true
+
+            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
 
             return codexRecord.save()
 
