@@ -45,7 +45,7 @@ export default {
               return codexRecord
             }
 
-            // assocaite the Record with this provider
+            // associate the Record with this provider
             codexRecord.provider = provider
 
             // if we don't host the metadata for this provider, we can stop here
@@ -67,7 +67,7 @@ export default {
 
                 codexRecordMetadata.codexRecordTokenId = codexRecord.tokenId
 
-                // @TODO: maybe verify hases here? e.g.:
+                // @TODO: maybe verify hashes here? e.g.:
                 // codexRecordMetadata.nameHash === codexRecord.nameHash
                 // codexRecordMetadata.descriptionHash === codexRecord.descriptionHash
 
@@ -242,7 +242,7 @@ export default {
 
         const [pendingUpdateToCommit] = codexRecord.metadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
 
-        // @TODO: maybe verify hases here? e.g.:
+        // @TODO: maybe verify hashes here? e.g.:
         // pendingUpdateToCommit.nameHash === nameHash
         // pendingUpdateToCommit.descriptionHash === descriptionHash
 

@@ -122,7 +122,7 @@ schema.virtual('changedData').get(function getChangedData() {
   // if this instance was created as a result of processing a Modified event for
   //  a third-party hosted Record, none of the non-hash values will exist
   //
-  // @NOTE: this can't just use the blockchain-provided hases since we wouldn't
+  // @NOTE: this can't just use the blockchain-provided hashes since we wouldn't
   //  be discern between images, files, and mainImage file hashes
   if (!this.provider || this.provider.id !== process.env.METADATA_PROVIDER_ID) {
     return null
