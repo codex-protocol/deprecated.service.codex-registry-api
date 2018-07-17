@@ -108,9 +108,8 @@ schema.set('toJSON', {
 
 schema.methods.generateMintTransactionData = function generateMintTransactionData() {
 
-  // @TODO: sort out proper provider ID functionality
   const additionalData = codexRecordService.encodeAdditionalData([
-    '1', // providerId
+    process.env.METADATA_PROVIDER_ID, // providerId
     this.id, // providerMetadataId
   ])
 
@@ -135,9 +134,8 @@ schema.methods.generateModifyMetadataHashesTransactionData = function generateMo
     throw new Error('generateModifyMetadataHashesTransactionData could not be called because a pendingUpdate was not specified.')
   }
 
-  // @TODO: sort out proper provider ID functionality
   const additionalData = codexRecordService.encodeAdditionalData([
-    '1', // providerId
+    process.env.METADATA_PROVIDER_ID, // providerId
     this.id, // providerMetadataId
   ])
 

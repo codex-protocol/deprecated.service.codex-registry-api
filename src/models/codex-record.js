@@ -48,9 +48,8 @@ const schema = new mongoose.Schema({
     type: String,
   }],
   providerId: {
-    type: String, // @TODO: use mongoose.Schema.Types.ObjectId?
+    type: String,
     default: null,
-    // ref: 'Provider', // @TODO: link this to a Provider model?
   },
   providerMetadataId: {
     type: String,
@@ -86,6 +85,11 @@ const schema = new mongoose.Schema({
     permissions: ['owner'],
     // @TODO: add validators to make sure only proper addresses can be specified
   }],
+  provider: {
+    default: null,
+    ref: 'Provider',
+    type: mongoose.Schema.Types.ObjectId,
+  },
   metadata: {
     default: null,
     permissions: ['approved'],
@@ -188,9 +192,10 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-// always get provenance & metadata
+// always get provenance & metadata, etc
 function populate(next) {
   this.populate('metadata')
+  this.populate('provider')
   this.populate({
     path: 'provenance',
     options: {

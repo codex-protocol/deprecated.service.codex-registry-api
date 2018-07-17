@@ -9,7 +9,7 @@ export default {
 
   requireAuthentication: true,
 
-  // @TODO: add admin authentication and allow this in all environments
+  // @TODO: allow this in all environments when user galleries are implemented
   restrictToEnvironments: [
     'development',
   ],
