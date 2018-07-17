@@ -7,6 +7,11 @@ export default {
 
   requireAuthentication: true,
 
+  // @TODO: allow this in all environments when user galleries are implemented
+  restrictToEnvironments: [
+    'development',
+  ],
+
   handler(request, response) {
 
     const conditions = {
