@@ -108,6 +108,10 @@ export default {
                     transaction.markModified('tx')
                     transaction.save()
 
+                    // increase the nonce after we know this transaction was
+                    //  submitted to the blockchain successfully
+                    job.data.currentNonce += 1
+
                     resolve()
 
                   })
@@ -121,28 +125,25 @@ export default {
                     transaction.markModified('tx')
                     transaction.save()
 
-                    // @NOTE: don't reject when there's an error, since we don't
-                    //  want to prevent any subsequent transactions in this job
-                    //  from running - just marking the transaction as failed is
-                    //  good enough for now
-                    resolve()
-
+                    // sometimes an error event is emitted when the nonce should
+                    //  NOT increase (for example, bad TX params?), so we can't
+                    //  reliably increment the nonce here - instead let's just
+                    //  get the current TX count and set the nonce to that
+                    return eth.getTransactionCount(config.blockchain.signerPublicAddress)
+                      .then((currentNonce) => {
+                        job.data.currentNonce = currentNonce
+                        // @NOTE: don't reject when there's an error, since we
+                        //  don't want to prevent any subsequent transactions in
+                        //  this batch from running - just marking the
+                        //  transaction as failed is good enough for now
+                        resolve()
+                      })
                   })
 
               })
-                // increase the nonce after we know this transaction was
-                //  submitted to the blockchain
-                //
-                // @NOTE: we use finally here in case the logic above ever
-                //  rejects or throws an error because technically that was a
-                //  transaction attempt
                 .finally(() => {
-
-                  job.data.currentNonce += 1
                   job.markModified('data')
-
                   return job.save()
-
                 })
 
             })
