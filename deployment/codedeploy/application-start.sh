@@ -5,11 +5,7 @@ source /home/ec2-user/.bash_profile
 
 # set the NODE_ENV environment variable based on the CodeDeploy deployment group
 #  name
-#
-# NOTE: this is probably redundant since the source line above will load the
-#  NODE_ENV exported in /etc/environment, but it's just a safegaurd to make sure
-#  the app runs in the correct environment
-if [[ $DEPLOYMENT_GROUP_NAME == "production" ]]
+if [[ $DEPLOYMENT_GROUP_NAME == "production" ]] || [[ $DEPLOYMENT_GROUP_NAME == "mainnet" ]]
 then
     NODE_ENV=production
 elif [[ $DEPLOYMENT_GROUP_NAME == "staging" ]]
