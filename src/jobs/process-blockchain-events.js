@@ -112,7 +112,7 @@ export default {
                   })
 
               })
-              .then(() => {
+              .finally(() => {
                 return job.save()
               })
 

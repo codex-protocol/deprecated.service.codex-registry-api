@@ -138,7 +138,7 @@ const fullConfig = {
     personalMessageToSign,
 
     faucet: {
-      enabled: true,
+      enabled: false,
       cooldown: 24 * 60 * 60 * 1000, // 24 hours
       amount: new BigNumber(10).pow(18).times(100), // 100 CODX
     },
@@ -165,10 +165,10 @@ const fullConfig = {
 
     blockchain: {
       gasLimit: 300000,
-      gasPrice: 5000000000, // 5 gwei
+      gasPrice: 21000000000, // 21 gwei
 
-      minConfirmations: 5,
-      startingBlockHeight: 2449841, // @TODO: update this when production is pointing to mainnet (non-beta)
+      minConfirmations: 8,
+      startingBlockHeight: 5992644,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for

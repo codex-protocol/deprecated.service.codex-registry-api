@@ -1,14 +1,22 @@
 import { contracts } from '@codex-protocol/ethereum-service'
 
+import logger from './logger'
 import config from '../config'
 import models from '../models'
 import SocketService from './socket'
 
 export default {
 
+  // this is the delimiter used to separate providerId, providerMetadataId, etc
+  //  in additionalData strings sent to CodexRecord.mint() and
+  //  CodexRecord.modifyMetadataHashes() contract calls
+  additionalDataDelimiter: '::',
+
   // this links a CodexRecord record to a CodexRecordMetadata record based on
   //  the info emitted by the Minted event
-  confirmMint(tokenId, providerId, providerMetadataId, transactionHash) {
+  confirmMint(tokenId, additionalData, transactionHash) {
+
+    const [providerId = null, providerMetadataId = null] = this.decodeAdditionalData(additionalData)
 
     return models.CodexRecord.findById(tokenId)
       .then((codexRecord) => {
@@ -17,32 +25,59 @@ export default {
           throw new Error(`Could not confirm CodexRecord with tokenId ${tokenId} because it does not exist.`)
         }
 
-        codexRecord.providerMetadataId = providerMetadataId
-        codexRecord.providerId = providerId
-
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId !== '1') {
-          return codexRecord
+        if (codexRecord.providerId !== null) {
+          throw new Error(`Could not confirm CodexRecord with tokenId ${tokenId} because it is already associated with providerId ${codexRecord.providerId}.`)
         }
 
-        return models.CodexRecordMetadata.findById(providerMetadataId)
-          .then((codexRecordMetadata) => {
+        if (codexRecord.providerMetadataId !== null) {
+          throw new Error(`Could not confirm CodexRecord with tokenId ${tokenId} because it is already associated with providerMetadataId ${codexRecord.providerMetadataId}.`)
+        }
 
-            if (!codexRecordMetadata) {
-              throw new Error(`Could not confirm CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+        codexRecord.providerId = providerId
+        codexRecord.providerMetadataId = providerMetadataId
+
+        return models.Provider.findById(providerId)
+          .then((provider) => {
+
+            // if no provider was found, we can stop here
+            if (!provider) {
+              logger.warn(`Found unknown providerId "${providerId}" for CodexRecord with tokenId ${tokenId}`)
+              return codexRecord
             }
 
-            codexRecordMetadata.codexRecordTokenId = codexRecord.tokenId
+            // associate the Record with this provider
+            codexRecord.provider = provider
 
-            // @TODO: maybe verify hases here? e.g.:
-            // codexRecordMetadata.nameHash === codexRecord.nameHash
-            // codexRecordMetadata.descriptionHash === codexRecord.descriptionHash
+            // if we don't host the metadata for this provider, we can stop here
+            if (provider.id !== process.env.METADATA_PROVIDER_ID) {
+              return codexRecord
+            }
 
-            return codexRecordMetadata.save()
-              .then(() => {
-                codexRecord.metadata = codexRecordMetadata
-                return codexRecord
+            // otherwise find the metadata and associate with this Record
+            return models.CodexRecordMetadata.findById(providerMetadataId)
+              .then((codexRecordMetadata) => {
+
+                if (!codexRecordMetadata) {
+                  throw new Error(`Could not confirm CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exist.`)
+                }
+
+                if (codexRecordMetadata.codexRecordTokenId !== null) {
+                  throw new Error(`Could not confirm CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} is already associated with tokenId ${codexRecordMetadata.codexRecordTokenId}.`)
+                }
+
+                codexRecordMetadata.codexRecordTokenId = codexRecord.tokenId
+
+                // @TODO: maybe verify hashes here? e.g.:
+                // codexRecordMetadata.nameHash === codexRecord.nameHash
+                // codexRecordMetadata.descriptionHash === codexRecord.descriptionHash
+
+                return codexRecordMetadata.save()
+                  .then(() => {
+                    codexRecord.metadata = codexRecordMetadata
+                    return codexRecord
+                  })
               })
+
           })
       })
 
@@ -51,8 +86,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId === '1') {
+        if (codexRecord.provider && codexRecord.provider.id === process.env.METADATA_PROVIDER_ID) {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'codex-record:minted', codexRecord)
         }
@@ -100,15 +134,16 @@ export default {
     newNameHash,
     newDescriptionHash,
     newFileHashes,
-    providerId,
-    providerMetadataId,
+    additionalData,
     transactionHash,
   ) {
 
+    const [providerId = null, providerMetadataId = null] = this.decodeAdditionalData(additionalData)
+
     const findCodexRecordConditions = {
-      providerId,
-      _id: tokenId,
       providerMetadataId,
+      _id: tokenId,
+      providerId,
     }
 
     const newCodexRecordModifiedEvent = new models.CodexRecordModifiedEvent({
@@ -131,6 +166,10 @@ export default {
 
         if (!codexRecord) {
           throw new Error(`Could not modify CodexRecord with tokenId ${tokenId} because it does not exist.`)
+        }
+
+        if (codexRecord.provider) {
+          newCodexRecordModifiedEvent.provider = codexRecord.provider
         }
 
         newCodexRecordModifiedEvent.oldNameHash = codexRecord.nameHash
@@ -170,13 +209,12 @@ export default {
 
       .then((codexRecord) => {
 
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId !== '1') {
+        if (!codexRecord.provider || codexRecord.provider.id !== process.env.METADATA_PROVIDER_ID) {
           return codexRecord
         }
 
         if (!codexRecord.metadata) {
-          throw new Error(`Could not modify CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exit.`)
+          throw new Error(`Could not modify CodexRecord with tokenId ${codexRecord.tokenId} because metadata with id ${providerMetadataId} does not exist.`)
         }
 
         const pendingUpdateToCommitIndex = codexRecord.metadata.pendingUpdates.findIndex((pendingUpdate) => {
@@ -204,7 +242,7 @@ export default {
 
         const [pendingUpdateToCommit] = codexRecord.metadata.pendingUpdates.splice(pendingUpdateToCommitIndex, 1)
 
-        // @TODO: maybe verify hases here? e.g.:
+        // @TODO: maybe verify hashes here? e.g.:
         // pendingUpdateToCommit.nameHash === nameHash
         // pendingUpdateToCommit.descriptionHash === descriptionHash
 
@@ -242,8 +280,7 @@ export default {
           })
       })
       .then((codexRecord) => {
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId === '1') {
+        if (codexRecord.provider && codexRecord.provider.id === process.env.METADATA_PROVIDER_ID) {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(codexRecord.ownerAddress, 'codex-record:modified', codexRecord)
         }
@@ -272,12 +309,16 @@ export default {
         return new models.CodexRecordProvenanceEvent(newCodexRecordProvenanceEventData).save()
           .then((newCodexRecordProvenanceEvent) => {
 
-            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
-            codexRecord.ownerAddress = newOwnerAddress
-            codexRecord.whitelistedAddresses = []
             codexRecord.approvedAddress = null
-            codexRecord.isIgnored = false
+            codexRecord.whitelistedAddresses = []
+            codexRecord.ownerAddress = newOwnerAddress
+
             codexRecord.isPrivate = true
+            codexRecord.isIgnored = false
+            codexRecord.isInGallery = false
+            codexRecord.isHistoricalProvenancePrivate = true
+
+            codexRecord.provenance.unshift(newCodexRecordProvenanceEvent)
 
             return codexRecord.save()
 
@@ -286,8 +327,8 @@ export default {
       })
 
       .then((codexRecord) => {
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId === '1') {
+
+        if (codexRecord.provider && codexRecord.provider.id === process.env.METADATA_PROVIDER_ID) {
           // @NOTE: normally we'd want to use
           //  codexRecord.setLocals({ userAddress: oldOwnerAddress }) when
           //  constructing the JSON for the old owner... but if we do that then
@@ -301,7 +342,9 @@ export default {
           SocketService.emitToAddress(newOwnerAddress, 'codex-record:transferred:new-owner', responseJSON)
           SocketService.emitToAddress(oldOwnerAddress, 'codex-record:transferred:old-owner', responseJSON)
         }
+
         return codexRecord
+
       })
 
   },
@@ -336,8 +379,7 @@ export default {
       })
 
       .then((codexRecord) => {
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId === '1') {
+        if (codexRecord.provider && codexRecord.provider.id === process.env.METADATA_PROVIDER_ID) {
           codexRecord.setLocals({ userAddress: codexRecord.ownerAddress })
           SocketService.emitToAddress(ownerAddress, 'codex-record:destroyed', codexRecord)
         }
@@ -363,9 +405,8 @@ export default {
       })
 
       .then((codexRecord) => {
-        // @TODO: sort out proper provider ID functionality
-        if (codexRecord.providerId === '1') {
 
+        if (codexRecord.provider && codexRecord.provider.id === process.env.METADATA_PROVIDER_ID) {
           const ownerResponse = codexRecord.setLocals({ userAddress: codexRecord.ownerAddress }).toJSON()
           const approvedResponse = codexRecord.setLocals({ userAddress: codexRecord.approvedAddress }).toJSON()
 
@@ -384,9 +425,46 @@ export default {
             SocketService.emitToAddress(codexRecord.approvedAddress, 'codex-record:address-approved:approved', approvedResponse)
           }
         }
+
         return codexRecord
+
       })
 
+  },
+
+  // this simply returns all arguments passed concatenated in a string delimited
+  //  by the additionalDataDelimeter defined above - it also hex-encodes the
+  //  string
+  //
+  // this string should be passed to CodexRecord.mint() and
+  //  CodexRecord.modifyMetadataHashes() contract calls as the additionalData
+  //  parameter
+  encodeAdditionalData(...args) {
+
+    // allow an array or a list of arguments to be passed in
+    const additionalData = (Object.prototype.toString.call(args[0]) === '[object Array]') ? args[0] : args
+
+    const hexString = Buffer
+      .from(additionalData.join(this.additionalDataDelimiter))
+      .toString('hex')
+
+    return `0x${hexString}`
+
+  },
+
+  // this decodes additionalData strings when a Minted or Modified event is
+  //  processed to determine which CodexRecordMetadata or
+  //  CodexRecordMetadataPendingUpdate record to apply
+  decodeAdditionalData(additionalData) {
+
+    if (typeof additionalData !== 'string') {
+      return []
+    }
+
+    return Buffer
+      .from(additionalData.substr(2), 'hex')
+      .toString()
+      .split(this.additionalDataDelimiter)
   },
 
 }

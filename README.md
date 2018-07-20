@@ -130,10 +130,6 @@ Now you will need to install & set up some dependencies.
 
     After you've set up your account, you will need to save your credentials to `~/.aws/credentials`. See [these instructions](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html) for further details.
 
-    ```javascript
-    // @TODO: make S3 bucket configurable in .env
-    ```
-
 1. Link the [ethereum-service Repository](https://github.com/codex-protocol/npm.ethereum-service)
 
     Make sure you've cloned the [ethereum-service repository](https://github.com/codex-protocol/npm.ethereum-service) and have `npm link`ed it so that the API will be able to use your locally-deployed smart contracts (see [Clone & Set Up Required Repositories](#clone--set-up-required-repositories) above).

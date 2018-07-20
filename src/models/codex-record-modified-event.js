@@ -17,10 +17,14 @@ const schema = new mongoose.Schema({
     lowercase: true,
     // @TODO: add validators to make sure only proper addresses can be specified
   },
+  provider: {
+    default: null,
+    ref: 'Provider',
+    type: mongoose.Schema.Types.ObjectId,
+  },
   providerId: {
-    type: String, // @TODO: use mongoose.Schema.Types.ObjectId?
+    type: 'String',
     required: true,
-    // ref: 'Provider', // @TODO: link this to a Provider model?
   },
   providerMetadataId: {
     type: String,
@@ -116,10 +120,11 @@ const schema = new mongoose.Schema({
 schema.virtual('changedData').get(function getChangedData() {
 
   // if this instance was created as a result of processing a Modified event for
-  //  a third-party hosted Record, none of the non-hash value will exist
+  //  a third-party hosted Record, none of the non-hash values will exist
   //
-  // @TODO: sort out proper provider ID functionality
-  if (this.providerId !== '1') {
+  // @NOTE: this can't just use the blockchain-provided hashes since we wouldn't
+  //  be discern between images, files, and mainImage file hashes
+  if (!this.provider || this.provider.id !== process.env.METADATA_PROVIDER_ID) {
     return null
   }
 
@@ -181,9 +186,9 @@ schema.pre('findOne', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndRemove', makeQueryAddressesCaseInsensitive)
 schema.pre('findOneAndUpdate', makeQueryAddressesCaseInsensitive)
 
-// always get images, files, and pendingUpdates
+// always get images, files, pendingUpdates, etc
 function populate(next) {
-  this.populate('newMainImage newImages newFiles oldMainImage oldImages oldFiles')
+  this.populate('provider newMainImage newImages newFiles oldMainImage oldImages oldFiles')
   next()
 }
 
