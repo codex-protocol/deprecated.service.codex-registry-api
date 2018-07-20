@@ -1,8 +1,19 @@
 #!/bin/sh
 
 # this makes sure nvm (and thus global npm packages) are in the path
-# .bash_profile also loads the correct NODE_ENV exported in /etc/environment
 source /home/ec2-user/.bash_profile
+
+# set the NODE_ENV environment variable based on the CodeDeploy deployment group
+#  name
+if [[ $DEPLOYMENT_GROUP_NAME == "production" ]] || [[ $DEPLOYMENT_GROUP_NAME == "mainnet" ]]
+then
+    NODE_ENV=production
+elif [[ $DEPLOYMENT_GROUP_NAME == "staging" ]]
+then
+    NODE_ENV=staging
+else
+    NODE_ENV=development
+fi
 
 # copy secrets from aws secrets manager to the .env file
 $(/opt/process/deployment/secrets-to-env.sh)
