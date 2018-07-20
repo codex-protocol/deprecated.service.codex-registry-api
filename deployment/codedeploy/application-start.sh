@@ -7,12 +7,12 @@ source /home/ec2-user/.bash_profile
 #  name
 if [[ $DEPLOYMENT_GROUP_NAME == "production" ]] || [[ $DEPLOYMENT_GROUP_NAME == "mainnet" ]]
 then
-    NODE_ENV=production
+  NODE_ENV=production
 elif [[ $DEPLOYMENT_GROUP_NAME == "staging" ]]
 then
-    NODE_ENV=staging
+  NODE_ENV=staging
 else
-    NODE_ENV=development
+  NODE_ENV=development
 fi
 
 # copy secrets from aws secrets manager to the .env file

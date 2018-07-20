@@ -168,7 +168,7 @@ const fullConfig = {
       gasPrice: 21000000000, // 21 gwei
 
       minConfirmations: 8,
-      startingBlockHeight: 5999311,
+      startingBlockHeight: 5999924,
       averageBlockTime: 15, // in seconds, this dictates how frequently to run agenda jobs
 
       // remove 0x from beginning of signerPrivateKey and store in a Buffer for
