@@ -11,7 +11,6 @@ import initialize from './initializers'
 
 const app = express()
 const httpApp = http.Server(app)
-
 const socketApp = io(httpApp, { serveClient: false })
 
 if (config.redis.host && config.redis.port) {
