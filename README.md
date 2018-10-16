@@ -1,4 +1,4 @@
-# Codex Protocol | Codex Registry API _(service.codex-registry-api)_
+### 10/16/18: This repository has been deprecated in favor of a different back-end repository which will be made open-source at a later date.
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
