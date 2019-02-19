@@ -1,4 +1,4 @@
-### 10/16/18: This repository has been deprecated in favor of a different back-end repository which will be made open-source at a later date.
+### 10/16/18: This repository has been deprecated in favor of a different back-end repository which will likely not be made open-source. This repository has been archived for reference, but should not be considered up to date or useable by any means.
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
